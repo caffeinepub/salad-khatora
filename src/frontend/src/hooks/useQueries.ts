@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Customer, Recipe, Subscription, SaladBowlType, Time, SaladBowl } from '../backend';
+import type { Customer, Recipe, Subscription, SaladBowlType, Time, SaladBowl, Ingredient } from '../backend';
+import { toast } from 'sonner';
 
 // Analytics Metrics
 export function useAnalyticsMetrics() {
@@ -296,6 +297,81 @@ export function useDeleteSubscription() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subscriptions'] });
+    },
+  });
+}
+
+// Ingredient Management
+export function useAllIngredients() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Ingredient[]>({
+    queryKey: ['ingredients'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllIngredients();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useAddIngredient() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async (ingredient: Ingredient) => {
+      if (!actor) throw new Error('Actor not initialized');
+      await actor.addIngredient(ingredient);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      toast.success('Ingredient added successfully');
+    },
+    onError: () => {
+      toast.error('Failed to add ingredient');
+    },
+  });
+}
+
+export function useUpdateIngredient() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async ({ name, updatedIngredient }: { name: string; updatedIngredient: Ingredient }) => {
+      if (!actor) throw new Error('Actor not initialized');
+      const result = await actor.updateIngredient(name, updatedIngredient);
+      if (!result) throw new Error('Failed to update ingredient');
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      toast.success('Ingredient updated successfully');
+    },
+    onError: () => {
+      toast.error('Failed to update ingredient');
+    },
+  });
+}
+
+export function useDeleteIngredient() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async (name: string) => {
+      if (!actor) throw new Error('Actor not initialized');
+      const result = await actor.deleteIngredient(name);
+      if (!result) throw new Error('Failed to delete ingredient');
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      toast.success('Ingredient deleted successfully');
+    },
+    onError: () => {
+      toast.error('Failed to delete ingredient');
     },
   });
 }

@@ -5,8 +5,8 @@ import List "mo:core/List";
 import Map "mo:core/Map";
 import Nat "mo:core/Nat";
 import Order "mo:core/Order";
-import Iter "mo:core/Iter";
 import Int "mo:core/Int";
+import Iter "mo:core/Iter";
 
 actor {
   type Ingredient = {
@@ -330,5 +330,44 @@ actor {
 
   public query ({ caller }) func getAllProductsWithInactive() : async [SaladBowl] {
     products.values().toArray();
+  };
+
+  // Inventory Management
+
+  // Add a new ingredient
+  public shared ({ caller }) func addIngredient(ingredient : Ingredient) : async () {
+    ingredientInventory.add(ingredient.name, ingredient);
+  };
+
+  // Update an existing ingredient
+  public shared ({ caller }) func updateIngredient(name : Text, updatedIngredient : Ingredient) : async Bool {
+    switch (ingredientInventory.get(name)) {
+      case (null) { false };
+      case (?_) {
+        ingredientInventory.add(name, updatedIngredient);
+        true;
+      };
+    };
+  };
+
+  // Delete an ingredient
+  public shared ({ caller }) func deleteIngredient(name : Text) : async Bool {
+    switch (ingredientInventory.get(name)) {
+      case (null) { false };
+      case (?_) {
+        ingredientInventory.remove(name);
+        true;
+      };
+    };
+  };
+
+  // Get a specific ingredient
+  public query ({ caller }) func getIngredient(name : Text) : async ?Ingredient {
+    ingredientInventory.get(name);
+  };
+
+  // Get all ingredients
+  public query ({ caller }) func getAllIngredients() : async [Ingredient] {
+    ingredientInventory.values().toArray();
   };
 };

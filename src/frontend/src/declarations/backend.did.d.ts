@@ -16,6 +16,13 @@ export interface Customer {
   'preferences' : string,
   'contactDetails' : string,
 }
+export interface Ingredient {
+  'lowStockThreshold' : bigint,
+  'supplierName' : string,
+  'name' : string,
+  'quantity' : bigint,
+  'costPricePerUnit' : bigint,
+}
 export interface Invoice {
   'customerName' : string,
   'timestamp' : Time,
@@ -51,6 +58,7 @@ export interface Subscription {
 export type Time = bigint;
 export interface _SERVICE {
   'addCustomer' : ActorMethod<[bigint, string, string, string], boolean>,
+  'addIngredient' : ActorMethod<[Ingredient], undefined>,
   'addProduct' : ActorMethod<[SaladBowl], bigint>,
   'bowlSizes' : ActorMethod<
     [],
@@ -73,6 +81,7 @@ export interface _SERVICE {
     boolean
   >,
   'deductIngredientsOnSale' : ActorMethod<[Invoice], undefined>,
+  'deleteIngredient' : ActorMethod<[string], boolean>,
   'deleteProduct' : ActorMethod<[bigint], boolean>,
   'deleteSubscription' : ActorMethod<[bigint], boolean>,
   'editSaladBowlRecipe' : ActorMethod<[string, Recipe], boolean>,
@@ -94,6 +103,7 @@ export interface _SERVICE {
   >,
   'getAllActiveProducts' : ActorMethod<[], Array<SaladBowl>>,
   'getAllCustomers' : ActorMethod<[], Array<Customer>>,
+  'getAllIngredients' : ActorMethod<[], Array<Ingredient>>,
   'getAllProductsWithInactive' : ActorMethod<[], Array<SaladBowl>>,
   'getAllSubscriptions' : ActorMethod<[], Array<Subscription>>,
   'getAnalyticsMetrics' : ActorMethod<
@@ -106,9 +116,11 @@ export interface _SERVICE {
       'dailyExpenses' : bigint,
     }
   >,
+  'getIngredient' : ActorMethod<[string], [] | [Ingredient]>,
   'getProduct' : ActorMethod<[bigint], [] | [SaladBowl]>,
   'monthlyPlanDuration' : ActorMethod<[], bigint>,
   'toggleSaladBowlAvailability' : ActorMethod<[string, boolean], undefined>,
+  'updateIngredient' : ActorMethod<[string, Ingredient], boolean>,
   'updateProduct' : ActorMethod<[bigint, SaladBowl], boolean>,
   'weeklyPlanDuration' : ActorMethod<[], bigint>,
 }

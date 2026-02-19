@@ -8,6 +8,13 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const Ingredient = IDL.Record({
+  'lowStockThreshold' : IDL.Nat,
+  'supplierName' : IDL.Text,
+  'name' : IDL.Text,
+  'quantity' : IDL.Nat,
+  'costPricePerUnit' : IDL.Nat,
+});
 export const SaladBowlType = IDL.Variant({
   'custom' : IDL.Null,
   'gm250' : IDL.Null,
@@ -56,6 +63,7 @@ export const idlService = IDL.Service({
       [IDL.Bool],
       [],
     ),
+  'addIngredient' : IDL.Func([Ingredient], [], []),
   'addProduct' : IDL.Func([SaladBowl], [IDL.Nat], []),
   'bowlSizes' : IDL.Func(
       [],
@@ -86,6 +94,7 @@ export const idlService = IDL.Service({
       [],
     ),
   'deductIngredientsOnSale' : IDL.Func([Invoice], [], []),
+  'deleteIngredient' : IDL.Func([IDL.Text], [IDL.Bool], []),
   'deleteProduct' : IDL.Func([IDL.Nat], [IDL.Bool], []),
   'deleteSubscription' : IDL.Func([IDL.Nat], [IDL.Bool], []),
   'editSaladBowlRecipe' : IDL.Func([IDL.Text, Recipe], [IDL.Bool], []),
@@ -108,6 +117,7 @@ export const idlService = IDL.Service({
     ),
   'getAllActiveProducts' : IDL.Func([], [IDL.Vec(SaladBowl)], ['query']),
   'getAllCustomers' : IDL.Func([], [IDL.Vec(Customer)], ['query']),
+  'getAllIngredients' : IDL.Func([], [IDL.Vec(Ingredient)], ['query']),
   'getAllProductsWithInactive' : IDL.Func([], [IDL.Vec(SaladBowl)], ['query']),
   'getAllSubscriptions' : IDL.Func([], [IDL.Vec(Subscription)], ['query']),
   'getAnalyticsMetrics' : IDL.Func(
@@ -123,9 +133,11 @@ export const idlService = IDL.Service({
       ],
       [],
     ),
+  'getIngredient' : IDL.Func([IDL.Text], [IDL.Opt(Ingredient)], ['query']),
   'getProduct' : IDL.Func([IDL.Nat], [IDL.Opt(SaladBowl)], ['query']),
   'monthlyPlanDuration' : IDL.Func([], [IDL.Nat], []),
   'toggleSaladBowlAvailability' : IDL.Func([IDL.Text, IDL.Bool], [], []),
+  'updateIngredient' : IDL.Func([IDL.Text, Ingredient], [IDL.Bool], []),
   'updateProduct' : IDL.Func([IDL.Nat, SaladBowl], [IDL.Bool], []),
   'weeklyPlanDuration' : IDL.Func([], [IDL.Nat], []),
 });
@@ -133,6 +145,13 @@ export const idlService = IDL.Service({
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const Ingredient = IDL.Record({
+    'lowStockThreshold' : IDL.Nat,
+    'supplierName' : IDL.Text,
+    'name' : IDL.Text,
+    'quantity' : IDL.Nat,
+    'costPricePerUnit' : IDL.Nat,
+  });
   const SaladBowlType = IDL.Variant({
     'custom' : IDL.Null,
     'gm250' : IDL.Null,
@@ -181,6 +200,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Bool],
         [],
       ),
+    'addIngredient' : IDL.Func([Ingredient], [], []),
     'addProduct' : IDL.Func([SaladBowl], [IDL.Nat], []),
     'bowlSizes' : IDL.Func(
         [],
@@ -211,6 +231,7 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'deductIngredientsOnSale' : IDL.Func([Invoice], [], []),
+    'deleteIngredient' : IDL.Func([IDL.Text], [IDL.Bool], []),
     'deleteProduct' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'deleteSubscription' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'editSaladBowlRecipe' : IDL.Func([IDL.Text, Recipe], [IDL.Bool], []),
@@ -233,6 +254,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getAllActiveProducts' : IDL.Func([], [IDL.Vec(SaladBowl)], ['query']),
     'getAllCustomers' : IDL.Func([], [IDL.Vec(Customer)], ['query']),
+    'getAllIngredients' : IDL.Func([], [IDL.Vec(Ingredient)], ['query']),
     'getAllProductsWithInactive' : IDL.Func(
         [],
         [IDL.Vec(SaladBowl)],
@@ -252,9 +274,11 @@ export const idlFactory = ({ IDL }) => {
         ],
         [],
       ),
+    'getIngredient' : IDL.Func([IDL.Text], [IDL.Opt(Ingredient)], ['query']),
     'getProduct' : IDL.Func([IDL.Nat], [IDL.Opt(SaladBowl)], ['query']),
     'monthlyPlanDuration' : IDL.Func([], [IDL.Nat], []),
     'toggleSaladBowlAvailability' : IDL.Func([IDL.Text, IDL.Bool], [], []),
+    'updateIngredient' : IDL.Func([IDL.Text, Ingredient], [IDL.Bool], []),
     'updateProduct' : IDL.Func([IDL.Nat, SaladBowl], [IDL.Bool], []),
     'weeklyPlanDuration' : IDL.Func([], [IDL.Nat], []),
   });

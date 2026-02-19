@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 11,
+  "projectStateVersion": 13,
   "summary": "Full-stack web application for Salad Khatora business with inventory management, product/recipe management (with availability toggle and recipe editing), billing/sales (product selection from menu), dashboard analytics (daily/weekly/monthly sales, cash flow, daily expenses), subscription management (weekly 6-day, monthly 24-day plans), alerts, admin auth, comprehensive reports download, customer management with push notifications, and CSV export",
   "architectural_notes": [
     "Full-stack web application architecture",
@@ -16,7 +16,8 @@
   ],
   "known_issues": [
     "Logo image (logo.dim_256x256.png) not loading in navigation header",
-    "Edit and delete functionality not working for products in products tab"
+    "Edit and delete functionality not working for products in products tab",
+    "Edit and delete functionality not working for inventory items in inventory tab"
   ],
   "isFixRequest": true,
   "existing_features": [
@@ -201,6 +202,22 @@
       "title": "Implement delete functionality for products in the products tab with confirmation dialog to prevent accidental deletion",
       "reqIds": [
         "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-edit-functionality-for-inventory-items-in-the-inventory-tab-allowing-modification-of-ingredient-details-including-name-quantity-unit-type-cost-price-supplier-name-and-low-stock-threshold",
+      "title": "Implement edit functionality for inventory items in the inventory tab, allowing modification of ingredient details including name, quantity, unit type, cost price, supplier name, and low stock threshold",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-delete-functionality-for-inventory-items-in-the-inventory-tab-with-confirmation-dialog-to-prevent-accidental-deletion",
+      "title": "Implement delete functionality for inventory items in the inventory tab with confirmation dialog to prevent accidental deletion",
+      "reqIds": [
+        "REQ-28"
       ],
       "version": 1
     }

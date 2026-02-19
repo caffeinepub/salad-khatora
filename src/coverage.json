@@ -1,51 +1,40 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-19T22:11:53.560Z",
+  "generatedAt": "2026-02-19T22:28:39.214Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-24",
-        "summary": "Fix logo image (logo.dim_256x256.png) not loading in the navigation header by verifying the image path is correct and the file exists in frontend/public/assets/generated directory",
+        "id": "REQ-27",
+        "summary": "Implement edit functionality for inventory items in the inventory tab, allowing modification of ingredient details including name, quantity, unit type, cost price, supplier name, and low stock threshold",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/Layout.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Layout.tsx"
-        ]
-      },
-      {
-        "id": "REQ-25",
-        "summary": "Implement edit functionality for products in the products tab, allowing modification of product details including name, type, price, and availability status",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/ProductList.tsx",
-          "frontend/src/components/EditProductDialog.tsx",
+          "frontend/src/components/EditIngredientDialog.tsx",
+          "frontend/src/components/IngredientList.tsx",
           "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/ProductList.tsx",
-          "frontend/src/components/EditProductDialog.tsx",
+          "frontend/src/components/EditIngredientDialog.tsx",
+          "frontend/src/components/IngredientList.tsx",
           "frontend/src/hooks/useQueries.ts"
         ]
       },
       {
-        "id": "REQ-26",
-        "summary": "Implement delete functionality for products in the products tab with confirmation dialog to prevent accidental deletion",
+        "id": "REQ-28",
+        "summary": "Implement delete functionality for inventory items in the inventory tab with confirmation dialog to prevent accidental deletion",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/ProductList.tsx",
+          "frontend/src/components/IngredientList.tsx",
           "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/ProductList.tsx",
+          "frontend/src/components/IngredientList.tsx",
           "frontend/src/hooks/useQueries.ts"
         ]
       }
@@ -59,9 +48,9 @@
     "frontend-implementation-plan.json",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
-    "frontend/src/components/EditProductDialog.tsx",
-    "frontend/src/components/Layout.tsx",
-    "frontend/src/components/ProductList.tsx",
+    "frontend/src/components/EditIngredientDialog.tsx",
+    "frontend/src/components/IngredientForm.tsx",
+    "frontend/src/components/IngredientList.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
     "frontend/src/hooks/useQueries.ts",

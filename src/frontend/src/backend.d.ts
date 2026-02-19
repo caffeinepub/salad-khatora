@@ -21,6 +21,13 @@ export interface Subscription {
     startDate: Time;
 }
 export type Time = bigint;
+export interface Ingredient {
+    lowStockThreshold: bigint;
+    supplierName: string;
+    name: string;
+    quantity: bigint;
+    costPricePerUnit: bigint;
+}
 export interface SaladBowl {
     active: boolean;
     name: string;
@@ -29,18 +36,18 @@ export interface SaladBowl {
     recipe: Recipe;
 }
 export type Recipe = Array<[string, bigint]>;
-export interface Customer {
-    id: bigint;
-    name: string;
-    preferences: string;
-    contactDetails: string;
-}
 export interface Invoice {
     customerName: string;
     timestamp: Time;
     paymentMode: string;
     totalPrice: bigint;
     itemsOrdered: Array<[string, bigint]>;
+}
+export interface Customer {
+    id: bigint;
+    name: string;
+    preferences: string;
+    contactDetails: string;
 }
 export enum SaladBowlType {
     custom = "custom",
@@ -50,6 +57,7 @@ export enum SaladBowlType {
 }
 export interface backendInterface {
     addCustomer(id: bigint, name: string, contactDetails: string, preferences: string): Promise<boolean>;
+    addIngredient(ingredient: Ingredient): Promise<void>;
     addProduct(product: SaladBowl): Promise<bigint>;
     bowlSizes(): Promise<{
         gm250: boolean;
@@ -58,12 +66,14 @@ export interface backendInterface {
     }>;
     createSubscription(id: bigint, name: string, customerName: string, phoneNumber: string, planType: string, bowlSize: SaladBowlType, price: bigint, isPaid: boolean, startDate: Time, endDate: Time, remainingDeliveries: bigint): Promise<boolean>;
     deductIngredientsOnSale(invoice: Invoice): Promise<void>;
+    deleteIngredient(name: string): Promise<boolean>;
     deleteProduct(id: bigint): Promise<boolean>;
     deleteSubscription(id: bigint): Promise<boolean>;
     editSaladBowlRecipe(bowlName: string, newRecipe: Recipe): Promise<boolean>;
     editSubscription(id: bigint, updatedName: string, updatedCustomerName: string, updatedPhoneNumber: string, updatedPlanType: string, updatedBowlSize: SaladBowlType, updatedPrice: bigint, updatedIsPaid: boolean, updatedStartDate: Time, updatedEndDate: Time, updatedRemainingDeliveries: bigint): Promise<boolean>;
     getAllActiveProducts(): Promise<Array<SaladBowl>>;
     getAllCustomers(): Promise<Array<Customer>>;
+    getAllIngredients(): Promise<Array<Ingredient>>;
     getAllProductsWithInactive(): Promise<Array<SaladBowl>>;
     getAllSubscriptions(): Promise<Array<Subscription>>;
     getAnalyticsMetrics(): Promise<{
@@ -73,9 +83,11 @@ export interface backendInterface {
         cashFlow: bigint;
         dailyExpenses: bigint;
     }>;
+    getIngredient(name: string): Promise<Ingredient | null>;
     getProduct(id: bigint): Promise<SaladBowl | null>;
     monthlyPlanDuration(): Promise<bigint>;
     toggleSaladBowlAvailability(bowlName: string, isAvailable: boolean): Promise<void>;
+    updateIngredient(name: string, updatedIngredient: Ingredient): Promise<boolean>;
     updateProduct(id: bigint, updatedProduct: SaladBowl): Promise<boolean>;
     weeklyPlanDuration(): Promise<bigint>;
 }

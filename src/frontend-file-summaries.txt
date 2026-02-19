@@ -11,8 +11,8 @@
   "frontend/src/components/AlertPanel.tsx": "Alert panel displaying low stock warnings and expiring subscription notifications with placeholder for email integration (fixed missing import).",
   "frontend/src/components/DashboardMetrics.tsx": "Dashboard metrics component displaying five key metrics (daily sales, weekly sales, monthly sales, cash flow, daily expenses) fetched from backend analytics.",
   "frontend/src/components/SalesChart.tsx": "Sales and profit visualization charts using Recharts with daily, weekly, and monthly views.",
-  "frontend/src/components/IngredientForm.tsx": "Form component for adding new ingredients with all required fields (name, quantity, unit, cost, supplier, threshold).",
-  "frontend/src/components/IngredientList.tsx": "Ingredient list component displaying inventory with total value calculation and low stock indicators.",
+  "frontend/src/components/IngredientForm.tsx": "Form component for adding new ingredients with all required fields integrated with backend via useAddIngredient mutation hook.",
+  "frontend/src/components/IngredientList.tsx": "Ingredient list component displaying inventory with total value calculation, low stock indicators, and edit/delete functionality with confirmation dialog.",
   "frontend/src/components/ProductForm.tsx": "Product form for creating salad bowls with dynamic bowl size options (250gm, 350gm, 500gm) fetched from backend and recipe ingredient configuration.",
   "frontend/src/components/ProductList.tsx": "Product list displaying salad bowls with availability toggle, edit recipe, edit product, and delete buttons; converts backend Recipe tuple format to frontend RecipeItem format for the EditRecipeDialog component.",
   "frontend/src/components/BillingForm.tsx": "Invoice generation form with product selector dropdown showing only available products, auto-filling prices, and itemized order calculation.",
@@ -20,7 +20,7 @@
   "frontend/src/components/SubscriptionForm.tsx": "Form component for creating new subscriptions with subscription name field, customer details, plan type, bowl size, dates, price, and payment status; integrates with backend createSubscription mutation.",
   "frontend/src/components/SubscriptionList.tsx": "Displays all subscriptions in a grid with subscription name, customer details, plan info, and action buttons for edit and delete; includes confirmation dialog for deletion.",
   "frontend/src/utils/csvExport.ts": "Utility functions for client-side CSV generation and download for sales and inventory reports.",
-  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including analytics, products (with CRUD operations), customers, and subscriptions with proper cache invalidation.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including analytics, products, customers, subscriptions, and ingredients with full CRUD operations and proper cache invalidation.",
   "frontend/src/index.css": "Global styles with OKLCH color system featuring fresh green and warm orange palette optimized for food business branding, mobile-friendly touch targets, and comprehensive print media queries for KOT printing with kitchen-optimized styling.",
   "frontend/tailwind.config.js": "Tailwind configuration with custom color palette (fresh greens, warm oranges), Inter font, and extended theme for Salad Khatora branding.",
   "frontend/src/components/EditRecipeDialog.tsx": "Dialog component for editing product recipes with add/remove ingredient functionality and integration with backend recipe update mutation.",
@@ -30,5 +30,6 @@
   "frontend/src/components/NotificationDialog.tsx": "Dialog for composing and sending notifications to selected customers with recipient preview and message input.",
   "frontend/src/components/KOTPrintView.tsx": "Print-optimized Kitchen Order Ticket view displaying active subscriptions with subscription name, customer name, bowl size, plan type, and remaining deliveries in a clean table layout.",
   "frontend/src/components/EditSubscriptionDialog.tsx": "Dialog component for editing existing subscriptions with pre-populated form fields including subscription name, customer details, plan configuration, and remaining deliveries; uses backend editSubscription mutation.",
-  "frontend/src/components/EditProductDialog.tsx": "Dialog component for editing product details including name, bowl size, price, and availability status; uses backend updateProduct mutation with form validation."
+  "frontend/src/components/EditProductDialog.tsx": "Dialog component for editing product details including name, bowl size, price, and availability status; uses backend updateProduct mutation with form validation.",
+  "frontend/src/components/EditIngredientDialog.tsx": "Dialog component for editing existing ingredients with pre-populated form fields for name, quantity, cost price, supplier, and low stock threshold."
 }

@@ -103,6 +103,13 @@ export interface Subscription {
     startDate: Time;
 }
 export type Time = bigint;
+export interface Ingredient {
+    lowStockThreshold: bigint;
+    supplierName: string;
+    name: string;
+    quantity: bigint;
+    costPricePerUnit: bigint;
+}
 export interface SaladBowl {
     active: boolean;
     name: string;
@@ -111,18 +118,18 @@ export interface SaladBowl {
     recipe: Recipe;
 }
 export type Recipe = Array<[string, bigint]>;
-export interface Customer {
-    id: bigint;
-    name: string;
-    preferences: string;
-    contactDetails: string;
-}
 export interface Invoice {
     customerName: string;
     timestamp: Time;
     paymentMode: string;
     totalPrice: bigint;
     itemsOrdered: Array<[string, bigint]>;
+}
+export interface Customer {
+    id: bigint;
+    name: string;
+    preferences: string;
+    contactDetails: string;
 }
 export enum SaladBowlType {
     custom = "custom",
@@ -132,6 +139,7 @@ export enum SaladBowlType {
 }
 export interface backendInterface {
     addCustomer(id: bigint, name: string, contactDetails: string, preferences: string): Promise<boolean>;
+    addIngredient(ingredient: Ingredient): Promise<void>;
     addProduct(product: SaladBowl): Promise<bigint>;
     bowlSizes(): Promise<{
         gm250: boolean;
@@ -140,12 +148,14 @@ export interface backendInterface {
     }>;
     createSubscription(id: bigint, name: string, customerName: string, phoneNumber: string, planType: string, bowlSize: SaladBowlType, price: bigint, isPaid: boolean, startDate: Time, endDate: Time, remainingDeliveries: bigint): Promise<boolean>;
     deductIngredientsOnSale(invoice: Invoice): Promise<void>;
+    deleteIngredient(name: string): Promise<boolean>;
     deleteProduct(id: bigint): Promise<boolean>;
     deleteSubscription(id: bigint): Promise<boolean>;
     editSaladBowlRecipe(bowlName: string, newRecipe: Recipe): Promise<boolean>;
     editSubscription(id: bigint, updatedName: string, updatedCustomerName: string, updatedPhoneNumber: string, updatedPlanType: string, updatedBowlSize: SaladBowlType, updatedPrice: bigint, updatedIsPaid: boolean, updatedStartDate: Time, updatedEndDate: Time, updatedRemainingDeliveries: bigint): Promise<boolean>;
     getAllActiveProducts(): Promise<Array<SaladBowl>>;
     getAllCustomers(): Promise<Array<Customer>>;
+    getAllIngredients(): Promise<Array<Ingredient>>;
     getAllProductsWithInactive(): Promise<Array<SaladBowl>>;
     getAllSubscriptions(): Promise<Array<Subscription>>;
     getAnalyticsMetrics(): Promise<{
@@ -155,13 +165,15 @@ export interface backendInterface {
         cashFlow: bigint;
         dailyExpenses: bigint;
     }>;
+    getIngredient(name: string): Promise<Ingredient | null>;
     getProduct(id: bigint): Promise<SaladBowl | null>;
     monthlyPlanDuration(): Promise<bigint>;
     toggleSaladBowlAvailability(bowlName: string, isAvailable: boolean): Promise<void>;
+    updateIngredient(name: string, updatedIngredient: Ingredient): Promise<boolean>;
     updateProduct(id: bigint, updatedProduct: SaladBowl): Promise<boolean>;
     weeklyPlanDuration(): Promise<bigint>;
 }
-import type { Recipe as _Recipe, SaladBowl as _SaladBowl, SaladBowlType as _SaladBowlType, Subscription as _Subscription, Time as _Time } from "./declarations/backend.did.d.ts";
+import type { Ingredient as _Ingredient, Recipe as _Recipe, SaladBowl as _SaladBowl, SaladBowlType as _SaladBowlType, Subscription as _Subscription, Time as _Time } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async addCustomer(arg0: bigint, arg1: string, arg2: string, arg3: string): Promise<boolean> {
@@ -175,6 +187,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.addCustomer(arg0, arg1, arg2, arg3);
+            return result;
+        }
+    }
+    async addIngredient(arg0: Ingredient): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addIngredient(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addIngredient(arg0);
             return result;
         }
     }
@@ -235,6 +261,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.deductIngredientsOnSale(arg0);
+            return result;
+        }
+    }
+    async deleteIngredient(arg0: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteIngredient(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteIngredient(arg0);
             return result;
         }
     }
@@ -322,6 +362,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getAllIngredients(): Promise<Array<Ingredient>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllIngredients();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllIngredients();
+            return result;
+        }
+    }
     async getAllProductsWithInactive(): Promise<Array<SaladBowl>> {
         if (this.processError) {
             try {
@@ -370,18 +424,32 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getProduct(arg0: bigint): Promise<SaladBowl | null> {
+    async getIngredient(arg0: string): Promise<Ingredient | null> {
         if (this.processError) {
             try {
-                const result = await this.actor.getProduct(arg0);
+                const result = await this.actor.getIngredient(arg0);
                 return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getProduct(arg0);
+            const result = await this.actor.getIngredient(arg0);
             return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getProduct(arg0: bigint): Promise<SaladBowl | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getProduct(arg0);
+                return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getProduct(arg0);
+            return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
         }
     }
     async monthlyPlanDuration(): Promise<bigint> {
@@ -409,6 +477,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.toggleSaladBowlAvailability(arg0, arg1);
+            return result;
+        }
+    }
+    async updateIngredient(arg0: string, arg1: Ingredient): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateIngredient(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateIngredient(arg0, arg1);
             return result;
         }
     }
@@ -450,7 +532,10 @@ function from_candid_SaladBowl_n6(_uploadFile: (file: ExternalBlob) => Promise<U
 function from_candid_Subscription_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Subscription): Subscription {
     return from_candid_record_n12(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_SaladBowl]): SaladBowl | null {
+function from_candid_opt_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Ingredient]): Ingredient | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_SaladBowl]): SaladBowl | null {
     return value.length === 0 ? null : from_candid_SaladBowl_n6(_uploadFile, _downloadFile, value[0]);
 }
 function from_candid_record_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {

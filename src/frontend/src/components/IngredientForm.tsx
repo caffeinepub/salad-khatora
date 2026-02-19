@@ -2,19 +2,17 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from 'sonner';
+import { useAddIngredient } from '../hooks/useQueries';
 
 interface IngredientFormProps {
   onSuccess?: () => void;
 }
 
 export default function IngredientForm({ onSuccess }: IngredientFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const addIngredient = useAddIngredient();
   const [formData, setFormData] = useState({
     name: '',
     quantity: '',
-    unitType: 'grams',
     costPricePerUnit: '',
     supplierName: '',
     lowStockThreshold: '',
@@ -22,26 +20,40 @@ export default function IngredientForm({ onSuccess }: IngredientFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+
+    const quantity = parseInt(formData.quantity);
+    const costPricePerUnit = parseInt(formData.costPricePerUnit);
+    const lowStockThreshold = parseInt(formData.lowStockThreshold);
+
+    if (isNaN(quantity) || quantity < 0) {
+      return;
+    }
+    if (isNaN(costPricePerUnit) || costPricePerUnit < 0) {
+      return;
+    }
+    if (isNaN(lowStockThreshold) || lowStockThreshold < 0) {
+      return;
+    }
 
     try {
-      // TODO: Call backend API once available
-      // await actor.addIngredient({...formData});
-      
-      toast.success('Ingredient added successfully');
+      await addIngredient.mutateAsync({
+        name: formData.name,
+        quantity: BigInt(quantity),
+        costPricePerUnit: BigInt(costPricePerUnit),
+        supplierName: formData.supplierName,
+        lowStockThreshold: BigInt(lowStockThreshold),
+      });
+
       setFormData({
         name: '',
         quantity: '',
-        unitType: 'grams',
         costPricePerUnit: '',
         supplierName: '',
         lowStockThreshold: '',
       });
       onSuccess?.();
     } catch (error) {
-      toast.error('Failed to add ingredient');
-    } finally {
-      setIsSubmitting(false);
+      console.error('Failed to add ingredient:', error);
     }
   };
 
@@ -71,7 +83,7 @@ export default function IngredientForm({ onSuccess }: IngredientFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="quantity">Current Quantity *</Label>
+          <Label htmlFor="quantity">Current Quantity (grams) *</Label>
           <Input
             id="quantity"
             type="number"
@@ -84,21 +96,6 @@ export default function IngredientForm({ onSuccess }: IngredientFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="unitType">Unit Type *</Label>
-          <Select value={formData.unitType} onValueChange={(value) => setFormData({ ...formData, unitType: value })}>
-            <SelectTrigger id="unitType">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="grams">Grams</SelectItem>
-              <SelectItem value="kilograms">Kilograms</SelectItem>
-              <SelectItem value="pieces">Pieces</SelectItem>
-              <SelectItem value="liters">Liters</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="costPricePerUnit">Cost Price per Unit (₹) *</Label>
           <Input
             id="costPricePerUnit"
@@ -108,12 +105,11 @@ export default function IngredientForm({ onSuccess }: IngredientFormProps) {
             placeholder="e.g., 2"
             required
             min="0"
-            step="0.01"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="lowStockThreshold">Low Stock Threshold *</Label>
+          <Label htmlFor="lowStockThreshold">Low Stock Threshold (grams) *</Label>
           <Input
             id="lowStockThreshold"
             type="number"
@@ -126,8 +122,12 @@ export default function IngredientForm({ onSuccess }: IngredientFormProps) {
         </div>
       </div>
 
-      <Button type="submit" disabled={isSubmitting} className="w-full bg-fresh-600 hover:bg-fresh-700">
-        {isSubmitting ? 'Adding...' : 'Add Ingredient'}
+      <Button 
+        type="submit" 
+        disabled={addIngredient.isPending} 
+        className="w-full bg-fresh-600 hover:bg-fresh-700"
+      >
+        {addIngredient.isPending ? 'Adding...' : 'Add Ingredient'}
       </Button>
     </form>
   );

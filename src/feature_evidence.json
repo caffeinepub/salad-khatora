@@ -2,29 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-logo-image-logo-dim-256x256-png-not-loading-in-the-navigation-header-by-verifying-the-image-path-is-correct-and-the-file-exists-in-frontend-public-assets-generated-directory",
-      "featureTitle": "Fix logo image (logo.dim_256x256.png) not loading in the navigation header by verifying the image path is correct and the file exists in frontend/public/assets/generated directory",
+      "featureId": "feature-implement-edit-functionality-for-inventory-items-in-the-inventory-tab-allowing-modification-of-ingredient-details-including-name-quantity-unit-type-cost-price-supplier-name-and-low-stock-threshold",
+      "featureTitle": "Implement edit functionality for inventory items in the inventory tab, allowing modification of ingredient details including name, quantity, unit type, cost price, supplier name, and low stock threshold",
       "files": [
-        "frontend/src/components/Layout.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-24"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-edit-functionality-for-products-in-the-products-tab-allowing-modification-of-product-details-including-name-type-price-and-availability-status",
-      "featureTitle": "Implement edit functionality for products in the products tab, allowing modification of product details including name, type, price, and availability status",
-      "files": [
-        "frontend/src/components/EditProductDialog.tsx",
-        "frontend/src/components/ProductList.tsx",
+        "frontend/src/components/EditIngredientDialog.tsx",
+        "frontend/src/components/IngredientList.tsx",
         "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
@@ -35,15 +17,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-25"
+        "REQ-27"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-delete-functionality-for-products-in-the-products-tab-with-confirmation-dialog-to-prevent-accidental-deletion",
-      "featureTitle": "Implement delete functionality for products in the products tab with confirmation dialog to prevent accidental deletion",
+      "featureId": "feature-implement-delete-functionality-for-inventory-items-in-the-inventory-tab-with-confirmation-dialog-to-prevent-accidental-deletion",
+      "featureTitle": "Implement delete functionality for inventory items in the inventory tab with confirmation dialog to prevent accidental deletion",
       "files": [
-        "frontend/src/components/ProductList.tsx",
+        "frontend/src/components/IngredientList.tsx",
         "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
@@ -54,7 +36,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-26"
+        "REQ-28"
       ],
       "confidence": "high"
     }
