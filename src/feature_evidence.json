@@ -2,12 +2,14 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-implement-edit-functionality-for-inventory-items-in-the-inventory-tab-allowing-modification-of-ingredient-details-including-name-quantity-unit-type-cost-price-supplier-name-and-low-stock-threshold",
-      "featureTitle": "Implement edit functionality for inventory items in the inventory tab, allowing modification of ingredient details including name, quantity, unit type, cost price, supplier name, and low stock threshold",
+      "featureId": "feature-restructure-the-inventory-page-to-include-four-sub-tabs-stock-in-stock-out-write-off-and-stock-status-replace-the-current-single-view-inventory-management-with-a-tabbed-interface",
+      "featureTitle": "Restructure the inventory page to include four sub-tabs: Stock In, Stock Out, Write Off, and Stock Status. Replace the current single-view inventory management with a tabbed interface.",
       "files": [
-        "frontend/src/components/EditIngredientDialog.tsx",
-        "frontend/src/components/IngredientList.tsx",
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/components/StockInTab.tsx",
+        "frontend/src/components/StockOutTab.tsx",
+        "frontend/src/components/StockStatusTab.tsx",
+        "frontend/src/components/WriteOffTab.tsx",
+        "frontend/src/pages/InventoryPage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -17,15 +19,14 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-27"
+        "REQ-29"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-delete-functionality-for-inventory-items-in-the-inventory-tab-with-confirmation-dialog-to-prevent-accidental-deletion",
-      "featureTitle": "Implement delete functionality for inventory items in the inventory tab with confirmation dialog to prevent accidental deletion",
+      "featureId": "feature-implement-stock-in-tab-with-form-to-record-incoming-inventory-including-fields-for-ingredient-selection-quantity-received-supplier-name-purchase-date-and-cost-price-update-ingredient-quantities-in-the-backend-when-stock-is-added",
+      "featureTitle": "Implement Stock In tab with form to record incoming inventory, including fields for ingredient selection, quantity received, supplier name, purchase date, and cost price. Update ingredient quantities in the backend when stock is added.",
       "files": [
-        "frontend/src/components/IngredientList.tsx",
         "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
@@ -36,7 +37,82 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-28"
+        "REQ-30"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-stock-out-tab-with-form-to-record-inventory-consumption-or-removal-not-tied-to-sales-including-ingredient-selection-quantity-removed-reason-for-removal-and-date-decrease-ingredient-quantities-in-the-backend-when-stock-is-removed",
+      "featureTitle": "Implement Stock Out tab with form to record inventory consumption or removal not tied to sales, including ingredient selection, quantity removed, reason for removal, and date. Decrease ingredient quantities in the backend when stock is removed.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-31"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-write-off-tab-with-form-to-record-damaged-expired-or-unusable-inventory-including-ingredient-selection-quantity-to-write-off-reason-and-date-decrease-ingredient-quantities-in-the-backend-and-maintain-a-separate-write-off-log-for-tracking-losses",
+      "featureTitle": "Implement Write Off tab with form to record damaged, expired, or unusable inventory, including ingredient selection, quantity to write off, reason, and date. Decrease ingredient quantities in the backend and maintain a separate write-off log for tracking losses.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-32"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-stock-status-tab-displaying-the-current-inventory-overview-with-all-ingredients-their-current-quantities-unit-types-cost-prices-low-stock-status-indicators-and-total-inventory-value-this-should-be-the-main-view-for-monitoring-current-stock-levels",
+      "featureTitle": "Implement Stock Status tab displaying the current inventory overview with all ingredients, their current quantities, unit types, cost prices, low-stock status indicators, and total inventory value. This should be the main view for monitoring current stock levels.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-33"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-display-transaction-history-tables-in-stock-in-stock-out-and-write-off-tabs-showing-recent-transactions-with-details-like-date-ingredient-name-quantity-reason-and-supplier-where-applicable",
+      "featureTitle": "Display transaction history tables in Stock In, Stock Out, and Write Off tabs showing recent transactions with details like date, ingredient name, quantity, reason, and supplier (where applicable).",
+      "files": [
+        "frontend/src/components/StockInTab.tsx",
+        "frontend/src/components/StockOutTab.tsx",
+        "frontend/src/components/StockTransactionTable.tsx",
+        "frontend/src/components/WriteOffTab.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-35"
       ],
       "confidence": "high"
     }

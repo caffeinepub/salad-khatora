@@ -17,11 +17,17 @@ export interface Customer {
   'contactDetails' : string,
 }
 export interface Ingredient {
+  'unitType' : string,
   'lowStockThreshold' : bigint,
   'supplierName' : string,
   'name' : string,
   'quantity' : bigint,
   'costPricePerUnit' : bigint,
+}
+export interface InventoryItem {
+  'unitType' : string,
+  'quantityInStock' : bigint,
+  'ingredientName' : string,
 }
 export interface Invoice {
   'customerName' : string,
@@ -42,6 +48,28 @@ export type SaladBowlType = { 'custom' : null } |
   { 'gm250' : null } |
   { 'gm350' : null } |
   { 'gm500' : null };
+export interface StockStatus {
+  'unitType' : string,
+  'quantityInStock' : bigint,
+  'isLowStock' : boolean,
+  'currentQuantity' : bigint,
+  'ingredientName' : string,
+  'costPricePerUnit' : bigint,
+}
+export interface StockTransaction {
+  'unitType' : string,
+  'transactionType' : StockTransactionType,
+  'supplier' : [] | [string],
+  'date' : Time,
+  'quantity' : bigint,
+  'ingredientName' : string,
+  'costPrice' : [] | [bigint],
+  'transactionId' : bigint,
+  'reason' : string,
+}
+export type StockTransactionType = { 'writeOff' : null } |
+  { 'stockOut' : null } |
+  { 'stockIn' : null };
 export interface Subscription {
   'id' : bigint,
   'customerName' : string,
@@ -105,6 +133,7 @@ export interface _SERVICE {
   'getAllCustomers' : ActorMethod<[], Array<Customer>>,
   'getAllIngredients' : ActorMethod<[], Array<Ingredient>>,
   'getAllProductsWithInactive' : ActorMethod<[], Array<SaladBowl>>,
+  'getAllStockTransactions' : ActorMethod<[], Array<StockTransaction>>,
   'getAllSubscriptions' : ActorMethod<[], Array<Subscription>>,
   'getAnalyticsMetrics' : ActorMethod<
     [],
@@ -117,8 +146,23 @@ export interface _SERVICE {
     }
   >,
   'getIngredient' : ActorMethod<[string], [] | [Ingredient]>,
+  'getInventoryStatus' : ActorMethod<
+    [],
+    { 'totalValue' : bigint, 'items' : Array<InventoryItem> }
+  >,
   'getProduct' : ActorMethod<[bigint], [] | [SaladBowl]>,
+  'getStockStatus' : ActorMethod<[], Array<StockStatus>>,
+  'getStockTransactionsByType' : ActorMethod<
+    [StockTransactionType],
+    Array<StockTransaction>
+  >,
   'monthlyPlanDuration' : ActorMethod<[], bigint>,
+  'recordStockIn' : ActorMethod<
+    [string, bigint, string, bigint, string],
+    boolean
+  >,
+  'recordStockOut' : ActorMethod<[string, bigint, string], boolean>,
+  'recordWriteOff' : ActorMethod<[string, bigint, string], boolean>,
   'toggleSaladBowlAvailability' : ActorMethod<[string, boolean], undefined>,
   'updateIngredient' : ActorMethod<[string, Ingredient], boolean>,
   'updateProduct' : ActorMethod<[bigint, SaladBowl], boolean>,

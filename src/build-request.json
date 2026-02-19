@@ -1,65 +1,154 @@
 {
   "kind": "build_request",
-  "title": "Implement edit and delete functionality for inventory items",
+  "title": "Add inventory sub-tabs for Stock In, Stock Out, Write Off, and Stock Status",
   "projectName": "Salad Khatora",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-27",
-      "text": "Implement edit functionality for inventory items in the inventory tab, allowing modification of ingredient details including name, quantity, unit type, cost price, supplier name, and low stock threshold",
-      "target": "both",
+      "id": "REQ-29",
+      "text": "Restructure the inventory page to include four sub-tabs: Stock In, Stock Out, Write Off, and Stock Status. Replace the current single-view inventory management with a tabbed interface.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-final"
         ],
         "quotes": [
-          "in inventory also not able to edit or delete the items"
+          "Inventory tab-  need below sub tabs Stock in Stock out Write off Stock status"
         ]
       },
       "acceptanceCriteria": [
-        "An edit button or icon appears for each ingredient in the IngredientList component",
-        "Clicking edit opens a dialog with pre-populated fields for the selected ingredient",
-        "All ingredient fields are editable: name, quantity, unit type, cost price, supplier, and low stock threshold",
-        "Changes are validated before submission",
-        "Backend provides an update method for modifying ingredient records",
-        "UI updates immediately after successful edit using React Query invalidation",
-        "User receives confirmation feedback when edit is successful"
+        "Inventory page displays four distinct tabs: Stock In, Stock Out, Write Off, and Stock Status",
+        "User can switch between tabs to access different inventory management functions",
+        "Each tab contains its own dedicated interface and functionality"
       ]
     },
     {
-      "id": "REQ-28",
-      "text": "Implement delete functionality for inventory items in the inventory tab with confirmation dialog to prevent accidental deletion",
+      "id": "REQ-30",
+      "text": "Implement Stock In tab with form to record incoming inventory, including fields for ingredient selection, quantity received, supplier name, purchase date, and cost price. Update ingredient quantities in the backend when stock is added.",
       "target": "both",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-final"
         ],
         "quotes": [
-          "in inventory also not able to edit or delete the items"
+          "Stock in"
         ]
       },
       "acceptanceCriteria": [
-        "A delete button or icon appears for each ingredient in the IngredientList component",
-        "Clicking delete shows a confirmation dialog before proceeding",
-        "Confirmation dialog displays the ingredient name being deleted",
-        "Backend provides a delete method for removing ingredient records by ID",
-        "Ingredient is removed from the list immediately after successful deletion using React Query invalidation",
-        "User receives confirmation feedback when deletion is successful",
-        "Total inventory value recalculates automatically after deletion"
+        "Stock In tab displays a form with ingredient dropdown, quantity input, supplier field, date picker, and cost price input",
+        "Upon submission, the selected ingredient's quantity is increased in the backend",
+        "Stock In transactions are logged with timestamp and details",
+        "Success notification appears after successful stock addition"
+      ]
+    },
+    {
+      "id": "REQ-31",
+      "text": "Implement Stock Out tab with form to record inventory consumption or removal not tied to sales, including ingredient selection, quantity removed, reason for removal, and date. Decrease ingredient quantities in the backend when stock is removed.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-final"
+        ],
+        "quotes": [
+          "Stock out"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Stock Out tab displays a form with ingredient dropdown, quantity input, reason field, and date picker",
+        "Upon submission, the selected ingredient's quantity is decreased in the backend",
+        "Stock Out transactions are logged with timestamp and details",
+        "Validation prevents removing more quantity than currently available",
+        "Success notification appears after successful stock removal"
+      ]
+    },
+    {
+      "id": "REQ-32",
+      "text": "Implement Write Off tab with form to record damaged, expired, or unusable inventory, including ingredient selection, quantity to write off, reason, and date. Decrease ingredient quantities in the backend and maintain a separate write-off log for tracking losses.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-final"
+        ],
+        "quotes": [
+          "Write off"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Write Off tab displays a form with ingredient dropdown, quantity input, reason field, and date picker",
+        "Upon submission, the selected ingredient's quantity is decreased in the backend",
+        "Write-off transactions are logged separately from regular stock-out events",
+        "Write-off history is displayed in a table showing all write-off records with date, ingredient, quantity, and reason",
+        "Validation prevents writing off more quantity than currently available",
+        "Success notification appears after successful write-off"
+      ]
+    },
+    {
+      "id": "REQ-33",
+      "text": "Implement Stock Status tab displaying the current inventory overview with all ingredients, their current quantities, unit types, cost prices, low-stock status indicators, and total inventory value. This should be the main view for monitoring current stock levels.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-final"
+        ],
+        "quotes": [
+          "Stock status"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Stock Status tab displays a comprehensive table of all ingredients with current quantity, unit type, cost price, supplier, and low-stock threshold",
+        "Ingredients below their low-stock threshold are visually highlighted with warning indicators",
+        "Total inventory value is calculated and displayed at the top of the view",
+        "The existing edit and delete functionality for ingredients is accessible from this tab",
+        "Stock Status tab serves as the default landing tab when accessing the inventory page"
+      ]
+    },
+    {
+      "id": "REQ-34",
+      "text": "Create backend data types and storage for Stock In, Stock Out, and Write Off transaction records, including fields for transaction ID, ingredient ID, quantity, transaction type, reason, date, and supplier (for Stock In only).",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-final"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend defines StockTransaction type with fields: id, ingredientId, quantity, transactionType (in/out/writeoff), reason, date, and optional supplier",
+        "Stable storage map maintains all stock transaction history",
+        "Backend provides methods to add Stock In, Stock Out, and Write Off transactions",
+        "Backend provides query methods to retrieve transaction history filtered by type",
+        "Transaction records are immutable once created"
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "text": "Display transaction history tables in Stock In, Stock Out, and Write Off tabs showing recent transactions with details like date, ingredient name, quantity, reason, and supplier (where applicable).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-final"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Stock In tab displays a table of recent stock-in transactions below the form",
+        "Stock Out tab displays a table of recent stock-out transactions below the form",
+        "Write Off tab displays a table of write-off history below the form",
+        "Each transaction table shows date, ingredient name, quantity, and relevant details",
+        "Tables are sorted by date in descending order (most recent first)"
       ]
     }
   ],
   "constraints": [
-    "Follow the same implementation pattern used for product edit and delete functionality",
-    "Maintain consistency with existing dialog components and mutation patterns",
-    "Use React Query hooks for data fetching and mutations as established in useQueries.ts",
-    "Preserve the existing IngredientList table structure and styling"
+    "Do not modify the single-actor backend architecture",
+    "Preserve existing ingredient CRUD operations and data structure",
+    "Maintain compatibility with existing inventory deduction from sales/billing",
+    "Stock Status tab must display the same ingredient data currently shown in InventoryPage.tsx"
   ],
   "nonGoals": [
-    "Modifying the ingredient data model or adding new fields",
-    "Changing the ingredient form validation logic",
-    "Implementing batch operations for multiple ingredients",
-    "Adding undo/redo functionality for edits or deletions"
+    "Batch import/export of stock transactions",
+    "Advanced inventory forecasting or predictive analytics",
+    "Multi-location inventory tracking",
+    "Barcode scanning or QR code integration",
+    "Automated reordering or purchase order generation"
   ],
   "imageRequirements": {
     "required": [],

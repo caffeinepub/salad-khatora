@@ -21,6 +21,7 @@ export default function EditIngredientDialog({ ingredient, open, onOpenChange }:
     costPricePerUnit: ingredient.costPricePerUnit.toString(),
     supplierName: ingredient.supplierName,
     lowStockThreshold: ingredient.lowStockThreshold.toString(),
+    unitType: ingredient.unitType || 'gram',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,6 +50,7 @@ export default function EditIngredientDialog({ ingredient, open, onOpenChange }:
           costPricePerUnit: BigInt(costPricePerUnit),
           supplierName: formData.supplierName,
           lowStockThreshold: BigInt(lowStockThreshold),
+          unitType: formData.unitType,
         },
       });
 

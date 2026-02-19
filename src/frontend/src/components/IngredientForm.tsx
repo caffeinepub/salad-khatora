@@ -16,6 +16,7 @@ export default function IngredientForm({ onSuccess }: IngredientFormProps) {
     costPricePerUnit: '',
     supplierName: '',
     lowStockThreshold: '',
+    unitType: 'gram',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,6 +43,7 @@ export default function IngredientForm({ onSuccess }: IngredientFormProps) {
         costPricePerUnit: BigInt(costPricePerUnit),
         supplierName: formData.supplierName,
         lowStockThreshold: BigInt(lowStockThreshold),
+        unitType: formData.unitType,
       });
 
       setFormData({
@@ -50,6 +52,7 @@ export default function IngredientForm({ onSuccess }: IngredientFormProps) {
         costPricePerUnit: '',
         supplierName: '',
         lowStockThreshold: '',
+        unitType: 'gram',
       });
       onSuccess?.();
     } catch (error) {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 13,
+  "projectStateVersion": 15,
   "summary": "Full-stack web application for Salad Khatora business with inventory management, product/recipe management (with availability toggle and recipe editing), billing/sales (product selection from menu), dashboard analytics (daily/weekly/monthly sales, cash flow, daily expenses), subscription management (weekly 6-day, monthly 24-day plans), alerts, admin auth, comprehensive reports download, customer management with push notifications, and CSV export",
   "architectural_notes": [
     "Full-stack web application architecture",
@@ -220,6 +220,54 @@
         "REQ-28"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-restructure-the-inventory-page-to-include-four-sub-tabs-stock-in-stock-out-write-off-and-stock-status-replace-the-current-single-view-inventory-management-with-a-tabbed-interface",
+      "title": "Restructure the inventory page to include four sub-tabs: Stock In, Stock Out, Write Off, and Stock Status. Replace the current single-view inventory management with a tabbed interface.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-stock-in-tab-with-form-to-record-incoming-inventory-including-fields-for-ingredient-selection-quantity-received-supplier-name-purchase-date-and-cost-price-update-ingredient-quantities-in-the-backend-when-stock-is-added",
+      "title": "Implement Stock In tab with form to record incoming inventory, including fields for ingredient selection, quantity received, supplier name, purchase date, and cost price. Update ingredient quantities in the backend when stock is added.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-stock-out-tab-with-form-to-record-inventory-consumption-or-removal-not-tied-to-sales-including-ingredient-selection-quantity-removed-reason-for-removal-and-date-decrease-ingredient-quantities-in-the-backend-when-stock-is-removed",
+      "title": "Implement Stock Out tab with form to record inventory consumption or removal not tied to sales, including ingredient selection, quantity removed, reason for removal, and date. Decrease ingredient quantities in the backend when stock is removed.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-write-off-tab-with-form-to-record-damaged-expired-or-unusable-inventory-including-ingredient-selection-quantity-to-write-off-reason-and-date-decrease-ingredient-quantities-in-the-backend-and-maintain-a-separate-write-off-log-for-tracking-losses",
+      "title": "Implement Write Off tab with form to record damaged, expired, or unusable inventory, including ingredient selection, quantity to write off, reason, and date. Decrease ingredient quantities in the backend and maintain a separate write-off log for tracking losses.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-stock-status-tab-displaying-the-current-inventory-overview-with-all-ingredients-their-current-quantities-unit-types-cost-prices-low-stock-status-indicators-and-total-inventory-value-this-should-be-the-main-view-for-monitoring-current-stock-levels",
+      "title": "Implement Stock Status tab displaying the current inventory overview with all ingredients, their current quantities, unit types, cost prices, low-stock status indicators, and total inventory value. This should be the main view for monitoring current stock levels.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-transaction-history-tables-in-stock-in-stock-out-and-write-off-tabs-showing-recent-transactions-with-details-like-date-ingredient-name-quantity-reason-and-supplier-where-applicable",
+      "title": "Display transaction history tables in Stock In, Stock Out, and Write Off tabs showing recent transactions with details like date, ingredient name, quantity, reason, and supplier (where applicable).",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -359,6 +407,20 @@
       "id": "AR-23",
       "summary": "Add subscription name field to subscription management module",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Add sub-tabs to inventory tab: Stock In, Stock Out, Write Off, and Stock Status",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-30",
+      "summary": "Create backend data types and storage for Stock In, Stock Out, and Write Off transaction records, including fields for transaction ID, ingredient ID, quantity, transaction type, reason, date, and supplier (for Stock In only).",
+      "reqIds": [
+        "REQ-34"
+      ],
       "status": "pending"
     }
   ],

@@ -9,6 +9,7 @@
 import { IDL } from '@icp-sdk/core/candid';
 
 export const Ingredient = IDL.Record({
+  'unitType' : IDL.Text,
   'lowStockThreshold' : IDL.Nat,
   'supplierName' : IDL.Text,
   'name' : IDL.Text,
@@ -43,6 +44,22 @@ export const Customer = IDL.Record({
   'preferences' : IDL.Text,
   'contactDetails' : IDL.Text,
 });
+export const StockTransactionType = IDL.Variant({
+  'writeOff' : IDL.Null,
+  'stockOut' : IDL.Null,
+  'stockIn' : IDL.Null,
+});
+export const StockTransaction = IDL.Record({
+  'unitType' : IDL.Text,
+  'transactionType' : StockTransactionType,
+  'supplier' : IDL.Opt(IDL.Text),
+  'date' : Time,
+  'quantity' : IDL.Nat,
+  'ingredientName' : IDL.Text,
+  'costPrice' : IDL.Opt(IDL.Nat),
+  'transactionId' : IDL.Nat,
+  'reason' : IDL.Text,
+});
 export const Subscription = IDL.Record({
   'id' : IDL.Nat,
   'customerName' : IDL.Text,
@@ -55,6 +72,19 @@ export const Subscription = IDL.Record({
   'planType' : IDL.Text,
   'bowlSize' : SaladBowlType,
   'startDate' : Time,
+});
+export const InventoryItem = IDL.Record({
+  'unitType' : IDL.Text,
+  'quantityInStock' : IDL.Nat,
+  'ingredientName' : IDL.Text,
+});
+export const StockStatus = IDL.Record({
+  'unitType' : IDL.Text,
+  'quantityInStock' : IDL.Nat,
+  'isLowStock' : IDL.Bool,
+  'currentQuantity' : IDL.Nat,
+  'ingredientName' : IDL.Text,
+  'costPricePerUnit' : IDL.Nat,
 });
 
 export const idlService = IDL.Service({
@@ -119,6 +149,7 @@ export const idlService = IDL.Service({
   'getAllCustomers' : IDL.Func([], [IDL.Vec(Customer)], ['query']),
   'getAllIngredients' : IDL.Func([], [IDL.Vec(Ingredient)], ['query']),
   'getAllProductsWithInactive' : IDL.Func([], [IDL.Vec(SaladBowl)], ['query']),
+  'getAllStockTransactions' : IDL.Func([], [IDL.Vec(StockTransaction)], []),
   'getAllSubscriptions' : IDL.Func([], [IDL.Vec(Subscription)], ['query']),
   'getAnalyticsMetrics' : IDL.Func(
       [],
@@ -134,8 +165,31 @@ export const idlService = IDL.Service({
       [],
     ),
   'getIngredient' : IDL.Func([IDL.Text], [IDL.Opt(Ingredient)], ['query']),
+  'getInventoryStatus' : IDL.Func(
+      [],
+      [
+        IDL.Record({
+          'totalValue' : IDL.Nat,
+          'items' : IDL.Vec(InventoryItem),
+        }),
+      ],
+      [],
+    ),
   'getProduct' : IDL.Func([IDL.Nat], [IDL.Opt(SaladBowl)], ['query']),
+  'getStockStatus' : IDL.Func([], [IDL.Vec(StockStatus)], []),
+  'getStockTransactionsByType' : IDL.Func(
+      [StockTransactionType],
+      [IDL.Vec(StockTransaction)],
+      [],
+    ),
   'monthlyPlanDuration' : IDL.Func([], [IDL.Nat], []),
+  'recordStockIn' : IDL.Func(
+      [IDL.Text, IDL.Nat, IDL.Text, IDL.Nat, IDL.Text],
+      [IDL.Bool],
+      [],
+    ),
+  'recordStockOut' : IDL.Func([IDL.Text, IDL.Nat, IDL.Text], [IDL.Bool], []),
+  'recordWriteOff' : IDL.Func([IDL.Text, IDL.Nat, IDL.Text], [IDL.Bool], []),
   'toggleSaladBowlAvailability' : IDL.Func([IDL.Text, IDL.Bool], [], []),
   'updateIngredient' : IDL.Func([IDL.Text, Ingredient], [IDL.Bool], []),
   'updateProduct' : IDL.Func([IDL.Nat, SaladBowl], [IDL.Bool], []),
@@ -146,6 +200,7 @@ export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
   const Ingredient = IDL.Record({
+    'unitType' : IDL.Text,
     'lowStockThreshold' : IDL.Nat,
     'supplierName' : IDL.Text,
     'name' : IDL.Text,
@@ -180,6 +235,22 @@ export const idlFactory = ({ IDL }) => {
     'preferences' : IDL.Text,
     'contactDetails' : IDL.Text,
   });
+  const StockTransactionType = IDL.Variant({
+    'writeOff' : IDL.Null,
+    'stockOut' : IDL.Null,
+    'stockIn' : IDL.Null,
+  });
+  const StockTransaction = IDL.Record({
+    'unitType' : IDL.Text,
+    'transactionType' : StockTransactionType,
+    'supplier' : IDL.Opt(IDL.Text),
+    'date' : Time,
+    'quantity' : IDL.Nat,
+    'ingredientName' : IDL.Text,
+    'costPrice' : IDL.Opt(IDL.Nat),
+    'transactionId' : IDL.Nat,
+    'reason' : IDL.Text,
+  });
   const Subscription = IDL.Record({
     'id' : IDL.Nat,
     'customerName' : IDL.Text,
@@ -192,6 +263,19 @@ export const idlFactory = ({ IDL }) => {
     'planType' : IDL.Text,
     'bowlSize' : SaladBowlType,
     'startDate' : Time,
+  });
+  const InventoryItem = IDL.Record({
+    'unitType' : IDL.Text,
+    'quantityInStock' : IDL.Nat,
+    'ingredientName' : IDL.Text,
+  });
+  const StockStatus = IDL.Record({
+    'unitType' : IDL.Text,
+    'quantityInStock' : IDL.Nat,
+    'isLowStock' : IDL.Bool,
+    'currentQuantity' : IDL.Nat,
+    'ingredientName' : IDL.Text,
+    'costPricePerUnit' : IDL.Nat,
   });
   
   return IDL.Service({
@@ -260,6 +344,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(SaladBowl)],
         ['query'],
       ),
+    'getAllStockTransactions' : IDL.Func([], [IDL.Vec(StockTransaction)], []),
     'getAllSubscriptions' : IDL.Func([], [IDL.Vec(Subscription)], ['query']),
     'getAnalyticsMetrics' : IDL.Func(
         [],
@@ -275,8 +360,31 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'getIngredient' : IDL.Func([IDL.Text], [IDL.Opt(Ingredient)], ['query']),
+    'getInventoryStatus' : IDL.Func(
+        [],
+        [
+          IDL.Record({
+            'totalValue' : IDL.Nat,
+            'items' : IDL.Vec(InventoryItem),
+          }),
+        ],
+        [],
+      ),
     'getProduct' : IDL.Func([IDL.Nat], [IDL.Opt(SaladBowl)], ['query']),
+    'getStockStatus' : IDL.Func([], [IDL.Vec(StockStatus)], []),
+    'getStockTransactionsByType' : IDL.Func(
+        [StockTransactionType],
+        [IDL.Vec(StockTransaction)],
+        [],
+      ),
     'monthlyPlanDuration' : IDL.Func([], [IDL.Nat], []),
+    'recordStockIn' : IDL.Func(
+        [IDL.Text, IDL.Nat, IDL.Text, IDL.Nat, IDL.Text],
+        [IDL.Bool],
+        [],
+      ),
+    'recordStockOut' : IDL.Func([IDL.Text, IDL.Nat, IDL.Text], [IDL.Bool], []),
+    'recordWriteOff' : IDL.Func([IDL.Text, IDL.Nat, IDL.Text], [IDL.Bool], []),
     'toggleSaladBowlAvailability' : IDL.Func([IDL.Text, IDL.Bool], [], []),
     'updateIngredient' : IDL.Func([IDL.Text, Ingredient], [IDL.Bool], []),
     'updateProduct' : IDL.Func([IDL.Nat, SaladBowl], [IDL.Bool], []),

@@ -7,7 +7,9 @@ import Nat "mo:core/Nat";
 import Order "mo:core/Order";
 import Int "mo:core/Int";
 import Iter "mo:core/Iter";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   type Ingredient = {
     name : Text;
@@ -15,6 +17,7 @@ actor {
     costPricePerUnit : Nat;
     supplierName : Text;
     lowStockThreshold : Nat;
+    unitType : Text;
   };
 
   type SaladBowlType = {
@@ -61,6 +64,39 @@ actor {
     #monthly : { duration : Nat };
   };
 
+  type StockTransactionType = {
+    #stockIn;
+    #stockOut;
+    #writeOff;
+  };
+
+  public type StockTransaction = {
+    transactionId : Nat;
+    ingredientName : Text;
+    quantity : Nat;
+    transactionType : StockTransactionType;
+    reason : Text;
+    date : Time.Time;
+    supplier : ?Text;
+    costPrice : ?Nat;
+    unitType : Text;
+  };
+
+  type StockStatus = {
+    ingredientName : Text;
+    currentQuantity : Nat;
+    quantityInStock : Nat;
+    unitType : Text;
+    costPricePerUnit : Nat;
+    isLowStock : Bool;
+  };
+
+  type InventoryItem = {
+    ingredientName : Text;
+    quantityInStock : Nat;
+    unitType : Text;
+  };
+
   type Subscription = {
     id : Nat;
     name : Text; // New field for custom subscription name/label
@@ -91,6 +127,9 @@ actor {
 
   let products = Map.empty<Nat, SaladBowl>();
   var nextProductId = 0;
+
+  let stockTransactions = Map.empty<Nat, StockTransaction>();
+  var nextStockTransactionId = 0;
 
   func compareInvoices(a : Invoice, b : Invoice) : Order.Order {
     Int.compare(a.timestamp, b.timestamp);
@@ -332,14 +371,10 @@ actor {
     products.values().toArray();
   };
 
-  // Inventory Management
-
-  // Add a new ingredient
   public shared ({ caller }) func addIngredient(ingredient : Ingredient) : async () {
     ingredientInventory.add(ingredient.name, ingredient);
   };
 
-  // Update an existing ingredient
   public shared ({ caller }) func updateIngredient(name : Text, updatedIngredient : Ingredient) : async Bool {
     switch (ingredientInventory.get(name)) {
       case (null) { false };
@@ -350,7 +385,6 @@ actor {
     };
   };
 
-  // Delete an ingredient
   public shared ({ caller }) func deleteIngredient(name : Text) : async Bool {
     switch (ingredientInventory.get(name)) {
       case (null) { false };
@@ -361,13 +395,166 @@ actor {
     };
   };
 
-  // Get a specific ingredient
   public query ({ caller }) func getIngredient(name : Text) : async ?Ingredient {
     ingredientInventory.get(name);
   };
 
-  // Get all ingredients
   public query ({ caller }) func getAllIngredients() : async [Ingredient] {
     ingredientInventory.values().toArray();
+  };
+
+  public shared ({ caller }) func recordStockIn(ingredientName : Text, quantity : Nat, supplier : Text, costPrice : Nat, unitType : Text) : async Bool {
+    let adjustedQuantity = if (quantity < 1) { 1 } else { quantity };
+
+    let transaction = {
+      transactionId = nextStockTransactionId;
+      ingredientName;
+      quantity = adjustedQuantity;
+      transactionType = #stockIn;
+      reason = "Stock In";
+      date = Time.now();
+      supplier = ?supplier;
+      costPrice = ?costPrice;
+      unitType;
+    };
+
+    stockTransactions.add(nextStockTransactionId, transaction);
+    nextStockTransactionId += 1;
+
+    switch (ingredientInventory.get(ingredientName)) {
+      case (null) {
+        let newIngredient = {
+          name = ingredientName;
+          quantity = adjustedQuantity;
+          costPricePerUnit = costPrice;
+          supplierName = supplier;
+          lowStockThreshold = 1; // Default threshold
+          unitType;
+        };
+        ingredientInventory.add(ingredientName, newIngredient);
+      };
+      case (?ingredient) {
+        let updatedIngredient = {
+          ingredient with
+          quantity = ingredient.quantity + adjustedQuantity;
+          costPricePerUnit = costPrice;
+        };
+        ingredientInventory.add(ingredientName, updatedIngredient);
+      };
+    };
+    true;
+  };
+
+  public shared ({ caller }) func recordStockOut(ingredientName : Text, quantity : Nat, reason : Text) : async Bool {
+    let adjustedQuantity = if (quantity < 1) { 1 } else { quantity };
+
+    let transaction = {
+      transactionId = nextStockTransactionId;
+      ingredientName;
+      quantity = adjustedQuantity;
+      transactionType = #stockOut;
+      reason;
+      date = Time.now();
+      supplier = null;
+      costPrice = null;
+      unitType = "";
+    };
+
+    stockTransactions.add(nextStockTransactionId, transaction);
+    nextStockTransactionId += 1;
+
+    switch (ingredientInventory.get(ingredientName)) {
+      case (null) { false };
+      case (?ingredient) {
+        let updatedQuantity = if (ingredient.quantity > adjustedQuantity) {
+          ingredient.quantity - adjustedQuantity;
+        } else { 0 };
+
+        let updatedIngredient = {
+          ingredient with
+          quantity = updatedQuantity;
+        };
+        ingredientInventory.add(ingredientName, updatedIngredient);
+        true;
+      };
+    };
+  };
+
+  public shared ({ caller }) func recordWriteOff(ingredientName : Text, quantity : Nat, reason : Text) : async Bool {
+    let adjustedQuantity = if (quantity < 1) { 1 } else { quantity };
+
+    let transaction = {
+      transactionId = nextStockTransactionId;
+      ingredientName;
+      quantity = adjustedQuantity;
+      transactionType = #writeOff;
+      reason;
+      date = Time.now();
+      supplier = null;
+      costPrice = null;
+      unitType = "";
+    };
+
+    stockTransactions.add(nextStockTransactionId, transaction);
+    nextStockTransactionId += 1;
+
+    switch (ingredientInventory.get(ingredientName)) {
+      case (null) { false };
+      case (?ingredient) {
+        let updatedQuantity = if (ingredient.quantity > adjustedQuantity) {
+          ingredient.quantity - adjustedQuantity;
+        } else { 0 };
+
+        let updatedIngredient = {
+          ingredient with
+          quantity = updatedQuantity;
+        };
+        ingredientInventory.add(ingredientName, updatedIngredient);
+        true;
+      };
+    };
+  };
+
+  public shared ({ caller }) func getStockStatus() : async [StockStatus] {
+    ingredientInventory.values().toArray().map(func(ingredient) {
+      {
+        ingredientName = ingredient.name;
+        currentQuantity = ingredient.quantity;
+        quantityInStock = ingredient.quantity;
+        unitType = ingredient.unitType;
+        costPricePerUnit = ingredient.costPricePerUnit;
+        isLowStock = ingredient.quantity < ingredient.lowStockThreshold;
+      };
+    });
+  };
+
+  public shared ({ caller }) func getAllStockTransactions() : async [StockTransaction] {
+    stockTransactions.values().toArray();
+  };
+
+  public shared ({ caller }) func getInventoryStatus() : async {
+    totalValue : Nat;
+    items : [InventoryItem];
+  } {
+    var totalValue = 0;
+    let inventoryItems = ingredientInventory.values().toArray().map(func(ingredient) {
+      totalValue += ingredient.quantity * ingredient.costPricePerUnit;
+      {
+        ingredientName = ingredient.name;
+        quantityInStock = ingredient.quantity;
+        unitType = ingredient.unitType;
+      };
+    });
+    {
+      totalValue;
+      items = inventoryItems;
+    };
+  };
+
+  public shared ({ caller }) func getStockTransactionsByType(transactionType : StockTransactionType) : async [StockTransaction] {
+    let filteredTransactions = stockTransactions.values().toArray().filter(
+      func(transaction) { transaction.transactionType == transactionType }
+    );
+    filteredTransactions;
   };
 };

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Customer, Recipe, Subscription, SaladBowlType, Time, SaladBowl, Ingredient } from '../backend';
+import type { Customer, Recipe, Subscription, SaladBowlType, Time, SaladBowl, Ingredient, StockTransactionType, StockStatus } from '../backend';
 import { toast } from 'sonner';
 
 // Analytics Metrics
@@ -326,6 +326,7 @@ export function useAddIngredient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
       toast.success('Ingredient added successfully');
     },
     onError: () => {
@@ -347,6 +348,7 @@ export function useUpdateIngredient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
       toast.success('Ingredient updated successfully');
     },
     onError: () => {
@@ -368,10 +370,123 @@ export function useDeleteIngredient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
       toast.success('Ingredient deleted successfully');
     },
     onError: () => {
       toast.error('Failed to delete ingredient');
     },
+  });
+}
+
+// Stock Management
+export function useGetStockStatus() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<StockStatus[]>({
+    queryKey: ['stockStatus'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getStockStatus();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useRecordStockIn() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async (params: {
+      ingredientName: string;
+      quantity: bigint;
+      supplier: string;
+      costPrice: bigint;
+      unitType: string;
+    }) => {
+      if (!actor) throw new Error('Actor not initialized');
+      const result = await actor.recordStockIn(
+        params.ingredientName,
+        params.quantity,
+        params.supplier,
+        params.costPrice,
+        params.unitType
+      );
+      if (!result) throw new Error('Failed to record stock in');
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
+      queryClient.invalidateQueries({ queryKey: ['stockTransactions'] });
+    },
+  });
+}
+
+export function useRecordStockOut() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async (params: {
+      ingredientName: string;
+      quantity: bigint;
+      reason: string;
+    }) => {
+      if (!actor) throw new Error('Actor not initialized');
+      const result = await actor.recordStockOut(
+        params.ingredientName,
+        params.quantity,
+        params.reason
+      );
+      if (!result) throw new Error('Failed to record stock out');
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
+      queryClient.invalidateQueries({ queryKey: ['stockTransactions'] });
+    },
+  });
+}
+
+export function useRecordWriteOff() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async (params: {
+      ingredientName: string;
+      quantity: bigint;
+      reason: string;
+    }) => {
+      if (!actor) throw new Error('Actor not initialized');
+      const result = await actor.recordWriteOff(
+        params.ingredientName,
+        params.quantity,
+        params.reason
+      );
+      if (!result) throw new Error('Failed to record write-off');
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
+      queryClient.invalidateQueries({ queryKey: ['stockTransactions'] });
+    },
+  });
+}
+
+export function useGetStockTransactionsByType(transactionType: StockTransactionType) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery({
+    queryKey: ['stockTransactions', transactionType],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getStockTransactionsByType(transactionType);
+    },
+    enabled: !!actor && !isFetching,
   });
 }

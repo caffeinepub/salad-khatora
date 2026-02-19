@@ -1,40 +1,43 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus } from 'lucide-react';
-import IngredientForm from '../components/IngredientForm';
-import IngredientList from '../components/IngredientList';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import StockInTab from '../components/StockInTab';
+import StockOutTab from '../components/StockOutTab';
+import WriteOffTab from '../components/WriteOffTab';
+import StockStatusTab from '../components/StockStatusTab';
 
 export default function InventoryPage() {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Inventory Management</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your ingredients and track stock levels
-          </p>
-        </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-fresh-600 hover:bg-fresh-700">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Ingredient
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Add New Ingredient</DialogTitle>
-            </DialogHeader>
-            <IngredientForm onSuccess={() => setIsDialogOpen(false)} />
-          </DialogContent>
-        </Dialog>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Inventory Management</h1>
+        <p className="text-muted-foreground mt-1">
+          Manage your ingredients and track stock levels
+        </p>
       </div>
 
-      <IngredientList />
+      <Tabs defaultValue="stock-status" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="stock-status">Stock Status</TabsTrigger>
+          <TabsTrigger value="stock-in">Stock In</TabsTrigger>
+          <TabsTrigger value="stock-out">Stock Out</TabsTrigger>
+          <TabsTrigger value="write-off">Write Off</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="stock-status" className="mt-6">
+          <StockStatusTab />
+        </TabsContent>
+
+        <TabsContent value="stock-in" className="mt-6">
+          <StockInTab />
+        </TabsContent>
+
+        <TabsContent value="stock-out" className="mt-6">
+          <StockOutTab />
+        </TabsContent>
+
+        <TabsContent value="write-off" className="mt-6">
+          <WriteOffTab />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

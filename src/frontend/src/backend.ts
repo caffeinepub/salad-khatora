@@ -102,8 +102,20 @@ export interface Subscription {
     bowlSize: SaladBowlType;
     startDate: Time;
 }
+export interface InventoryItem {
+    unitType: string;
+    quantityInStock: bigint;
+    ingredientName: string;
+}
+export interface Customer {
+    id: bigint;
+    name: string;
+    preferences: string;
+    contactDetails: string;
+}
 export type Time = bigint;
 export interface Ingredient {
+    unitType: string;
     lowStockThreshold: bigint;
     supplierName: string;
     name: string;
@@ -117,6 +129,25 @@ export interface SaladBowl {
     bowlType: SaladBowlType;
     recipe: Recipe;
 }
+export interface StockStatus {
+    unitType: string;
+    quantityInStock: bigint;
+    isLowStock: boolean;
+    currentQuantity: bigint;
+    ingredientName: string;
+    costPricePerUnit: bigint;
+}
+export interface StockTransaction {
+    unitType: string;
+    transactionType: StockTransactionType;
+    supplier?: string;
+    date: Time;
+    quantity: bigint;
+    ingredientName: string;
+    costPrice?: bigint;
+    transactionId: bigint;
+    reason: string;
+}
 export type Recipe = Array<[string, bigint]>;
 export interface Invoice {
     customerName: string;
@@ -125,17 +156,16 @@ export interface Invoice {
     totalPrice: bigint;
     itemsOrdered: Array<[string, bigint]>;
 }
-export interface Customer {
-    id: bigint;
-    name: string;
-    preferences: string;
-    contactDetails: string;
-}
 export enum SaladBowlType {
     custom = "custom",
     gm250 = "gm250",
     gm350 = "gm350",
     gm500 = "gm500"
+}
+export enum StockTransactionType {
+    writeOff = "writeOff",
+    stockOut = "stockOut",
+    stockIn = "stockIn"
 }
 export interface backendInterface {
     addCustomer(id: bigint, name: string, contactDetails: string, preferences: string): Promise<boolean>;
@@ -157,6 +187,7 @@ export interface backendInterface {
     getAllCustomers(): Promise<Array<Customer>>;
     getAllIngredients(): Promise<Array<Ingredient>>;
     getAllProductsWithInactive(): Promise<Array<SaladBowl>>;
+    getAllStockTransactions(): Promise<Array<StockTransaction>>;
     getAllSubscriptions(): Promise<Array<Subscription>>;
     getAnalyticsMetrics(): Promise<{
         monthlySales: bigint;
@@ -166,14 +197,23 @@ export interface backendInterface {
         dailyExpenses: bigint;
     }>;
     getIngredient(name: string): Promise<Ingredient | null>;
+    getInventoryStatus(): Promise<{
+        totalValue: bigint;
+        items: Array<InventoryItem>;
+    }>;
     getProduct(id: bigint): Promise<SaladBowl | null>;
+    getStockStatus(): Promise<Array<StockStatus>>;
+    getStockTransactionsByType(transactionType: StockTransactionType): Promise<Array<StockTransaction>>;
     monthlyPlanDuration(): Promise<bigint>;
+    recordStockIn(ingredientName: string, quantity: bigint, supplier: string, costPrice: bigint, unitType: string): Promise<boolean>;
+    recordStockOut(ingredientName: string, quantity: bigint, reason: string): Promise<boolean>;
+    recordWriteOff(ingredientName: string, quantity: bigint, reason: string): Promise<boolean>;
     toggleSaladBowlAvailability(bowlName: string, isAvailable: boolean): Promise<void>;
     updateIngredient(name: string, updatedIngredient: Ingredient): Promise<boolean>;
     updateProduct(id: bigint, updatedProduct: SaladBowl): Promise<boolean>;
     weeklyPlanDuration(): Promise<bigint>;
 }
-import type { Ingredient as _Ingredient, Recipe as _Recipe, SaladBowl as _SaladBowl, SaladBowlType as _SaladBowlType, Subscription as _Subscription, Time as _Time } from "./declarations/backend.did.d.ts";
+import type { Ingredient as _Ingredient, Recipe as _Recipe, SaladBowl as _SaladBowl, SaladBowlType as _SaladBowlType, StockTransaction as _StockTransaction, StockTransactionType as _StockTransactionType, Subscription as _Subscription, Time as _Time } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async addCustomer(arg0: bigint, arg1: string, arg2: string, arg3: string): Promise<boolean> {
@@ -390,18 +430,32 @@ export class Backend implements backendInterface {
             return from_candid_vec_n5(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getAllSubscriptions(): Promise<Array<Subscription>> {
+    async getAllStockTransactions(): Promise<Array<StockTransaction>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getAllSubscriptions();
+                const result = await this.actor.getAllStockTransactions();
                 return from_candid_vec_n10(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getAllSubscriptions();
+            const result = await this.actor.getAllStockTransactions();
             return from_candid_vec_n10(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getAllSubscriptions(): Promise<Array<Subscription>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllSubscriptions();
+                return from_candid_vec_n17(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllSubscriptions();
+            return from_candid_vec_n17(this._uploadFile, this._downloadFile, result);
         }
     }
     async getAnalyticsMetrics(): Promise<{
@@ -428,28 +482,73 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getIngredient(arg0);
-                return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n20(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getIngredient(arg0);
-            return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n20(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getInventoryStatus(): Promise<{
+        totalValue: bigint;
+        items: Array<InventoryItem>;
+    }> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getInventoryStatus();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getInventoryStatus();
+            return result;
         }
     }
     async getProduct(arg0: bigint): Promise<SaladBowl | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getProduct(arg0);
-                return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getProduct(arg0);
-            return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getStockStatus(): Promise<Array<StockStatus>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getStockStatus();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getStockStatus();
+            return result;
+        }
+    }
+    async getStockTransactionsByType(arg0: StockTransactionType): Promise<Array<StockTransaction>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getStockTransactionsByType(to_candid_StockTransactionType_n22(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_vec_n10(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getStockTransactionsByType(to_candid_StockTransactionType_n22(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_vec_n10(this._uploadFile, this._downloadFile, result);
         }
     }
     async monthlyPlanDuration(): Promise<bigint> {
@@ -463,6 +562,48 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.monthlyPlanDuration();
+            return result;
+        }
+    }
+    async recordStockIn(arg0: string, arg1: bigint, arg2: string, arg3: bigint, arg4: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.recordStockIn(arg0, arg1, arg2, arg3, arg4);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.recordStockIn(arg0, arg1, arg2, arg3, arg4);
+            return result;
+        }
+    }
+    async recordStockOut(arg0: string, arg1: bigint, arg2: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.recordStockOut(arg0, arg1, arg2);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.recordStockOut(arg0, arg1, arg2);
+            return result;
+        }
+    }
+    async recordWriteOff(arg0: string, arg1: bigint, arg2: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.recordWriteOff(arg0, arg1, arg2);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.recordWriteOff(arg0, arg1, arg2);
             return result;
         }
     }
@@ -529,16 +670,61 @@ function from_candid_SaladBowlType_n8(_uploadFile: (file: ExternalBlob) => Promi
 function from_candid_SaladBowl_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _SaladBowl): SaladBowl {
     return from_candid_record_n7(_uploadFile, _downloadFile, value);
 }
-function from_candid_Subscription_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Subscription): Subscription {
+function from_candid_StockTransactionType_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _StockTransactionType): StockTransactionType {
+    return from_candid_variant_n14(_uploadFile, _downloadFile, value);
+}
+function from_candid_StockTransaction_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _StockTransaction): StockTransaction {
     return from_candid_record_n12(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Ingredient]): Ingredient | null {
+function from_candid_Subscription_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Subscription): Subscription {
+    return from_candid_record_n19(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_SaladBowl]): SaladBowl | null {
+function from_candid_opt_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Ingredient]): Ingredient | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_SaladBowl]): SaladBowl | null {
     return value.length === 0 ? null : from_candid_SaladBowl_n6(_uploadFile, _downloadFile, value[0]);
 }
 function from_candid_record_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    unitType: string;
+    transactionType: _StockTransactionType;
+    supplier: [] | [string];
+    date: _Time;
+    quantity: bigint;
+    ingredientName: string;
+    costPrice: [] | [bigint];
+    transactionId: bigint;
+    reason: string;
+}): {
+    unitType: string;
+    transactionType: StockTransactionType;
+    supplier?: string;
+    date: Time;
+    quantity: bigint;
+    ingredientName: string;
+    costPrice?: bigint;
+    transactionId: bigint;
+    reason: string;
+} {
+    return {
+        unitType: value.unitType,
+        transactionType: from_candid_StockTransactionType_n13(_uploadFile, _downloadFile, value.transactionType),
+        supplier: record_opt_to_undefined(from_candid_opt_n15(_uploadFile, _downloadFile, value.supplier)),
+        date: value.date,
+        quantity: value.quantity,
+        ingredientName: value.ingredientName,
+        costPrice: record_opt_to_undefined(from_candid_opt_n16(_uploadFile, _downloadFile, value.costPrice)),
+        transactionId: value.transactionId,
+        reason: value.reason
+    };
+}
+function from_candid_record_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     id: bigint;
     customerName: string;
     endDate: _Time;
@@ -598,6 +784,15 @@ function from_candid_record_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint
         recipe: value.recipe
     };
 }
+function from_candid_variant_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    writeOff: null;
+} | {
+    stockOut: null;
+} | {
+    stockIn: null;
+}): StockTransactionType {
+    return "writeOff" in value ? StockTransactionType.writeOff : "stockOut" in value ? StockTransactionType.stockOut : "stockIn" in value ? StockTransactionType.stockIn : value;
+}
 function from_candid_variant_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     custom: null;
 } | {
@@ -609,8 +804,11 @@ function from_candid_variant_n9(_uploadFile: (file: ExternalBlob) => Promise<Uin
 }): SaladBowlType {
     return "custom" in value ? SaladBowlType.custom : "gm250" in value ? SaladBowlType.gm250 : "gm350" in value ? SaladBowlType.gm350 : "gm500" in value ? SaladBowlType.gm500 : value;
 }
-function from_candid_vec_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Subscription>): Array<Subscription> {
-    return value.map((x)=>from_candid_Subscription_n11(_uploadFile, _downloadFile, x));
+function from_candid_vec_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_StockTransaction>): Array<StockTransaction> {
+    return value.map((x)=>from_candid_StockTransaction_n11(_uploadFile, _downloadFile, x));
+}
+function from_candid_vec_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Subscription>): Array<Subscription> {
+    return value.map((x)=>from_candid_Subscription_n18(_uploadFile, _downloadFile, x));
 }
 function from_candid_vec_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_SaladBowl>): Array<SaladBowl> {
     return value.map((x)=>from_candid_SaladBowl_n6(_uploadFile, _downloadFile, x));
@@ -620,6 +818,9 @@ function to_candid_SaladBowlType_n3(_uploadFile: (file: ExternalBlob) => Promise
 }
 function to_candid_SaladBowl_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: SaladBowl): _SaladBowl {
     return to_candid_record_n2(_uploadFile, _downloadFile, value);
+}
+function to_candid_StockTransactionType_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: StockTransactionType): _StockTransactionType {
+    return to_candid_variant_n23(_uploadFile, _downloadFile, value);
 }
 function to_candid_record_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     active: boolean;
@@ -641,6 +842,21 @@ function to_candid_record_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
         bowlType: to_candid_SaladBowlType_n3(_uploadFile, _downloadFile, value.bowlType),
         recipe: value.recipe
     };
+}
+function to_candid_variant_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: StockTransactionType): {
+    writeOff: null;
+} | {
+    stockOut: null;
+} | {
+    stockIn: null;
+} {
+    return value == StockTransactionType.writeOff ? {
+        writeOff: null
+    } : value == StockTransactionType.stockOut ? {
+        stockOut: null
+    } : value == StockTransactionType.stockIn ? {
+        stockIn: null
+    } : value;
 }
 function to_candid_variant_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: SaladBowlType): {
     custom: null;
