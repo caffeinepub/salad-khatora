@@ -1,58 +1,76 @@
 {
   "kind": "build_request",
-  "title": "Implement Internet Identity authentication for customer management access",
+  "title": "Enforce authentication requirement and redirect unauthenticated users to login page",
   "projectName": "Salad Khatora",
-  "priority": "normal",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-41",
-      "text": "Protect the CustomersPage route with Internet Identity authentication, redirecting unauthenticated users to the LoginPage",
+      "id": "REQ-43",
+      "text": "Update the App.tsx router configuration to enforce authentication checks on all protected routes (dashboard, inventory, products, billing, subscriptions, reports, customers). Unauthenticated users must be redirected to the login page (/login) before accessing any protected page.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "Now put this in the admin side with login"
+          "Nothing has changed directly opening site , no login page available"
         ]
       },
       "acceptanceCriteria": [
-        "Users cannot access /customers route without authentication",
-        "Unauthenticated users are redirected to /login when attempting to access /customers",
-        "After successful Internet Identity login, users can access the customer management tab",
-        "The authentication check uses the existing useInternetIdentity hook"
+        "When an unauthenticated user navigates to the root URL (/), they are redirected to /login",
+        "When an unauthenticated user attempts to access any protected route (e.g., /dashboard, /inventory, /products), they are redirected to /login",
+        "After successful Internet Identity authentication, the user is redirected to /dashboard",
+        "Authenticated users can access all protected routes without being redirected to login"
       ]
     },
     {
-      "id": "REQ-42",
-      "text": "Update the Layout component sidebar navigation to show the Customers menu item only when the user is authenticated",
+      "id": "REQ-44",
+      "text": "Update the Layout component to check authentication state and redirect unauthenticated users to the login page if they attempt to access protected routes through direct navigation or URL entry.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "Now put this in the admin side with login"
+          "Nothing has changed directly opening site , no login page available"
         ]
       },
       "acceptanceCriteria": [
-        "The Customers navigation link is hidden in the sidebar when user is not authenticated",
-        "The Customers navigation link appears in the sidebar after successful login",
-        "All other navigation items remain visible regardless of authentication state"
+        "Layout component checks isAuthenticated state from useInternetIdentity hook",
+        "If user is not authenticated and attempts to render a protected page, redirect to /login occurs",
+        "Redirect logic works consistently across all protected routes"
+      ]
+    },
+    {
+      "id": "REQ-45",
+      "text": "Document the admin Internet Identity credentials in the project documentation or provide them in a secure manner to the user for accessing the application.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "share admin credentials"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin Internet Identity principal or authentication instructions are documented",
+        "User receives clear instructions on how to authenticate using Internet Identity",
+        "Documentation includes steps for creating an Internet Identity if the user doesn't have one"
       ]
     }
   ],
   "constraints": [
-    "Do not modify frontend/src/hooks/useInternetIdentity.ts or frontend/src/hooks/useInternetIdentity.tsx",
-    "Do not modify frontend/src/hooks/useActor.ts",
-    "Use the existing Internet Identity authentication infrastructure already implemented in the app",
-    "Do not change the backend authentication logic"
+    "Must use existing Internet Identity authentication system (useInternetIdentity hook)",
+    "Do not modify the Internet Identity hook implementation (frontend/src/hooks/useInternetIdentity.ts is immutable)",
+    "Authentication flow must work with TanStack Router configuration in App.tsx",
+    "Login page (/login) must remain publicly accessible without authentication"
   ],
   "nonGoals": [
-    "Adding new authentication methods beyond Internet Identity",
-    "Implementing role-based access control or permissions",
-    "Adding authentication to other pages beyond the customer management tab",
-    "Changing the existing login page design or functionality"
+    "Creating a custom username/password authentication system",
+    "Adding role-based access control beyond admin authentication",
+    "Implementing session timeout or token refresh mechanisms",
+    "Adding multi-factor authentication"
   ],
   "imageRequirements": {
     "required": [],

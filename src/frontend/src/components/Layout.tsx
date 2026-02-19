@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Home, Package, ShoppingCart, CreditCard, Calendar, FileText, Users, LogOut } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { SiCoffeescript } from 'react-icons/si';
 
@@ -14,9 +14,16 @@ export default function Layout({ children }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { clear, loginStatus } = useInternetIdentity();
+  const { clear, loginStatus, isInitializing } = useInternetIdentity();
 
   const isAuthenticated = loginStatus === 'success';
+
+  // Redirect to login if not authenticated and not on login page
+  useEffect(() => {
+    if (!isInitializing && !isAuthenticated && location.pathname !== '/login') {
+      navigate({ to: '/login' });
+    }
+  }, [isAuthenticated, isInitializing, location.pathname, navigate]);
 
   const handleLogout = () => {
     clear();
@@ -24,7 +31,7 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   const allNavItems = [
-    { name: 'Dashboard', path: '/', icon: Home, requiresAuth: false },
+    { name: 'Dashboard', path: '/dashboard', icon: Home, requiresAuth: false },
     { name: 'Inventory', path: '/inventory', icon: Package, requiresAuth: false },
     { name: 'Products', path: '/products', icon: ShoppingCart, requiresAuth: false },
     { name: 'Billing', path: '/billing', icon: CreditCard, requiresAuth: false },
@@ -76,7 +83,7 @@ export default function Layout({ children }: LayoutProps) {
               </SheetContent>
             </Sheet>
 
-            <Link to="/" className="flex items-center gap-2">
+            <Link to="/dashboard" className="flex items-center gap-2">
               <img 
                 src="/assets/Salad Khatora.jpeg" 
                 alt="Salad Khatora" 

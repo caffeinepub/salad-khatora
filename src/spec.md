@@ -1,10 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Protect the customer management page with Internet Identity authentication.
+**Goal:** Enforce authentication requirement and redirect unauthenticated users to the login page.
 
 **Planned changes:**
-- Add authentication check to the CustomersPage route to redirect unauthenticated users to the login page
-- Update the sidebar navigation to conditionally show the Customers menu item only for authenticated users
+- Update App.tsx router configuration to redirect unauthenticated users from protected routes to /login
+- Update Layout component to check authentication state and redirect unauthenticated users to /login
+- Document admin Internet Identity credentials and authentication instructions
 
-**User-visible outcome:** Users must log in with Internet Identity to access the customer management tab. The Customers menu item appears in the sidebar only after successful login.
+**User-visible outcome:** Users attempting to access the application without authentication will be automatically redirected to the login page. After successful Internet Identity authentication, users will be redirected to the dashboard and can access all protected routes.

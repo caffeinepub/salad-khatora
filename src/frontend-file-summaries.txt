@@ -1,13 +1,13 @@
 {
-  "frontend/src/App.tsx": "Main application component with TanStack Router setup including new customers route and all page routes properly configured.",
-  "frontend/src/pages/LoginPage.tsx": "Login page with Internet Identity authentication, featuring Salad Khatora branding and secure login flow.",
+  "frontend/src/App.tsx": "Main application component with TanStack Router setup including proper React component wrappers for all routes with authentication guards using a reusable ProtectedRoute component that redirects unauthenticated users to /login with loading states during initialization.",
+  "frontend/src/pages/LoginPage.tsx": "Login page with Internet Identity authentication, featuring Salad Khatora branding and secure login flow that redirects to /dashboard after successful authentication.",
   "frontend/src/pages/DashboardPage.tsx": "Dashboard page displaying hero banner, alert panel, metrics, and sales charts for business overview.",
   "frontend/src/pages/InventoryPage.tsx": "Inventory management page with tabbed interface for Stock Status, Stock In, Stock Out, and Write Off sub-tabs using shadcn/ui Tabs component.",
   "frontend/src/pages/ProductsPage.tsx": "Product management page for salad bowls with recipe configuration and product list.",
   "frontend/src/pages/BillingPage.tsx": "Billing page with tabs for creating new invoices and viewing invoice history.",
   "frontend/src/pages/SubscriptionsPage.tsx": "Subscription management page with form to add subscriptions, list of active/expiring subscriptions, and Print KOT button that opens a preview dialog and triggers browser print functionality.",
   "frontend/src/pages/ReportsPage.tsx": "Reports page with CSV export functionality for inventory, sales, subscriptions, and expenses reports with note about Excel format coming soon.",
-  "frontend/src/components/Layout.tsx": "Responsive layout component with navigation, mobile menu, and footer; conditionally displays the Customers navigation item only when user is authenticated via Internet Identity.",
+  "frontend/src/components/Layout.tsx": "Responsive layout component with navigation, mobile menu, and footer; includes useEffect hook to redirect unauthenticated users to login page and updated dashboard link path from \"/\" to \"/dashboard\".",
   "frontend/src/components/AlertPanel.tsx": "Alert panel displaying low stock warnings and expiring subscription notifications with placeholder for email integration (fixed missing import).",
   "frontend/src/components/DashboardMetrics.tsx": "Dashboard metrics component displaying five key metrics (daily sales, weekly sales, monthly sales, cash flow, daily expenses) fetched from backend analytics.",
   "frontend/src/components/SalesChart.tsx": "Sales and profit visualization charts using Recharts with daily, weekly, and monthly views.",
@@ -36,5 +36,6 @@
   "frontend/src/components/StockInTab.tsx": "Stock In tab with form to record incoming inventory including ingredient selection, quantity, supplier, cost price, and date fields, plus transaction history table using useGetStockTransactionsByType as a query hook.",
   "frontend/src/components/StockOutTab.tsx": "Stock Out tab with form to record inventory removal including ingredient selection, quantity validation against available stock, reason field, and transaction history table using useGetStockTransactionsByType as a query hook.",
   "frontend/src/components/WriteOffTab.tsx": "Write Off tab with form to record damaged/expired inventory including ingredient selection, quantity validation, reason field, and write-off history table using useGetStockTransactionsByType as a query hook.",
-  "frontend/src/components/StockTransactionTable.tsx": "Reusable table component displaying stock transactions sorted by date with columns for date, ingredient, quantity, type badge, reason, supplier, and cost price."
+  "frontend/src/components/StockTransactionTable.tsx": "Reusable table component displaying stock transactions sorted by date with columns for date, ingredient, quantity, type badge, reason, supplier, and cost price.",
+  "frontend/README.md": "Comprehensive documentation explaining Internet Identity authentication flow, how to create and use Internet Identity for login, application features, and important notes about passwordless authentication system."
 }
