@@ -28,8 +28,10 @@ export interface InventoryItem {
 export interface Customer {
     id: bigint;
     name: string;
+    email: string;
     preferences: string;
-    contactDetails: string;
+    address: string;
+    phone: string;
 }
 export type Time = bigint;
 export interface Ingredient {
@@ -86,7 +88,7 @@ export enum StockTransactionType {
     stockIn = "stockIn"
 }
 export interface backendInterface {
-    addCustomer(id: bigint, name: string, contactDetails: string, preferences: string): Promise<boolean>;
+    addCustomer(id: bigint, name: string, phone: string, email: string, address: string, preferences: string): Promise<boolean>;
     addIngredient(ingredient: Ingredient): Promise<void>;
     addProduct(product: SaladBowl): Promise<bigint>;
     bowlSizes(): Promise<{

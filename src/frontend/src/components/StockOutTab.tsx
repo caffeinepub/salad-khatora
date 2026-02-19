@@ -42,15 +42,14 @@ export default function StockOutTab() {
       return;
     }
 
-    // Check if quantity is available
     const selectedIngredient = ingredients.find(i => i.name === formData.ingredientName);
     if (!selectedIngredient) {
       toast.error('Selected ingredient not found');
       return;
     }
 
-    if (Number(selectedIngredient.quantity) < quantity) {
-      toast.error(`Insufficient stock. Available: ${selectedIngredient.quantity} ${selectedIngredient.unitType}`);
+    if (selectedIngredient.quantity < BigInt(quantity)) {
+      toast.error(`Insufficient stock. Available: ${selectedIngredient.quantity}`);
       return;
     }
 
@@ -61,7 +60,7 @@ export default function StockOutTab() {
         reason: formData.reason,
       });
 
-      toast.success('Stock removed successfully');
+      toast.success('Stock out recorded successfully');
       setFormData({
         ingredientName: '',
         quantity: '',
@@ -69,7 +68,7 @@ export default function StockOutTab() {
         date: new Date().toISOString().split('T')[0],
       });
     } catch (error) {
-      toast.error('Failed to remove stock');
+      toast.error('Failed to record stock out');
       console.error('Stock out error:', error);
     }
   };
@@ -95,7 +94,7 @@ export default function StockOutTab() {
                   <SelectContent>
                     {ingredients.map((ingredient) => (
                       <SelectItem key={ingredient.name} value={ingredient.name}>
-                        {ingredient.name} ({Number(ingredient.quantity)} {ingredient.unitType} available)
+                        {ingredient.name} (Available: {ingredient.quantity.toString()})
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -121,9 +120,9 @@ export default function StockOutTab() {
                   id="reason"
                   value={formData.reason}
                   onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  placeholder="Enter reason for stock removal"
-                  required
+                  placeholder="e.g., Used for production, Sample, etc."
                   rows={3}
+                  required
                 />
               </div>
 

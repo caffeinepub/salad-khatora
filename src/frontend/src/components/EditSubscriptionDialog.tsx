@@ -53,16 +53,16 @@ export default function EditSubscriptionDialog({ subscription, open, onOpenChang
     try {
       await editSubscription.mutateAsync({
         id: subscription.id,
-        updatedName: formData.name,
-        updatedCustomerName: formData.customerName,
-        updatedPhoneNumber: formData.phoneNumber,
-        updatedPlanType: formData.planType === 'weekly' ? 'Weekly (6 days)' : 'Monthly (24 days)',
-        updatedBowlSize: formData.bowlSize,
-        updatedPrice: BigInt(formData.price),
-        updatedIsPaid: formData.isPaid,
-        updatedStartDate: BigInt(startDate.getTime() * 1000000),
-        updatedEndDate: BigInt(endDate.getTime() * 1000000),
-        updatedRemainingDeliveries: BigInt(formData.remainingDeliveries),
+        name: formData.name,
+        customerName: formData.customerName,
+        phoneNumber: formData.phoneNumber,
+        planType: formData.planType === 'weekly' ? 'Weekly (6 days)' : 'Monthly (24 days)',
+        bowlSize: formData.bowlSize,
+        price: BigInt(formData.price),
+        isPaid: formData.isPaid,
+        startDate: BigInt(startDate.getTime() * 1000000),
+        endDate: BigInt(endDate.getTime() * 1000000),
+        remainingDeliveries: BigInt(formData.remainingDeliveries),
       });
 
       toast.success('Subscription updated successfully');

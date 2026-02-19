@@ -1,124 +1,47 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-19T22:44:22.134Z",
+  "generatedAt": "2026-02-19T23:13:56.342Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 7,
-    "implemented": 6,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-29",
-        "summary": "Restructure the inventory page to include four sub-tabs: Stock In, Stock Out, Write Off, and Stock Status. Replace the current single-view inventory management with a tabbed interface.",
+        "id": "REQ-41",
+        "summary": "Protect the CustomersPage route with Internet Identity authentication, redirecting unauthenticated users to the LoginPage",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/InventoryPage.tsx",
-          "frontend/src/components/StockInTab.tsx",
-          "frontend/src/components/StockOutTab.tsx",
-          "frontend/src/components/WriteOffTab.tsx",
-          "frontend/src/components/StockStatusTab.tsx"
+          "frontend/src/App.tsx",
+          "frontend/src/pages/CustomersPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/InventoryPage.tsx",
-          "frontend/src/components/StockInTab.tsx",
-          "frontend/src/components/StockOutTab.tsx",
-          "frontend/src/components/WriteOffTab.tsx",
-          "frontend/src/components/StockStatusTab.tsx"
+          "frontend/src/pages/CustomersPage.tsx"
         ]
       },
       {
-        "id": "REQ-30",
-        "summary": "Implement Stock In tab with form to record incoming inventory, including fields for ingredient selection, quantity received, supplier name, purchase date, and cost price. Update ingredient quantities in the backend when stock is added.",
+        "id": "REQ-42",
+        "summary": "Update the Layout component sidebar navigation to show the Customers menu item only when the user is authenticated",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/Layout.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-31",
-        "summary": "Implement Stock Out tab with form to record inventory consumption or removal not tied to sales, including ingredient selection, quantity removed, reason for removal, and date. Decrease ingredient quantities in the backend when stock is removed.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-32",
-        "summary": "Implement Write Off tab with form to record damaged, expired, or unusable inventory, including ingredient selection, quantity to write off, reason, and date. Decrease ingredient quantities in the backend and maintain a separate write-off log for tracking losses.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-33",
-        "summary": "Implement Stock Status tab displaying the current inventory overview with all ingredients, their current quantities, unit types, cost prices, low-stock status indicators, and total inventory value. This should be the main view for monitoring current stock levels.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-34",
-        "summary": "Create backend data types and storage for Stock In, Stock Out, and Write Off transaction records, including fields for transaction ID, ingredient ID, quantity, transaction type, reason, date, and supplier (for Stock In only).",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-35",
-        "summary": "Display transaction history tables in Stock In, Stock Out, and Write Off tabs showing recent transactions with details like date, ingredient name, quantity, reason, and supplier (where applicable).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/StockTransactionTable.tsx",
-          "frontend/src/components/StockInTab.tsx",
-          "frontend/src/components/StockOutTab.tsx",
-          "frontend/src/components/WriteOffTab.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/StockTransactionTable.tsx",
-          "frontend/src/components/StockInTab.tsx",
-          "frontend/src/components/StockOutTab.tsx",
-          "frontend/src/components/WriteOffTab.tsx"
+          "frontend/src/components/Layout.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/EditIngredientDialog.tsx",
-    "frontend/src/components/IngredientForm.tsx",
-    "frontend/src/components/StockInTab.tsx",
-    "frontend/src/components/StockOutTab.tsx",
-    "frontend/src/components/StockStatusTab.tsx",
-    "frontend/src/components/StockTransactionTable.tsx",
-    "frontend/src/components/WriteOffTab.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/InventoryPage.tsx",
+    "frontend/src/components/Layout.tsx",
+    "frontend/src/pages/CustomersPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

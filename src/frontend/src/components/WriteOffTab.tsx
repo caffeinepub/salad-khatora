@@ -38,19 +38,18 @@ export default function WriteOffTab() {
     }
 
     if (!formData.reason.trim()) {
-      toast.error('Please enter a reason for write-off');
+      toast.error('Please enter a reason');
       return;
     }
 
-    // Check if quantity is available
     const selectedIngredient = ingredients.find(i => i.name === formData.ingredientName);
     if (!selectedIngredient) {
       toast.error('Selected ingredient not found');
       return;
     }
 
-    if (Number(selectedIngredient.quantity) < quantity) {
-      toast.error(`Insufficient stock. Available: ${selectedIngredient.quantity} ${selectedIngredient.unitType}`);
+    if (selectedIngredient.quantity < BigInt(quantity)) {
+      toast.error(`Insufficient stock. Available: ${selectedIngredient.quantity}`);
       return;
     }
 
@@ -78,7 +77,7 @@ export default function WriteOffTab() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Record Write Off</CardTitle>
+          <CardTitle>Record Write-Off</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -95,7 +94,7 @@ export default function WriteOffTab() {
                   <SelectContent>
                     {ingredients.map((ingredient) => (
                       <SelectItem key={ingredient.name} value={ingredient.name}>
-                        {ingredient.name} ({Number(ingredient.quantity)} {ingredient.unitType} available)
+                        {ingredient.name} (Available: {ingredient.quantity.toString()})
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -121,9 +120,9 @@ export default function WriteOffTab() {
                   id="reason"
                   value={formData.reason}
                   onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  placeholder="e.g., Damaged, Expired, Unusable"
-                  required
+                  placeholder="e.g., Expired, Damaged, Spoiled, etc."
                   rows={3}
+                  required
                 />
               </div>
 
@@ -145,7 +144,7 @@ export default function WriteOffTab() {
                 disabled={recordWriteOff.isPending}
                 className="bg-fresh-600 hover:bg-fresh-700"
               >
-                {recordWriteOff.isPending ? 'Recording...' : 'Record Write Off'}
+                {recordWriteOff.isPending ? 'Recording...' : 'Record Write-Off'}
               </Button>
             </div>
           </form>
@@ -154,7 +153,7 @@ export default function WriteOffTab() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Write Off History</CardTitle>
+          <CardTitle>Write-Off History</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoadingTransactions ? (

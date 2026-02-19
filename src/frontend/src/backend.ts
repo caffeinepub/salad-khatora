@@ -110,8 +110,10 @@ export interface InventoryItem {
 export interface Customer {
     id: bigint;
     name: string;
+    email: string;
     preferences: string;
-    contactDetails: string;
+    address: string;
+    phone: string;
 }
 export type Time = bigint;
 export interface Ingredient {
@@ -168,7 +170,7 @@ export enum StockTransactionType {
     stockIn = "stockIn"
 }
 export interface backendInterface {
-    addCustomer(id: bigint, name: string, contactDetails: string, preferences: string): Promise<boolean>;
+    addCustomer(id: bigint, name: string, phone: string, email: string, address: string, preferences: string): Promise<boolean>;
     addIngredient(ingredient: Ingredient): Promise<void>;
     addProduct(product: SaladBowl): Promise<bigint>;
     bowlSizes(): Promise<{
@@ -216,17 +218,17 @@ export interface backendInterface {
 import type { Ingredient as _Ingredient, Recipe as _Recipe, SaladBowl as _SaladBowl, SaladBowlType as _SaladBowlType, StockTransaction as _StockTransaction, StockTransactionType as _StockTransactionType, Subscription as _Subscription, Time as _Time } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
-    async addCustomer(arg0: bigint, arg1: string, arg2: string, arg3: string): Promise<boolean> {
+    async addCustomer(arg0: bigint, arg1: string, arg2: string, arg3: string, arg4: string, arg5: string): Promise<boolean> {
         if (this.processError) {
             try {
-                const result = await this.actor.addCustomer(arg0, arg1, arg2, arg3);
+                const result = await this.actor.addCustomer(arg0, arg1, arg2, arg3, arg4, arg5);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.addCustomer(arg0, arg1, arg2, arg3);
+            const result = await this.actor.addCustomer(arg0, arg1, arg2, arg3, arg4, arg5);
             return result;
         }
     }

@@ -1,154 +1,58 @@
 {
   "kind": "build_request",
-  "title": "Add inventory sub-tabs for Stock In, Stock Out, Write Off, and Stock Status",
+  "title": "Implement Internet Identity authentication for customer management access",
   "projectName": "Salad Khatora",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-29",
-      "text": "Restructure the inventory page to include four sub-tabs: Stock In, Stock Out, Write Off, and Stock Status. Replace the current single-view inventory management with a tabbed interface.",
+      "id": "REQ-41",
+      "text": "Protect the CustomersPage route with Internet Identity authentication, redirecting unauthenticated users to the LoginPage",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-final"
+          "msg-latest"
         ],
         "quotes": [
-          "Inventory tab-  need below sub tabs Stock in Stock out Write off Stock status"
+          "Now put this in the admin side with login"
         ]
       },
       "acceptanceCriteria": [
-        "Inventory page displays four distinct tabs: Stock In, Stock Out, Write Off, and Stock Status",
-        "User can switch between tabs to access different inventory management functions",
-        "Each tab contains its own dedicated interface and functionality"
+        "Users cannot access /customers route without authentication",
+        "Unauthenticated users are redirected to /login when attempting to access /customers",
+        "After successful Internet Identity login, users can access the customer management tab",
+        "The authentication check uses the existing useInternetIdentity hook"
       ]
     },
     {
-      "id": "REQ-30",
-      "text": "Implement Stock In tab with form to record incoming inventory, including fields for ingredient selection, quantity received, supplier name, purchase date, and cost price. Update ingredient quantities in the backend when stock is added.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-final"
-        ],
-        "quotes": [
-          "Stock in"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Stock In tab displays a form with ingredient dropdown, quantity input, supplier field, date picker, and cost price input",
-        "Upon submission, the selected ingredient's quantity is increased in the backend",
-        "Stock In transactions are logged with timestamp and details",
-        "Success notification appears after successful stock addition"
-      ]
-    },
-    {
-      "id": "REQ-31",
-      "text": "Implement Stock Out tab with form to record inventory consumption or removal not tied to sales, including ingredient selection, quantity removed, reason for removal, and date. Decrease ingredient quantities in the backend when stock is removed.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-final"
-        ],
-        "quotes": [
-          "Stock out"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Stock Out tab displays a form with ingredient dropdown, quantity input, reason field, and date picker",
-        "Upon submission, the selected ingredient's quantity is decreased in the backend",
-        "Stock Out transactions are logged with timestamp and details",
-        "Validation prevents removing more quantity than currently available",
-        "Success notification appears after successful stock removal"
-      ]
-    },
-    {
-      "id": "REQ-32",
-      "text": "Implement Write Off tab with form to record damaged, expired, or unusable inventory, including ingredient selection, quantity to write off, reason, and date. Decrease ingredient quantities in the backend and maintain a separate write-off log for tracking losses.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-final"
-        ],
-        "quotes": [
-          "Write off"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Write Off tab displays a form with ingredient dropdown, quantity input, reason field, and date picker",
-        "Upon submission, the selected ingredient's quantity is decreased in the backend",
-        "Write-off transactions are logged separately from regular stock-out events",
-        "Write-off history is displayed in a table showing all write-off records with date, ingredient, quantity, and reason",
-        "Validation prevents writing off more quantity than currently available",
-        "Success notification appears after successful write-off"
-      ]
-    },
-    {
-      "id": "REQ-33",
-      "text": "Implement Stock Status tab displaying the current inventory overview with all ingredients, their current quantities, unit types, cost prices, low-stock status indicators, and total inventory value. This should be the main view for monitoring current stock levels.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-final"
-        ],
-        "quotes": [
-          "Stock status"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Stock Status tab displays a comprehensive table of all ingredients with current quantity, unit type, cost price, supplier, and low-stock threshold",
-        "Ingredients below their low-stock threshold are visually highlighted with warning indicators",
-        "Total inventory value is calculated and displayed at the top of the view",
-        "The existing edit and delete functionality for ingredients is accessible from this tab",
-        "Stock Status tab serves as the default landing tab when accessing the inventory page"
-      ]
-    },
-    {
-      "id": "REQ-34",
-      "text": "Create backend data types and storage for Stock In, Stock Out, and Write Off transaction records, including fields for transaction ID, ingredient ID, quantity, transaction type, reason, date, and supplier (for Stock In only).",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-final"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend defines StockTransaction type with fields: id, ingredientId, quantity, transactionType (in/out/writeoff), reason, date, and optional supplier",
-        "Stable storage map maintains all stock transaction history",
-        "Backend provides methods to add Stock In, Stock Out, and Write Off transactions",
-        "Backend provides query methods to retrieve transaction history filtered by type",
-        "Transaction records are immutable once created"
-      ]
-    },
-    {
-      "id": "REQ-35",
-      "text": "Display transaction history tables in Stock In, Stock Out, and Write Off tabs showing recent transactions with details like date, ingredient name, quantity, reason, and supplier (where applicable).",
+      "id": "REQ-42",
+      "text": "Update the Layout component sidebar navigation to show the Customers menu item only when the user is authenticated",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-final"
+          "msg-latest"
+        ],
+        "quotes": [
+          "Now put this in the admin side with login"
         ]
       },
       "acceptanceCriteria": [
-        "Stock In tab displays a table of recent stock-in transactions below the form",
-        "Stock Out tab displays a table of recent stock-out transactions below the form",
-        "Write Off tab displays a table of write-off history below the form",
-        "Each transaction table shows date, ingredient name, quantity, and relevant details",
-        "Tables are sorted by date in descending order (most recent first)"
+        "The Customers navigation link is hidden in the sidebar when user is not authenticated",
+        "The Customers navigation link appears in the sidebar after successful login",
+        "All other navigation items remain visible regardless of authentication state"
       ]
     }
   ],
   "constraints": [
-    "Do not modify the single-actor backend architecture",
-    "Preserve existing ingredient CRUD operations and data structure",
-    "Maintain compatibility with existing inventory deduction from sales/billing",
-    "Stock Status tab must display the same ingredient data currently shown in InventoryPage.tsx"
+    "Do not modify frontend/src/hooks/useInternetIdentity.ts or frontend/src/hooks/useInternetIdentity.tsx",
+    "Do not modify frontend/src/hooks/useActor.ts",
+    "Use the existing Internet Identity authentication infrastructure already implemented in the app",
+    "Do not change the backend authentication logic"
   ],
   "nonGoals": [
-    "Batch import/export of stock transactions",
-    "Advanced inventory forecasting or predictive analytics",
-    "Multi-location inventory tracking",
-    "Barcode scanning or QR code integration",
-    "Automated reordering or purchase order generation"
+    "Adding new authentication methods beyond Internet Identity",
+    "Implementing role-based access control or permissions",
+    "Adding authentication to other pages beyond the customer management tab",
+    "Changing the existing login page design or functionality"
   ],
   "imageRequirements": {
     "required": [],

@@ -176,9 +176,23 @@ export function useAddCustomer() {
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async (customer: { id: bigint; name: string; contactDetails: string; preferences: string }) => {
+    mutationFn: async (customer: { 
+      id: bigint; 
+      name: string; 
+      phone: string; 
+      email: string; 
+      address: string; 
+      preferences: string 
+    }) => {
       if (!actor) throw new Error('Actor not initialized');
-      const result = await actor.addCustomer(customer.id, customer.name, customer.contactDetails, customer.preferences);
+      const result = await actor.addCustomer(
+        customer.id, 
+        customer.name, 
+        customer.phone, 
+        customer.email, 
+        customer.address, 
+        customer.preferences
+      );
       if (!result) throw new Error('Failed to add customer');
       return result;
     },
@@ -248,32 +262,32 @@ export function useEditSubscription() {
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async (params: {
+    mutationFn: async (subscription: {
       id: bigint;
-      updatedName: string;
-      updatedCustomerName: string;
-      updatedPhoneNumber: string;
-      updatedPlanType: string;
-      updatedBowlSize: SaladBowlType;
-      updatedPrice: bigint;
-      updatedIsPaid: boolean;
-      updatedStartDate: Time;
-      updatedEndDate: Time;
-      updatedRemainingDeliveries: bigint;
+      name: string;
+      customerName: string;
+      phoneNumber: string;
+      planType: string;
+      bowlSize: SaladBowlType;
+      price: bigint;
+      isPaid: boolean;
+      startDate: Time;
+      endDate: Time;
+      remainingDeliveries: bigint;
     }) => {
       if (!actor) throw new Error('Actor not initialized');
       const result = await actor.editSubscription(
-        params.id,
-        params.updatedName,
-        params.updatedCustomerName,
-        params.updatedPhoneNumber,
-        params.updatedPlanType,
-        params.updatedBowlSize,
-        params.updatedPrice,
-        params.updatedIsPaid,
-        params.updatedStartDate,
-        params.updatedEndDate,
-        params.updatedRemainingDeliveries
+        subscription.id,
+        subscription.name,
+        subscription.customerName,
+        subscription.phoneNumber,
+        subscription.planType,
+        subscription.bowlSize,
+        subscription.price,
+        subscription.isPaid,
+        subscription.startDate,
+        subscription.endDate,
+        subscription.remainingDeliveries
       );
       if (!result) throw new Error('Failed to edit subscription');
       return result;
@@ -327,10 +341,6 @@ export function useAddIngredient() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ingredients'] });
       queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
-      toast.success('Ingredient added successfully');
-    },
-    onError: () => {
-      toast.error('Failed to add ingredient');
     },
   });
 }
@@ -349,10 +359,6 @@ export function useUpdateIngredient() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ingredients'] });
       queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
-      toast.success('Ingredient updated successfully');
-    },
-    onError: () => {
-      toast.error('Failed to update ingredient');
     },
   });
 }
@@ -371,10 +377,6 @@ export function useDeleteIngredient() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ingredients'] });
       queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
-      toast.success('Ingredient deleted successfully');
-    },
-    onError: () => {
-      toast.error('Failed to delete ingredient');
     },
   });
 }
@@ -398,7 +400,7 @@ export function useRecordStockIn() {
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async (params: {
+    mutationFn: async (data: {
       ingredientName: string;
       quantity: bigint;
       supplier: string;
@@ -407,11 +409,11 @@ export function useRecordStockIn() {
     }) => {
       if (!actor) throw new Error('Actor not initialized');
       const result = await actor.recordStockIn(
-        params.ingredientName,
-        params.quantity,
-        params.supplier,
-        params.costPrice,
-        params.unitType
+        data.ingredientName,
+        data.quantity,
+        data.supplier,
+        data.costPrice,
+        data.unitType
       );
       if (!result) throw new Error('Failed to record stock in');
       return result;
@@ -429,16 +431,16 @@ export function useRecordStockOut() {
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async (params: {
+    mutationFn: async (data: {
       ingredientName: string;
       quantity: bigint;
       reason: string;
     }) => {
       if (!actor) throw new Error('Actor not initialized');
       const result = await actor.recordStockOut(
-        params.ingredientName,
-        params.quantity,
-        params.reason
+        data.ingredientName,
+        data.quantity,
+        data.reason
       );
       if (!result) throw new Error('Failed to record stock out');
       return result;
@@ -456,18 +458,18 @@ export function useRecordWriteOff() {
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async (params: {
+    mutationFn: async (data: {
       ingredientName: string;
       quantity: bigint;
       reason: string;
     }) => {
       if (!actor) throw new Error('Actor not initialized');
       const result = await actor.recordWriteOff(
-        params.ingredientName,
-        params.quantity,
-        params.reason
+        data.ingredientName,
+        data.quantity,
+        data.reason
       );
-      if (!result) throw new Error('Failed to record write-off');
+      if (!result) throw new Error('Failed to record write off');
       return result;
     },
     onSuccess: () => {

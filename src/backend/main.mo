@@ -1,19 +1,20 @@
 import Time "mo:core/Time";
 import Array "mo:core/Array";
-import Text "mo:core/Text";
 import List "mo:core/List";
 import Map "mo:core/Map";
+import Text "mo:core/Text";
 import Nat "mo:core/Nat";
 import Order "mo:core/Order";
 import Int "mo:core/Int";
 import Iter "mo:core/Iter";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+// Specify the data migration function in with-clause
+
 actor {
   type Ingredient = {
     name : Text;
-    quantity : Nat; // grams or units
+    quantity : Nat;
     costPricePerUnit : Nat;
     supplierName : Text;
     lowStockThreshold : Nat;
@@ -27,7 +28,7 @@ actor {
     #custom;
   };
 
-  type Recipe = [(Text, Nat)]; // ingredient name and quantity needed
+  type Recipe = [(Text, Nat)];
 
   type SaladBowl = {
     name : Text;
@@ -39,7 +40,7 @@ actor {
 
   type Invoice = {
     customerName : Text;
-    itemsOrdered : [(Text, Nat)]; // product name and quantity
+    itemsOrdered : [(Text, Nat)];
     totalPrice : Nat;
     paymentMode : Text;
     timestamp : Time.Time;
@@ -55,7 +56,9 @@ actor {
   type Customer = {
     id : Nat;
     name : Text;
-    contactDetails : Text;
+    phone : Text;
+    email : Text;
+    address : Text;
     preferences : Text;
   };
 
@@ -99,7 +102,7 @@ actor {
 
   type Subscription = {
     id : Nat;
-    name : Text; // New field for custom subscription name/label
+    name : Text;
     customerName : Text;
     phoneNumber : Text;
     planType : Text;
@@ -124,7 +127,6 @@ actor {
   );
 
   let subscriptions = Map.empty<Nat, Subscription>();
-
   let products = Map.empty<Nat, SaladBowl>();
   var nextProductId = 0;
 
@@ -246,11 +248,13 @@ actor {
     };
   };
 
-  public shared ({ caller }) func addCustomer(id : Nat, name : Text, contactDetails : Text, preferences : Text) : async Bool {
+  public shared ({ caller }) func addCustomer(id : Nat, name : Text, phone : Text, email : Text, address : Text, preferences : Text) : async Bool {
     let newCustomer = {
       id;
       name;
-      contactDetails;
+      phone;
+      email;
+      address;
       preferences;
     };
     customers.add(id, newCustomer);
@@ -261,10 +265,22 @@ actor {
     customers.values().toArray();
   };
 
-  public shared ({ caller }) func createSubscription(id : Nat, name : Text, customerName : Text, phoneNumber : Text, planType : Text, bowlSize : SaladBowlType, price : Nat, isPaid : Bool, startDate : Time.Time, endDate : Time.Time, remainingDeliveries : Int) : async Bool {
+  public shared ({ caller }) func createSubscription(
+    id : Nat,
+    name : Text,
+    customerName : Text,
+    phoneNumber : Text,
+    planType : Text,
+    bowlSize : SaladBowlType,
+    price : Nat,
+    isPaid : Bool,
+    startDate : Time.Time,
+    endDate : Time.Time,
+    remainingDeliveries : Int,
+  ) : async Bool {
     let newSubscription = {
       id;
-      name; // Custom subscription name/label
+      name;
       customerName;
       phoneNumber;
       planType;

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -7,12 +8,41 @@ import CustomerList from '../components/CustomerList';
 import CustomerForm from '../components/CustomerForm';
 import NotificationDialog from '../components/NotificationDialog';
 import { useCustomers } from '../hooks/useQueries';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { toast } from 'sonner';
+import type { Customer } from '../backend';
 
 export default function CustomersPage() {
   const [selectedCustomers, setSelectedCustomers] = useState<bigint[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showNotificationDialog, setShowNotificationDialog] = useState(false);
+  const [recipientsForDialog, setRecipientsForDialog] = useState<Customer[]>([]);
   const { data: customers = [], isLoading } = useCustomers();
+  const { loginStatus, isInitializing } = useInternetIdentity();
+  const navigate = useNavigate();
+
+  const isAuthenticated = loginStatus === 'success';
+
+  useEffect(() => {
+    if (!isInitializing && !isAuthenticated) {
+      navigate({ to: '/login' });
+    }
+  }, [isAuthenticated, isInitializing, navigate]);
+
+  if (isInitializing) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-fresh-600 border-t-transparent mx-auto"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -30,11 +60,25 @@ export default function CustomersPage() {
     }
   };
 
-  const handleSendNotification = () => {
+  const handleSendBulkNotification = () => {
     if (selectedCustomers.length === 0) {
       return;
     }
+    const selectedCustomerObjects = customers.filter(c => selectedCustomers.includes(c.id));
+    setRecipientsForDialog(selectedCustomerObjects);
     setShowNotificationDialog(true);
+  };
+
+  const handleSendIndividualMessage = (customer: Customer) => {
+    setRecipientsForDialog([customer]);
+    setShowNotificationDialog(true);
+  };
+
+  const handleNotificationSuccess = () => {
+    setShowNotificationDialog(false);
+    setRecipientsForDialog([]);
+    setSelectedCustomers([]);
+    toast.success(`Message sent to ${recipientsForDialog.length} customer${recipientsForDialog.length !== 1 ? 's' : ''}`);
   };
 
   return (
@@ -83,12 +127,12 @@ export default function CustomersPage() {
               </div>
             </div>
             <Button
-              onClick={handleSendNotification}
+              onClick={handleSendBulkNotification}
               disabled={selectedCustomers.length === 0}
               variant="outline"
             >
               <Send className="h-4 w-4 mr-2" />
-              Send Notification ({selectedCustomers.length})
+              Send to Selected ({selectedCustomers.length})
             </Button>
           </div>
         </CardHeader>
@@ -97,6 +141,7 @@ export default function CustomersPage() {
             customers={customers}
             selectedCustomers={selectedCustomers}
             onSelectCustomer={handleSelectCustomer}
+            onSendIndividualMessage={handleSendIndividualMessage}
             isLoading={isLoading}
           />
         </CardContent>
@@ -106,11 +151,8 @@ export default function CustomersPage() {
         <NotificationDialog
           open={showNotificationDialog}
           onOpenChange={setShowNotificationDialog}
-          selectedCustomers={customers.filter(c => selectedCustomers.includes(c.id))}
-          onSuccess={() => {
-            setShowNotificationDialog(false);
-            setSelectedCustomers([]);
-          }}
+          selectedCustomers={recipientsForDialog}
+          onSuccess={handleNotificationSuccess}
         />
       )}
     </div>

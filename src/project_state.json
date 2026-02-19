@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 15,
+  "projectStateVersion": 19,
   "summary": "Full-stack web application for Salad Khatora business with inventory management, product/recipe management (with availability toggle and recipe editing), billing/sales (product selection from menu), dashboard analytics (daily/weekly/monthly sales, cash flow, daily expenses), subscription management (weekly 6-day, monthly 24-day plans), alerts, admin auth, comprehensive reports download, customer management with push notifications, and CSV export",
   "architectural_notes": [
     "Full-stack web application architecture",
@@ -19,7 +19,7 @@
     "Edit and delete functionality not working for products in products tab",
     "Edit and delete functionality not working for inventory items in inventory tab"
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-implement-billing-and-sales-system-that-generates-invoices-with-customer-name-phone-number-items-ordered-quantity-price-discount-payment-mode-and-date-upon-invoice-generation-automatically-deduct-ingredient-quantities-from-inventory-based-on-the-bowl-s-recipe-mapping",
@@ -268,6 +268,54 @@
         "REQ-35"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-customerform-component-to-include-input-fields-for-email-address-and-preferences-in-addition-to-existing-name-and-phone-fields",
+      "title": "Update the CustomerForm component to include input fields for email, address, and preferences in addition to existing name and phone fields",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-customerlist-component-to-display-email-address-and-preferences-columns-in-the-customer-table-view",
+      "title": "Update the CustomerList component to display email, address, and preferences columns in the customer table view",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-individual-customer-messaging-functionality-in-the-customerspage-that-allows-sending-offers-updates-and-messages-to-a-single-selected-customer",
+      "title": "Implement individual customer messaging functionality in the CustomersPage that allows sending offers, updates, and messages to a single selected customer",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-bulk-messaging-functionality-in-the-customerspage-allows-sending-offers-updates-and-messages-to-multiple-selected-customers-simultaneously",
+      "title": "Ensure bulk messaging functionality in the CustomersPage allows sending offers, updates, and messages to multiple selected customers simultaneously",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-protect-the-customerspage-route-with-internet-identity-authentication-redirecting-unauthenticated-users-to-the-loginpage",
+      "title": "Protect the CustomersPage route with Internet Identity authentication, redirecting unauthenticated users to the LoginPage",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-layout-component-sidebar-navigation-to-show-the-customers-menu-item-only-when-the-user-is-authenticated",
+      "title": "Update the Layout component sidebar navigation to show the Customers menu item only when the user is authenticated",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -421,6 +469,38 @@
       "reqIds": [
         "REQ-34"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-31",
+      "summary": "Implement customer tab with form to save customer details including name, mobile number, email, address, and preferences fields",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-32",
+      "summary": "Add functionality to send offers, updates, and messages to customers individually from the customer tab",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-33",
+      "summary": "Add functionality to send offers, updates, and messages to customers in bulk from the customer tab",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-34",
+      "summary": "Extend the backend Customer data type to include email (Text), address (Text), and preferences (Text) fields in addition to existing name and phone fields",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "Add admin login/authentication requirement to access the customer management tab",
+      "reqIds": [],
       "status": "pending"
     }
   ],

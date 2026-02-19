@@ -1,146 +1,43 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add inventory sub-tabs for Stock In, Stock Out, Write Off, and Stock Status",
+  "title": "Implement Internet Identity authentication for customer management access",
   "requirements": [
     {
-      "id": "REQ-29",
-      "summary": "Restructure the inventory page to include four sub-tabs: Stock In, Stock Out, Write Off, and Stock Status",
+      "id": "REQ-41",
+      "summary": "Protect the CustomersPage route with Internet Identity authentication, redirecting unauthenticated users to the LoginPage",
       "acceptanceCriteria": [
-        "Inventory page displays four distinct tabs: Stock In, Stock Out, Write Off, and Stock Status",
-        "User can switch between tabs to access different inventory management functions",
-        "Each tab contains its own dedicated interface and functionality"
+        "Users cannot access /customers route without authentication",
+        "Unauthenticated users are redirected to /login when attempting to access /customers",
+        "After successful Internet Identity login, users can access the customer management tab",
+        "The authentication check uses the existing useInternetIdentity hook"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/InventoryPage.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Replace the current single-view inventory management with a tabbed interface using shadcn/ui Tabs component. Add four tabs: Stock In, Stock Out, Write Off, and Stock Status. Set Stock Status as the default active tab. Remove the existing dialog-based add ingredient form since Stock In tab will handle incoming inventory. Import and render StockInTab, StockOutTab, WriteOffTab, and StockStatusTab components."
+          "description": "Add authentication guard to the /customers route that checks if user is authenticated using the useInternetIdentity hook. If not authenticated, redirect to /login. Preserve existing route configuration for all other pages."
         },
         {
-          "path": "frontend/src/components/StockInTab.tsx",
-          "operation": "create",
-          "description": "Create Stock In tab component with a form containing ingredient dropdown (populated from getAllIngredients), quantity input, supplier name field, date picker (defaulting to today), and cost price input. Include form submission that calls recordStockIn backend method. Display a transaction history table below the form showing recent stock-in transactions fetched via getStockTransactionsByType(stockIn). Show success toast notification after successful submission. Use shadcn/ui form components and validation with React Hook Form."
-        },
-        {
-          "path": "frontend/src/components/StockOutTab.tsx",
-          "operation": "create",
-          "description": "Create Stock Out tab component with a form containing ingredient dropdown (populated from getAllIngredients), quantity input, reason textarea, and date picker (defaulting to today). Include form submission that calls recordStockOut backend method. Add validation to prevent removing more quantity than available by checking current ingredient stock levels. Display a transaction history table below the form showing recent stock-out transactions fetched via getStockTransactionsByType(stockOut). Show success toast notification after successful submission. Use shadcn/ui form components and validation with React Hook Form."
-        },
-        {
-          "path": "frontend/src/components/WriteOffTab.tsx",
-          "operation": "create",
-          "description": "Create Write Off tab component with a form containing ingredient dropdown (populated from getAllIngredients), quantity input, reason textarea (for damaged/expired/unusable reasons), and date picker (defaulting to today). Include form submission that calls recordWriteOff backend method. Add validation to prevent writing off more quantity than available by checking current ingredient stock levels. Display a write-off history table below the form showing all write-off transactions fetched via getStockTransactionsByType(writeOff), with columns for date, ingredient name, quantity, and reason. Show success toast notification after successful submission. Use shadcn/ui form components and validation with React Hook Form."
-        },
-        {
-          "path": "frontend/src/components/StockStatusTab.tsx",
-          "operation": "create",
-          "description": "Create Stock Status tab component displaying a comprehensive table of all ingredients with current quantity, unit type, cost price, supplier name, and low-stock threshold. Fetch data via getStockStatus backend method which includes isLowStock indicators. Visually highlight ingredients below their low-stock threshold with warning badges or colored indicators. Calculate and display total inventory value at the top of the view. Integrate the existing EditIngredientDialog and delete functionality from the current InventoryPage.tsx so edit and delete actions remain accessible from this tab. Use the IngredientList component structure as reference."
+          "path": "frontend/src/pages/CustomersPage.tsx",
+          "operation": "modify",
+          "description": "Add authentication state check at the component level using the useInternetIdentity hook. Display a loading state while checking authentication and redirect to /login if user is not authenticated. Ensure the page renders customer management UI only when authenticated."
         }
       ]
     },
     {
-      "id": "REQ-30",
-      "summary": "Implement Stock In tab with form to record incoming inventory and update ingredient quantities in the backend",
+      "id": "REQ-42",
+      "summary": "Update the Layout component sidebar navigation to show the Customers menu item only when the user is authenticated",
       "acceptanceCriteria": [
-        "Stock In tab displays a form with ingredient dropdown, quantity input, supplier field, date picker, and cost price input",
-        "Upon submission, the selected ingredient's quantity is increased in the backend",
-        "Stock In transactions are logged with timestamp and details",
-        "Success notification appears after successful stock addition"
+        "The Customers navigation link is hidden in the sidebar when user is not authenticated",
+        "The Customers navigation link appears in the sidebar after successful login",
+        "All other navigation items remain visible regardless of authentication state"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/components/Layout.tsx",
           "operation": "modify",
-          "description": "Add useRecordStockIn mutation hook that calls the recordStockIn backend method with parameters (ingredientName, quantity, supplier, costPrice, unitType). Add useGetStockTransactionsByType query hook that calls getStockTransactionsByType backend method with a StockTransactionType parameter. Ensure both hooks invalidate relevant queries (ingredients, stockStatus, stockTransactions) on success."
-        }
-      ]
-    },
-    {
-      "id": "REQ-31",
-      "summary": "Implement Stock Out tab with form to record inventory consumption or removal and decrease ingredient quantities in the backend",
-      "acceptanceCriteria": [
-        "Stock Out tab displays a form with ingredient dropdown, quantity input, reason field, and date picker",
-        "Upon submission, the selected ingredient's quantity is decreased in the backend",
-        "Stock Out transactions are logged with timestamp and details",
-        "Validation prevents removing more quantity than currently available",
-        "Success notification appears after successful stock removal"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add useRecordStockOut mutation hook that calls the recordStockOut backend method with parameters (ingredientName, quantity, reason). Ensure the hook invalidates relevant queries (ingredients, stockStatus, stockTransactions) on success."
-        }
-      ]
-    },
-    {
-      "id": "REQ-32",
-      "summary": "Implement Write Off tab with form to record damaged, expired, or unusable inventory and maintain a separate write-off log",
-      "acceptanceCriteria": [
-        "Write Off tab displays a form with ingredient dropdown, quantity input, reason field, and date picker",
-        "Upon submission, the selected ingredient's quantity is decreased in the backend",
-        "Write-off transactions are logged separately from regular stock-out events",
-        "Write-off history is displayed in a table showing all write-off records with date, ingredient, quantity, and reason",
-        "Validation prevents writing off more quantity than currently available",
-        "Success notification appears after successful write-off"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add useRecordWriteOff mutation hook that calls the recordWriteOff backend method with parameters (ingredientName, quantity, reason). Ensure the hook invalidates relevant queries (ingredients, stockStatus, stockTransactions) on success."
-        }
-      ]
-    },
-    {
-      "id": "REQ-33",
-      "summary": "Implement Stock Status tab displaying the current inventory overview with all ingredients and their status indicators",
-      "acceptanceCriteria": [
-        "Stock Status tab displays a comprehensive table of all ingredients with current quantity, unit type, cost price, supplier, and low-stock threshold",
-        "Ingredients below their low-stock threshold are visually highlighted with warning indicators",
-        "Total inventory value is calculated and displayed at the top of the view",
-        "The existing edit and delete functionality for ingredients is accessible from this tab",
-        "Stock Status tab serves as the default landing tab when accessing the inventory page"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add useGetStockStatus query hook that calls the getStockStatus backend method to fetch detailed stock status information including low-stock indicators for all ingredients. This hook should return an array of StockStatus objects that include isLowStock boolean flags."
-        }
-      ]
-    },
-    {
-      "id": "REQ-35",
-      "summary": "Display transaction history tables in Stock In, Stock Out, and Write Off tabs showing recent transactions",
-      "acceptanceCriteria": [
-        "Stock In tab displays a table of recent stock-in transactions below the form",
-        "Stock Out tab displays a table of recent stock-out transactions below the form",
-        "Write Off tab displays a table of write-off history below the form",
-        "Each transaction table shows date, ingredient name, quantity, and relevant details",
-        "Tables are sorted by date in descending order (most recent first)"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/StockTransactionTable.tsx",
-          "operation": "create",
-          "description": "Create a reusable StockTransactionTable component that accepts an array of StockTransaction objects and displays them in a table format. Include columns for date (formatted), ingredient name, quantity with unit type, reason (if applicable), supplier (for stock-in transactions), and cost price (for stock-in transactions). Sort transactions by date in descending order. Handle empty states when no transactions exist. Use shadcn/ui Table components for consistent styling."
-        },
-        {
-          "path": "frontend/src/components/StockInTab.tsx",
-          "operation": "modify",
-          "description": "Import and render the StockTransactionTable component below the Stock In form, passing stock-in transactions fetched via useGetStockTransactionsByType(stockIn) hook. Show loading and error states appropriately."
-        },
-        {
-          "path": "frontend/src/components/StockOutTab.tsx",
-          "operation": "modify",
-          "description": "Import and render the StockTransactionTable component below the Stock Out form, passing stock-out transactions fetched via useGetStockTransactionsByType(stockOut) hook. Show loading and error states appropriately."
-        },
-        {
-          "path": "frontend/src/components/WriteOffTab.tsx",
-          "operation": "modify",
-          "description": "Import and render the StockTransactionTable component below the Write Off form, passing write-off transactions fetched via useGetStockTransactionsByType(writeOff) hook. Show loading and error states appropriately."
+          "description": "Add authentication state check using the useInternetIdentity hook to conditionally render the Customers navigation item in the sidebar. Show the Customers link only when isAuthenticated is true. Keep all other navigation items (Dashboard, Inventory, Products, Billing, Subscriptions, Reports) visible regardless of authentication state."
         }
       ]
     }

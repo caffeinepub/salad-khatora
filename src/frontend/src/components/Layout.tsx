@@ -23,15 +23,17 @@ export default function Layout({ children }: LayoutProps) {
     navigate({ to: '/login' });
   };
 
-  const navItems = [
-    { name: 'Dashboard', path: '/', icon: Home },
-    { name: 'Inventory', path: '/inventory', icon: Package },
-    { name: 'Products', path: '/products', icon: ShoppingCart },
-    { name: 'Billing', path: '/billing', icon: CreditCard },
-    { name: 'Subscriptions', path: '/subscriptions', icon: Calendar },
-    { name: 'Customers', path: '/customers', icon: Users },
-    { name: 'Reports', path: '/reports', icon: FileText },
+  const allNavItems = [
+    { name: 'Dashboard', path: '/', icon: Home, requiresAuth: false },
+    { name: 'Inventory', path: '/inventory', icon: Package, requiresAuth: false },
+    { name: 'Products', path: '/products', icon: ShoppingCart, requiresAuth: false },
+    { name: 'Billing', path: '/billing', icon: CreditCard, requiresAuth: false },
+    { name: 'Subscriptions', path: '/subscriptions', icon: Calendar, requiresAuth: false },
+    { name: 'Customers', path: '/customers', icon: Users, requiresAuth: true },
+    { name: 'Reports', path: '/reports', icon: FileText, requiresAuth: false },
   ];
+
+  const navItems = allNavItems.filter(item => !item.requiresAuth || isAuthenticated);
 
   if (location.pathname === '/login') {
     return <>{children}</>;

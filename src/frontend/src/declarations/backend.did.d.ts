@@ -13,8 +13,10 @@ import type { Principal } from '@icp-sdk/core/principal';
 export interface Customer {
   'id' : bigint,
   'name' : string,
+  'email' : string,
   'preferences' : string,
-  'contactDetails' : string,
+  'address' : string,
+  'phone' : string,
 }
 export interface Ingredient {
   'unitType' : string,
@@ -85,7 +87,10 @@ export interface Subscription {
 }
 export type Time = bigint;
 export interface _SERVICE {
-  'addCustomer' : ActorMethod<[bigint, string, string, string], boolean>,
+  'addCustomer' : ActorMethod<
+    [bigint, string, string, string, string, string],
+    boolean
+  >,
   'addIngredient' : ActorMethod<[Ingredient], undefined>,
   'addProduct' : ActorMethod<[SaladBowl], bigint>,
   'bowlSizes' : ActorMethod<

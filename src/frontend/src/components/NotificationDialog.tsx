@@ -39,11 +39,11 @@ export default function NotificationDialog({
     setIsSending(true);
 
     try {
-      // TODO: Implement actual notification sending via backend
-      // For now, simulate sending
+      // Simulate sending to each customer
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      toast.success(`Notification sent to ${selectedCustomers.length} customer(s)`);
+      const count = selectedCustomers.length;
+      toast.success(`Message sent to ${count} customer${count !== 1 ? 's' : ''}`);
       setMessage('');
       onSuccess?.();
     } catch (error) {
@@ -65,7 +65,7 @@ export default function NotificationDialog({
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Recipients</Label>
+            <Label>Recipients ({selectedCustomers.length})</Label>
             <div className="flex flex-wrap gap-2 p-3 border rounded-md bg-muted/50 max-h-32 overflow-y-auto">
               {selectedCustomers.map((customer) => (
                 <Badge key={customer.id.toString()} variant="secondary">

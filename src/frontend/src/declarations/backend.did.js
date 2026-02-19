@@ -41,8 +41,10 @@ export const Invoice = IDL.Record({
 export const Customer = IDL.Record({
   'id' : IDL.Nat,
   'name' : IDL.Text,
+  'email' : IDL.Text,
   'preferences' : IDL.Text,
-  'contactDetails' : IDL.Text,
+  'address' : IDL.Text,
+  'phone' : IDL.Text,
 });
 export const StockTransactionType = IDL.Variant({
   'writeOff' : IDL.Null,
@@ -89,7 +91,7 @@ export const StockStatus = IDL.Record({
 
 export const idlService = IDL.Service({
   'addCustomer' : IDL.Func(
-      [IDL.Nat, IDL.Text, IDL.Text, IDL.Text],
+      [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
       [IDL.Bool],
       [],
     ),
@@ -232,8 +234,10 @@ export const idlFactory = ({ IDL }) => {
   const Customer = IDL.Record({
     'id' : IDL.Nat,
     'name' : IDL.Text,
+    'email' : IDL.Text,
     'preferences' : IDL.Text,
-    'contactDetails' : IDL.Text,
+    'address' : IDL.Text,
+    'phone' : IDL.Text,
   });
   const StockTransactionType = IDL.Variant({
     'writeOff' : IDL.Null,
@@ -280,7 +284,7 @@ export const idlFactory = ({ IDL }) => {
   
   return IDL.Service({
     'addCustomer' : IDL.Func(
-        [IDL.Nat, IDL.Text, IDL.Text, IDL.Text],
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
         [IDL.Bool],
         [],
       ),
