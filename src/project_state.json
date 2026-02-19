@@ -1,0 +1,352 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 11,
+  "summary": "Full-stack web application for Salad Khatora business with inventory management, product/recipe management (with availability toggle and recipe editing), billing/sales (product selection from menu), dashboard analytics (daily/weekly/monthly sales, cash flow, daily expenses), subscription management (weekly 6-day, monthly 24-day plans), alerts, admin auth, comprehensive reports download, customer management with push notifications, and CSV export",
+  "architectural_notes": [
+    "Full-stack web application architecture",
+    "Recipe-to-ingredient mapping for automatic inventory deduction on sales",
+    "Database structure optimized for small business scale",
+    "Alert/notification system with email placeholder integration",
+    "Mobile-first responsive design approach",
+    "Customer data management with push notification capability",
+    "Comprehensive Excel report generation across all modules",
+    "Product availability toggle system for real-time menu control",
+    "Enhanced dashboard with cash flow and expense tracking",
+    "Print KOT functionality for subscription orders"
+  ],
+  "known_issues": [
+    "Logo image (logo.dim_256x256.png) not loading in navigation header",
+    "Edit and delete functionality not working for products in products tab"
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-implement-billing-and-sales-system-that-generates-invoices-with-customer-name-phone-number-items-ordered-quantity-price-discount-payment-mode-and-date-upon-invoice-generation-automatically-deduct-ingredient-quantities-from-inventory-based-on-the-bowl-s-recipe-mapping",
+      "title": "Implement billing and sales system that generates invoices with customer name, phone number, items ordered, quantity, price, discount, payment mode, and date. Upon invoice generation, automatically deduct ingredient quantities from inventory based on the bowl's recipe mapping.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-analytics-dashboard-displaying-daily-weekly-and-monthly-sales-totals-profit-calculations-selling-price-minus-cost-price-based-on-recipe-ingredients-top-selling-bowl-products-and-low-stock-ingredient-alerts",
+      "title": "Build analytics dashboard displaying daily, weekly, and monthly sales totals, profit calculations (selling price minus cost price based on recipe ingredients), top-selling bowl products, and low-stock ingredient alerts.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-subscription-management-module-supporting-weekly-and-monthly-plans-with-6-days-week-option-track-customer-details-plan-type-start-date-end-date-bowl-size-price-and-payment-status-generate-automatic-alerts-2-days-before-subscription-end-date-and-mark-subscriptions-as-expired-when-end-date-passes",
+      "title": "Create subscription management module supporting weekly and monthly plans with 6 days/week option. Track customer details, plan type, start date, end date, bowl size, price, and payment status. Generate automatic alerts 2 days before subscription end date and mark subscriptions as expired when end date passes.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-alert-system-that-displays-low-inventory-warnings-when-ingredient-quantity-falls-below-threshold-and-subscription-expiry-notifications-2-days-before-end-on-the-dashboard-include-placeholder-for-future-email-notification-integration",
+      "title": "Implement alert system that displays low inventory warnings (when ingredient quantity falls below threshold) and subscription expiry notifications (2 days before end) on the dashboard. Include placeholder for future email notification integration.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-admin-authentication-system-using-internet-identity-for-secure-access-to-the-application",
+      "title": "Implement admin authentication system using Internet Identity for secure access to the application.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-design-clean-mobile-friendly-dashboard-ui-optimized-for-small-food-business-owners-in-india-include-intuitive-navigation-between-inventory-products-billing-subscriptions-and-reports-sections",
+      "title": "Design clean, mobile-friendly dashboard UI optimized for small food business owners in India. Include intuitive navigation between inventory, products, billing, subscriptions, and reports sections.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-csv-export-functionality-for-sales-records-and-inventory-data-allowing-business-owner-to-download-reports-for-offline-analysis-and-record-keeping",
+      "title": "Implement CSV export functionality for sales records and inventory data, allowing business owner to download reports for offline analysis and record-keeping.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-subscription-plan-durations-weekly-plan-must-be-6-days-and-monthly-plan-must-be-24-days-in-the-subscription-management-system",
+      "title": "Update subscription plan durations: weekly plan must be 6 days and monthly plan must be 24 days in the subscription management system",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-500gm-bowl-size-option-to-product-management-in-addition-to-existing-250gm-and-350gm-sizes",
+      "title": "Add 500gm bowl size option to product management in addition to existing 250gm and 350gm sizes",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-expand-dashboard-analytics-to-track-and-display-daily-sales-weekly-sales-monthly-sales-cash-flow-and-daily-expenses-metrics",
+      "title": "Expand dashboard analytics to track and display daily sales, weekly sales, monthly sales, cash flow, and daily expenses metrics",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-comprehensive-reports-tab-with-downloadable-excel-format-reports-covering-inventory-sales-subscriptions-expenses-and-all-other-business-aspects-for-offline-analysis",
+      "title": "Create comprehensive reports tab with downloadable Excel-format reports covering inventory, sales, subscriptions, expenses, and all other business aspects for offline analysis",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-customer-management-tab-to-store-customer-data-and-enable-sending-push-messages-or-notifications-individually-and-in-bulk",
+      "title": "Create customer management tab to store customer data and enable sending push messages or notifications individually and in bulk",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enable-product-selection-from-available-menu-items-in-the-billing-tab-invoice-generation-form",
+      "title": "Enable product selection from available menu items in the billing tab invoice generation form",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-available-not-available-toggle-option-for-each-bowl-in-the-menu-products-tab",
+      "title": "Add available/not available toggle option for each bowl in the menu/products tab",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-edit-recipe-option-for-each-bowl-in-the-menu-products-tab-allowing-modification-of-ingredient-quantities",
+      "title": "Add edit recipe option for each bowl in the menu/products tab allowing modification of ingredient quantities",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-print-kot-button-in-the-subscription-tab-that-generates-a-kitchen-order-ticket-kot-containing-all-currently-active-subscription-plans-with-customer-name-bowl-size-and-plan-type-for-quick-kitchen-preparation",
+      "title": "Add a 'Print KOT' button in the subscription tab that generates a Kitchen Order Ticket (KOT) containing all currently active subscription plans with customer name, bowl size, and plan type for quick kitchen preparation",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-use-the-generated-logo-image-logo-dim-256x256-png-as-the-application-logo-in-the-navigation-header-replacing-any-existing-placeholder-logo",
+      "title": "Use the generated logo image (logo.dim_256x256.png) as the application logo in the navigation header, replacing any existing placeholder logo",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-subscription-name-field-to-the-subscription-management-module-allowing-users-to-assign-a-custom-name-label-to-each-subscription-e-g-john-s-weekly-plan-office-subscription",
+      "title": "Add subscription name field to the subscription management module, allowing users to assign a custom name/label to each subscription (e.g., 'John's Weekly Plan', 'Office Subscription')",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-edit-functionality-for-subscriptions-allowing-modification-of-subscription-details-including-customer-name-phone-number-subscription-name-plan-type-bowl-size-price-payment-status-and-dates",
+      "title": "Implement edit functionality for subscriptions, allowing modification of subscription details including customer name, phone number, subscription name, plan type, bowl size, price, payment status, and dates",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-delete-functionality-for-subscriptions-allowing-removal-of-subscription-records-with-confirmation-prompt-to-prevent-accidental-deletion",
+      "title": "Implement delete functionality for subscriptions, allowing removal of subscription records with confirmation prompt to prevent accidental deletion",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-logo-image-logo-dim-256x256-png-not-loading-in-the-navigation-header-by-verifying-the-image-path-is-correct-and-the-file-exists-in-frontend-public-assets-generated-directory",
+      "title": "Fix logo image (logo.dim_256x256.png) not loading in the navigation header by verifying the image path is correct and the file exists in frontend/public/assets/generated directory",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-edit-functionality-for-products-in-the-products-tab-allowing-modification-of-product-details-including-name-type-price-and-availability-status",
+      "title": "Implement edit functionality for products in the products tab, allowing modification of product details including name, type, price, and availability status",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-delete-functionality-for-products-in-the-products-tab-with-confirmation-dialog-to-prevent-accidental-deletion",
+      "title": "Implement delete functionality for products in the products tab with confirmation dialog to prevent accidental deletion",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Inventory management with ingredient tracking, cost price, supplier, low-stock threshold, and total value calculation",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Product management for salad bowls (250gm, 350gm, custom) with recipe-to-ingredient mapping",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Billing and sales system with invoice generation and automatic inventory deduction based on recipe mapping",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Dashboard with daily/weekly/monthly sales, profit analytics, top-selling bowls, and low-stock alerts",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Subscription management module with weekly/monthly plans, expiry alerts (2 days before), and auto-expiration marking",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Alert system for low inventory and subscription expiry with dashboard visibility and email notification placeholder",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Simple admin authentication system",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Mobile-friendly UI suitable for small food business in India",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "CSV export functionality for sales and inventory reports",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Create ingredient inventory management system with fields for ingredient name, current quantity (numeric), unit type (grams/kg), cost price per unit, supplier name, and low-stock threshold. Implement automatic calculation of total inventory value based on quantity × cost price.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Create product management system for salad bowls with three types: 250gm, 350gm, and custom bowls. Each bowl must have a recipe that maps to specific ingredient quantities, enabling automatic inventory deduction when sales are recorded.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Update subscription plans: weekly plan = 6 days, monthly plan = 24 days",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Add bowl size option: 500gm (in addition to existing 250gm and 350gm)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Expand dashboard analytics to track daily sales, weekly sales, monthly sales, cash flow, and daily expenses",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Create comprehensive reports tab with downloadable Excel-format reports for all aspects (inventory, sales, subscriptions, expenses, etc.)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Create customer management tab to store customer data and enable individual and bulk push notifications/messages",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "In billing tab, enable product selection from available menu items",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "In menu/products tab, add available/not available toggle for each bowl and add edit recipe option",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Add print KOT (Kitchen Order Ticket) functionality in subscription tab for current active plans to enable quick preparation",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Backend must provide a query method to retrieve all currently active subscription plans with customer details, bowl size, and plan type for KOT generation",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Enable edit and delete functionality for subscription users in subscription management",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Add subscription name field to subscription management module",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Salad Khatora",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

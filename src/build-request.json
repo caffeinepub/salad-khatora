@@ -1,0 +1,77 @@
+{
+  "kind": "build_request",
+  "title": "Fix logo loading and product edit/delete functionality",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-24",
+      "text": "Fix logo image (logo.dim_256x256.png) not loading in the navigation header by verifying the image path is correct and the file exists in frontend/public/assets/generated directory",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "logo not loading"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Logo image displays correctly in the navigation header",
+        "Image loads without 404 errors in browser console",
+        "Logo is visible on both desktop and mobile views"
+      ]
+    },
+    {
+      "id": "REQ-25",
+      "text": "Implement edit functionality for products in the products tab, allowing modification of product details including name, type, price, and availability status",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "in products tab also i am not able to edit or delete the products"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Edit button is visible for each product card",
+        "Clicking edit opens a dialog with current product details pre-filled",
+        "Changes to product details are saved to backend and reflected immediately in UI",
+        "Form validation prevents invalid inputs"
+      ]
+    },
+    {
+      "id": "REQ-26",
+      "text": "Implement delete functionality for products in the products tab with confirmation dialog to prevent accidental deletion",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "in products tab also i am not able to edit or delete the products"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Delete button is visible for each product card",
+        "Clicking delete shows confirmation dialog before proceeding",
+        "Successfully deleted products are removed from the UI immediately",
+        "Backend persistence reflects the deletion"
+      ]
+    }
+  ],
+  "constraints": [
+    "Use existing ProductList component pattern from frontend/src/components/ProductList.tsx",
+    "Follow the same edit/delete pattern used in SubscriptionList component",
+    "Maintain consistency with existing UI component library (shadcn)"
+  ],
+  "nonGoals": [
+    "Changing the overall product management UI layout",
+    "Modifying the recipe editing functionality which already exists",
+    "Altering the availability toggle feature which is working"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

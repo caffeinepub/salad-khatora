@@ -1,0 +1,72 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix logo loading and product edit/delete functionality",
+  "requirements": [
+    {
+      "id": "REQ-24",
+      "summary": "Fix logo image loading in navigation header",
+      "acceptanceCriteria": [
+        "Logo image displays correctly in the navigation header",
+        "Image loads without 404 errors in browser console",
+        "Logo is visible on both desktop and mobile views"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Update the logo image path to reference the correct generated logo file at frontend/public/assets/generated/logo.dim_256x256.png. Verify the image source attribute uses the correct path format for Vite public assets (/assets/generated/logo.dim_256x256.png). Ensure the img element has appropriate alt text and responsive sizing classes for both desktop and mobile views."
+        }
+      ]
+    },
+    {
+      "id": "REQ-25",
+      "summary": "Implement edit functionality for products in the products tab",
+      "acceptanceCriteria": [
+        "Edit button is visible for each product card",
+        "Clicking edit opens a dialog with current product details pre-filled",
+        "Changes to product details are saved to backend and reflected immediately in UI",
+        "Form validation prevents invalid inputs"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ProductList.tsx",
+          "operation": "modify",
+          "description": "Add an Edit button to each product card alongside the existing Edit Recipe button. The Edit button should open a new EditProductDialog component and pass the current product data. Follow the same pattern used in SubscriptionList.tsx for edit functionality. Ensure the card layout accommodates both edit buttons without breaking the existing UI design."
+        },
+        {
+          "path": "frontend/src/components/EditProductDialog.tsx",
+          "operation": "create",
+          "description": "Create a new dialog component for editing product details following the pattern from EditSubscriptionDialog.tsx. Include form fields for product name, bowl type selection (gm250/gm350/gm500/custom), price input, and active status toggle. Pre-fill all fields with current product data passed as props. Implement form validation to ensure required fields are filled and price is a valid positive number. Use the useUpdateProduct hook (to be created) to save changes. Display loading state during submission and show success/error feedback using toast notifications. Use shadcn Dialog, Form, Input, Select, and Switch components for consistency with existing UI."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a useUpdateProduct mutation hook that calls the backend updateProduct method with product ID and updated product data. Follow the existing pattern from useEditSubscription. Implement optimistic updates to immediately reflect changes in the UI. Configure the mutation to invalidate and refetch the products query on success to ensure data consistency across all components displaying product information."
+        }
+      ]
+    },
+    {
+      "id": "REQ-26",
+      "summary": "Implement delete functionality for products in the products tab",
+      "acceptanceCriteria": [
+        "Delete button is visible for each product card",
+        "Clicking delete shows confirmation dialog before proceeding",
+        "Successfully deleted products are removed from the UI immediately",
+        "Backend persistence reflects the deletion"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ProductList.tsx",
+          "operation": "modify",
+          "description": "Add a Delete button to each product card following the same pattern as SubscriptionList.tsx. Include a confirmation AlertDialog that triggers before deletion, displaying the product name and asking for user confirmation. Wire the delete action to call the useDeleteProduct hook (to be created). Implement optimistic UI updates to remove the product card immediately upon successful deletion. Handle loading and error states appropriately with toast notifications."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a useDeleteProduct mutation hook that calls the backend deleteProduct method with the product ID. Follow the existing pattern from useDeleteSubscription. Implement optimistic updates to immediately remove the deleted product from the UI. Configure the mutation to invalidate and refetch the products query on success. Handle error cases and provide appropriate error messages if deletion fails."
+        }
+      ]
+    }
+  ]
+}
