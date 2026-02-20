@@ -1,13 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Fix admin authentication login issues and resolve page flickering in the admin panel.
+**Goal:** Update the admin panel login page UI to match the new design mockup while maintaining existing Internet Identity authentication functionality.
 
 **Planned changes:**
-- Debug and fix Internet Identity authentication in LoginPage to enable successful admin login
-- Investigate and resolve page flickering issues in admin panel pages
-- Fix authentication state handling in useInternetIdentity hook to prevent component re-mount cycles
-- Correct Layout.tsx authentication redirect logic to eliminate redirect loops
-- Ensure App.tsx router properly handles authentication guards without causing route flashing
+- Redesign LoginPage component with centered card layout featuring Salad Khatora logo
+- Add "Admin Panel Login" heading and "Secure authentication for administrative access" subtitle
+- Display three feature sections with icons: Secure Authentication (shield), No Passwords (lock), and Biometric Support (fingerprint)
+- Add disclaimer text at bottom: "By logging in, you agree to use this admin panel responsibly"
+- Ensure responsive design for mobile devices
+- Maintain existing Internet Identity authentication integration and redirect flow
 
-**User-visible outcome:** Admins can successfully log in through Internet Identity without errors, and admin panel pages render smoothly without visual flickering or page flashing.
+**User-visible outcome:** Admins see a modernized, professional login page with clear feature descriptions while logging in seamlessly with Internet Identity.

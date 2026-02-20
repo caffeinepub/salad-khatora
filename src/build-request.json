@@ -1,100 +1,59 @@
 {
   "kind": "build_request",
-  "title": "Fix admin authentication and page flickering issues",
+  "title": "Update Admin Panel Login UI to Match New Design",
   "projectName": "Salad Khatora",
-  "priority": "high",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-76",
-      "text": "Debug and fix the admin authentication system to enable successful login through Internet Identity on the LoginPage component located at frontend/src/pages/LoginPage.tsx",
+      "id": "REQ-85",
+      "text": "Update the LoginPage component (frontend/src/pages/LoginPage.tsx) to match the uploaded design mockup. Replace the existing layout with a centered card design featuring the Salad Khatora logo at the top, 'Admin Panel Login' heading, 'Secure authentication for administrative access' subtitle, and three feature sections with icons and descriptions: 'Secure Authentication' (Login with Internet Identity for maximum security), 'No Passwords' (Passwordless authentication using cryptographic keys), and 'Biometric Support' (Use fingerprint or face recognition on supported devices). Add the text 'By logging in, you agree to use this admin panel responsibly' at the bottom.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-final"
+          "msg-user-deploy-again"
         ],
         "quotes": [
-          "not able to login"
+          "deploy again"
         ]
       },
       "acceptanceCriteria": [
-        "Admin users can successfully authenticate using Internet Identity",
-        "Login flow completes without errors and redirects to dashboard",
-        "Authentication state persists correctly across page refreshes"
+        "The LoginPage displays the Salad Khatora logo centered at the top",
+        "The heading 'Admin Panel Login' is displayed below the logo",
+        "The subtitle 'Secure authentication for administrative access' appears below the heading",
+        "Three feature sections are displayed with shield, lock, and fingerprint icons",
+        "Each feature section shows the title and description as shown in the mockup",
+        "The disclaimer text 'By logging in, you agree to use this admin panel responsibly' appears at the bottom",
+        "The Internet Identity login functionality remains functional",
+        "The layout is responsive and works on mobile devices"
       ]
     },
     {
-      "id": "REQ-77",
-      "text": "Investigate and resolve page flickering issue occurring on admin panel pages by checking for race conditions, infinite re-renders, or authentication state changes in Layout.tsx and protected route components",
+      "id": "REQ-86",
+      "text": "Maintain the existing Internet Identity authentication integration in the LoginPage component. Ensure that clicking the login button or area triggers the Internet Identity authentication flow using the useInternetIdentity hook, and successfully authenticated users are redirected to the admin dashboard.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-final"
-        ],
-        "quotes": [
-          "admin side page is flickiring"
+          "msg-user-deploy-again"
         ]
       },
       "acceptanceCriteria": [
-        "Admin panel pages render smoothly without visual flickering",
-        "No unnecessary re-renders occur during page load or navigation",
-        "Authentication checks execute efficiently without causing render loops"
-      ]
-    },
-    {
-      "id": "REQ-78",
-      "text": "Verify that the useInternetIdentity hook in frontend/src/hooks/useInternetIdentity.ts properly initializes authentication state and handles delegation without causing component re-mount cycles",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-user-final"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Internet Identity initialization completes without triggering multiple renders",
-        "Authentication state updates are batched appropriately",
-        "Hook does not cause components to unmount and remount during auth flow"
-      ]
-    },
-    {
-      "id": "REQ-79",
-      "text": "Check Layout.tsx authentication redirect logic to ensure it does not create redirect loops or unnecessary navigation attempts that could cause flickering",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-user-final"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Layout component checks authentication once and redirects cleanly if needed",
-        "No redirect loops occur between login page and protected routes",
-        "Loading states are displayed properly during authentication verification"
-      ]
-    },
-    {
-      "id": "REQ-80",
-      "text": "Ensure the App.tsx router configuration properly handles authentication guards without causing route flashing or multiple navigation events during initial load",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-user-final"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Protected routes check authentication before rendering content",
-        "No visible route transitions occur during authentication check",
-        "Router navigation is stable during the authentication initialization phase"
+        "The Internet Identity login flow is triggered when the user attempts to log in",
+        "Successful authentication redirects users to the admin dashboard",
+        "The authentication state is properly managed using the existing useInternetIdentity hook",
+        "No authentication functionality is broken by the UI changes"
       ]
     }
   ],
   "constraints": [
-    "Do not change the Internet Identity authentication mechanism",
-    "Maintain existing authentication flow for both admin and customer panels",
-    "Preserve all existing route configurations"
+    "Do not modify the authentication logic or useInternetIdentity hook implementation",
+    "Maintain compatibility with the existing Layout component and routing structure",
+    "Do not change the backend authentication system"
   ],
   "nonGoals": [
-    "Implementing alternative authentication methods",
-    "Redesigning the login interface",
-    "Modifying backend authentication logic"
+    "Adding actual email/password authentication",
+    "Modifying the admin panel features or functionality",
+    "Changing the customer-facing login page",
+    "Adding new authentication methods"
   ],
   "imageRequirements": {
     "required": [],

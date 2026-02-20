@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 31,
+  "projectStateVersion": 35,
   "summary": "Full-stack web application for Salad Khatora business with admin panel for inventory management, product/recipe management (with availability toggle and recipe editing), billing/sales (product selection from menu), dashboard analytics (daily/weekly/monthly sales, cash flow, daily expenses), subscription management (weekly 6-day, monthly 24-day plans), alerts, admin auth, comprehensive reports download, customer management with push notifications, and CSV export. User-facing ordering panel similar to Swiggy/Zomato for customers to browse menu, place salad bowl orders, track orders, and manage customer profiles with health information (BMI calculation), fully integrated with admin panel for order management and inventory updates.",
   "architectural_notes": [
     "Full-stack web application architecture",
@@ -20,7 +20,8 @@
     "Edit and delete functionality not working for inventory items in inventory tab",
     "Admin login page not appearing when opening site directly - authentication flow not enforcing login requirement",
     "Admin login functionality not working - unable to authenticate",
-    "Admin panel pages experiencing flickering/rendering issues"
+    "Admin panel pages experiencing flickering/rendering issues",
+    "Admin login not working in production - user unable to access admin panel"
   ],
   "isFixRequest": true,
   "existing_features": [
@@ -575,6 +576,30 @@
         "REQ-79"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-debug-and-fix-the-admin-login-functionality-on-the-loginpage-component-frontend-src-pages-loginpage-tsx-to-enable-successful-authentication-through-internet-identity-the-user-is-stuck-on-the-login-screen-and-unable-to-proceed-to-the-admin-dashboard",
+      "title": "Debug and fix the admin login functionality on the LoginPage component (frontend/src/pages/LoginPage.tsx) to enable successful authentication through Internet Identity. The user is stuck on the login screen and unable to proceed to the admin dashboard.",
+      "reqIds": [
+        "REQ-81"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-check-the-layout-component-frontend-src-components-layout-tsx-authentication-guard-logic-to-ensure-it-does-not-interfere-with-the-login-flow-or-create-redirect-loops-that-prevent-access-to-the-admin-panel",
+      "title": "Check the Layout component (frontend/src/components/Layout.tsx) authentication guard logic to ensure it does not interfere with the login flow or create redirect loops that prevent access to the admin panel.",
+      "reqIds": [
+        "REQ-83"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-document-and-provide-the-complete-admin-panel-url-in-the-project-readme-or-console-output-including-the-correct-path-format-e-g-https-canister-id-ic0-app-or-https-canister-id-icp0-io-for-accessing-the-admin-login-page",
+      "title": "Document and provide the complete admin panel URL in the project README or console output, including the correct path format (e.g., https://[canister-id].ic0.app or https://[canister-id].icp0.io) for accessing the admin login page.",
+      "reqIds": [
+        "REQ-84"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -873,6 +898,30 @@
       "summary": "Ensure the App.tsx router configuration properly handles authentication guards without causing route flashing or multiple navigation events during initial load",
       "reqIds": [
         "REQ-80"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-73",
+      "summary": "Verify that the useInternetIdentity hook (frontend/src/hooks/useInternetIdentity.ts) properly initializes the AuthClient, handles login callbacks, and stores delegation without errors that would prevent login completion.",
+      "reqIds": [
+        "REQ-82"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-74",
+      "summary": "Update the LoginPage component (frontend/src/pages/LoginPage.tsx) to match the uploaded design mockup. Replace the existing layout with a centered card design featuring the Salad Khatora logo at the top, 'Admin Panel Login' heading, 'Secure authentication for administrative access' subtitle, and three feature sections with icons and descriptions: 'Secure Authentication' (Login with Internet Identity for maximum security), 'No Passwords' (Passwordless authentication using cryptographic keys), and 'Biometric Support' (Use fingerprint or face recognition on supported devices). Add the text 'By logging in, you agree to use this admin panel responsibly' at the bottom.",
+      "reqIds": [
+        "REQ-85"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-75",
+      "summary": "Maintain the existing Internet Identity authentication integration in the LoginPage component. Ensure that clicking the login button or area triggers the Internet Identity authentication flow using the useInternetIdentity hook, and successfully authenticated users are redirected to the admin dashboard.",
+      "reqIds": [
+        "REQ-86"
       ],
       "status": "pending"
     }
