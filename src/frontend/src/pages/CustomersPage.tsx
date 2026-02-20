@@ -7,7 +7,7 @@ import { Users, Send, UserPlus } from 'lucide-react';
 import CustomerList from '../components/CustomerList';
 import CustomerForm from '../components/CustomerForm';
 import NotificationDialog from '../components/NotificationDialog';
-import { useCustomers } from '../hooks/useQueries';
+import { useAllCustomers } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { toast } from 'sonner';
 import type { Customer } from '../backend';
@@ -17,7 +17,7 @@ export default function CustomersPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showNotificationDialog, setShowNotificationDialog] = useState(false);
   const [recipientsForDialog, setRecipientsForDialog] = useState<Customer[]>([]);
-  const { data: customers = [], isLoading } = useCustomers();
+  const { data: customers = [], isLoading } = useAllCustomers();
   const { loginStatus, isInitializing } = useInternetIdentity();
   const navigate = useNavigate();
 
@@ -25,7 +25,7 @@ export default function CustomersPage() {
 
   useEffect(() => {
     if (!isInitializing && !isAuthenticated) {
-      navigate({ to: '/login' });
+      navigate({ to: '/admin/login' });
     }
   }, [isAuthenticated, isInitializing, navigate]);
 

@@ -7,11 +7,20 @@ import Nat "mo:core/Nat";
 import Order "mo:core/Order";
 import Int "mo:core/Int";
 import Iter "mo:core/Iter";
+import Principal "mo:core/Principal";
+import Runtime "mo:core/Runtime";
 
+import MixinAuthorization "authorization/MixinAuthorization";
+import AccessControl "authorization/access-control";
 
 // Specify the data migration function in with-clause
 
+
 actor {
+  // Integrate authorization system
+  let accessControlState = AccessControl.initState();
+  include MixinAuthorization(accessControlState);
+
   type Ingredient = {
     name : Text;
     quantity : Nat;
@@ -53,6 +62,7 @@ actor {
     #expenses;
   };
 
+  // Extend Customer with health info
   type Customer = {
     id : Nat;
     name : Text;
@@ -60,6 +70,26 @@ actor {
     email : Text;
     address : Text;
     preferences : Text;
+    gender : Text;
+    age : Nat;
+    heightCm : Float;
+    weightKg : Float;
+    calculatedBMI : Float;
+  };
+
+  // User profile type for authenticated users
+  public type UserProfile = {
+    customerId : Nat;
+    name : Text;
+    phone : Text;
+    email : Text;
+    address : Text;
+    preferences : Text;
+    gender : Text;
+    age : Nat;
+    heightCm : Float;
+    weightKg : Float;
+    calculatedBMI : Float;
   };
 
   type SubscriptionPlan = {
@@ -73,7 +103,8 @@ actor {
     #writeOff;
   };
 
-  public type StockTransaction = {
+  // Enforce stricter visibility for StockTransaction
+  type StockTransaction = {
     transactionId : Nat;
     ingredientName : Text;
     quantity : Nat;
@@ -114,10 +145,26 @@ actor {
     remainingDeliveries : Int;
   };
 
+  type Order = {
+    orderId : Nat;
+    customerId : Nat;
+    customerName : Text;
+    phone : Text;
+    deliveryAddress : Text;
+    items : [(Text, Nat)];
+    orderTotal : Nat;
+    paymentMode : Text;
+    orderStatus : Text;
+    orderDate : Time.Time;
+  };
+
   let ingredientInventory = Map.empty<Text, Ingredient>();
   let saladBowlProducts = Map.empty<Text, SaladBowl>();
   let invoices = List.empty<Invoice>();
   let customers = Map.empty<Nat, Customer>();
+  let orders = Map.empty<Nat, Order>();
+  let userProfiles = Map.empty<Principal, UserProfile>();
+  let principalToCustomerId = Map.empty<Principal, Nat>();
 
   let availablePlans = Map.fromIter<Text, SubscriptionPlan>(
     [
@@ -129,6 +176,8 @@ actor {
   let subscriptions = Map.empty<Nat, Subscription>();
   let products = Map.empty<Nat, SaladBowl>();
   var nextProductId = 0;
+  var nextOrderId = 0;
+  var nextCustomerId = 0;
 
   let stockTransactions = Map.empty<Nat, StockTransaction>();
   var nextStockTransactionId = 0;
@@ -154,7 +203,50 @@ actor {
     (startTime, endTime);
   };
 
+  // User profile management functions (required by frontend)
+  public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access profiles");
+    };
+    userProfiles.get(caller);
+  };
+
+  public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own profile");
+    };
+    userProfiles.get(user);
+  };
+
+  public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save profiles");
+    };
+    userProfiles.add(caller, profile);
+    principalToCustomerId.add(caller, profile.customerId);
+    
+    // Also update the customer record
+    let customer = {
+      id = profile.customerId;
+      name = profile.name;
+      phone = profile.phone;
+      email = profile.email;
+      address = profile.address;
+      preferences = profile.preferences;
+      gender = profile.gender;
+      age = profile.age;
+      heightCm = profile.heightCm;
+      weightKg = profile.weightKg;
+      calculatedBMI = profile.calculatedBMI;
+    };
+    customers.add(profile.customerId, customer);
+  };
+
+  // Admin-only: Invoice processing
   public shared ({ caller }) func deductIngredientsOnSale(invoice : Invoice) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can process invoices");
+    };
     for ((bowlName, quantity) in invoice.itemsOrdered.values()) {
       switch (saladBowlProducts.get(bowlName)) {
         case (null) {};
@@ -183,13 +275,17 @@ actor {
     invoices.add(invoice);
   };
 
-  public shared ({ caller }) func getAnalyticsMetrics() : async {
+  // Admin-only: Analytics
+  public query ({ caller }) func getAnalyticsMetrics() : async {
     dailySales : Nat;
     weeklySales : Nat;
     monthlySales : Nat;
     cashFlow : Nat;
     dailyExpenses : Nat;
   } {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view analytics");
+    };
     let dayRange = getPeriodRange(1);
     let weekRange = getPeriodRange(7);
     let monthRange = getPeriodRange(30);
@@ -207,7 +303,11 @@ actor {
     };
   };
 
+  // Admin-only: Product availability
   public shared ({ caller }) func toggleSaladBowlAvailability(bowlName : Text, isAvailable : Bool) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can toggle product availability");
+    };
     switch (saladBowlProducts.get(bowlName)) {
       case (null) {};
       case (?bowl) {
@@ -217,7 +317,11 @@ actor {
     };
   };
 
+  // Admin-only: Recipe editing
   public shared ({ caller }) func editSaladBowlRecipe(bowlName : Text, newRecipe : Recipe) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can edit recipes");
+    };
     switch (saladBowlProducts.get(bowlName)) {
       case (null) { false };
       case (?bowl) {
@@ -228,15 +332,16 @@ actor {
     };
   };
 
-  public shared ({ caller }) func weeklyPlanDuration() : async Nat {
+  // Public: Plan information
+  public query func weeklyPlanDuration() : async Nat {
     6;
   };
 
-  public shared ({ caller }) func monthlyPlanDuration() : async Nat {
+  public query func monthlyPlanDuration() : async Nat {
     24;
   };
 
-  public shared ({ caller }) func bowlSizes() : async {
+  public query func bowlSizes() : async {
     gm250 : Bool;
     gm350 : Bool;
     gm500 : Bool;
@@ -248,7 +353,11 @@ actor {
     };
   };
 
-  public shared ({ caller }) func addCustomer(id : Nat, name : Text, phone : Text, email : Text, address : Text, preferences : Text) : async Bool {
+  // Admin-only: Add customer
+  public shared ({ caller }) func addCustomer(id : Nat, name : Text, phone : Text, email : Text, address : Text, preferences : Text, gender : Text, age : Nat, heightCm : Float, weightKg : Float, calculatedBMI : Float) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add customers");
+    };
     let newCustomer = {
       id;
       name;
@@ -256,15 +365,49 @@ actor {
       email;
       address;
       preferences;
+      gender;
+      age;
+      heightCm;
+      weightKg;
+      calculatedBMI;
     };
     customers.add(id, newCustomer);
     true;
   };
 
+  // Admin-only: Get all customers
   public query ({ caller }) func getAllCustomers() : async [Customer] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view all customers");
+    };
     customers.values().toArray();
   };
 
+  // User can view own profile, admin can view any
+  public query ({ caller }) func getCustomerProfile(customerId : Nat) : async ?Customer {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can view profiles");
+    };
+    
+    // Check if user is viewing their own profile
+    switch (principalToCustomerId.get(caller)) {
+      case (?userCustomerId) {
+        if (userCustomerId != customerId and not AccessControl.isAdmin(accessControlState, caller)) {
+          Runtime.trap("Unauthorized: Can only view your own profile");
+        };
+      };
+      case (null) {
+        // If no mapping exists, only admin can view
+        if (not AccessControl.isAdmin(accessControlState, caller)) {
+          Runtime.trap("Unauthorized: Can only view your own profile");
+        };
+      };
+    };
+    
+    customers.get(customerId);
+  };
+
+  // Admin-only: Subscription management
   public shared ({ caller }) func createSubscription(
     id : Nat,
     name : Text,
@@ -278,6 +421,9 @@ actor {
     endDate : Time.Time,
     remainingDeliveries : Int,
   ) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can create subscriptions");
+    };
     let newSubscription = {
       id;
       name;
@@ -295,10 +441,15 @@ actor {
     true;
   };
 
+  // Admin-only: View all subscriptions
   public query ({ caller }) func getAllSubscriptions() : async [Subscription] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view all subscriptions");
+    };
     subscriptions.values().toArray();
   };
 
+  // Admin-only: Edit subscription
   public shared ({ caller }) func editSubscription(
     id : Nat,
     updatedName : Text,
@@ -312,6 +463,9 @@ actor {
     updatedEndDate : Time.Time,
     updatedRemainingDeliveries : Int,
   ) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can edit subscriptions");
+    };
     switch (subscriptions.get(id)) {
       case (null) { false };
       case (?_) {
@@ -334,7 +488,11 @@ actor {
     };
   };
 
+  // Admin-only: Delete subscription
   public shared ({ caller }) func deleteSubscription(id : Nat) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete subscriptions");
+    };
     switch (subscriptions.get(id)) {
       case (null) { false };
       case (?_) {
@@ -344,7 +502,38 @@ actor {
     };
   };
 
+  // User can view own orders, admin can view any customer's orders
+  public query ({ caller }) func getCustomerOrders(customerId : Nat) : async [Order] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can view orders");
+    };
+    
+    // Check if user is viewing their own orders
+    switch (principalToCustomerId.get(caller)) {
+      case (?userCustomerId) {
+        if (userCustomerId != customerId and not AccessControl.isAdmin(accessControlState, caller)) {
+          Runtime.trap("Unauthorized: Can only view your own orders");
+        };
+      };
+      case (null) {
+        // If no mapping exists, only admin can view
+        if (not AccessControl.isAdmin(accessControlState, caller)) {
+          Runtime.trap("Unauthorized: Can only view your own orders");
+        };
+      };
+    };
+    
+    let customerOrders = orders.values().toArray().filter(
+      func(order) { order.customerId == customerId }
+    );
+    customerOrders;
+  };
+
+  // Admin-only: Product management
   public shared ({ caller }) func addProduct(product : SaladBowl) : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add products");
+    };
     let id = nextProductId;
     products.add(id, product);
     nextProductId += 1;
@@ -352,6 +541,9 @@ actor {
   };
 
   public shared ({ caller }) func updateProduct(id : Nat, updatedProduct : SaladBowl) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update products");
+    };
     switch (products.get(id)) {
       case (null) { false };
       case (?_) {
@@ -362,6 +554,9 @@ actor {
   };
 
   public shared ({ caller }) func deleteProduct(id : Nat) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete products");
+    };
     switch (products.get(id)) {
       case (null) { false };
       case (?_) {
@@ -371,11 +566,13 @@ actor {
     };
   };
 
-  public query ({ caller }) func getProduct(id : Nat) : async ?SaladBowl {
+  // Public: View product (customers need to see products)
+  public query func getProduct(id : Nat) : async ?SaladBowl {
     products.get(id);
   };
 
-  public query ({ caller }) func getAllActiveProducts() : async [SaladBowl] {
+  // Public: View active products (customers need to see available products)
+  public query func getAllActiveProducts() : async [SaladBowl] {
     let productsArray = products.toArray().map(
       func((_, product)) { product }
     );
@@ -383,15 +580,26 @@ actor {
     filteredProducts;
   };
 
+  // Admin-only: View all products including inactive
   public query ({ caller }) func getAllProductsWithInactive() : async [SaladBowl] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view all products");
+    };
     products.values().toArray();
   };
 
+  // Admin-only: Ingredient management
   public shared ({ caller }) func addIngredient(ingredient : Ingredient) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add ingredients");
+    };
     ingredientInventory.add(ingredient.name, ingredient);
   };
 
   public shared ({ caller }) func updateIngredient(name : Text, updatedIngredient : Ingredient) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update ingredients");
+    };
     switch (ingredientInventory.get(name)) {
       case (null) { false };
       case (?_) {
@@ -402,6 +610,9 @@ actor {
   };
 
   public shared ({ caller }) func deleteIngredient(name : Text) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete ingredients");
+    };
     switch (ingredientInventory.get(name)) {
       case (null) { false };
       case (?_) {
@@ -411,15 +622,27 @@ actor {
     };
   };
 
+  // Admin-only: View ingredient
   public query ({ caller }) func getIngredient(name : Text) : async ?Ingredient {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view ingredients");
+    };
     ingredientInventory.get(name);
   };
 
+  // Admin-only: View all ingredients
   public query ({ caller }) func getAllIngredients() : async [Ingredient] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view all ingredients");
+    };
     ingredientInventory.values().toArray();
   };
 
+  // Admin-only: Stock management
   public shared ({ caller }) func recordStockIn(ingredientName : Text, quantity : Nat, supplier : Text, costPrice : Nat, unitType : Text) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can record stock in");
+    };
     let adjustedQuantity = if (quantity < 1) { 1 } else { quantity };
 
     let transaction = {
@@ -444,7 +667,7 @@ actor {
           quantity = adjustedQuantity;
           costPricePerUnit = costPrice;
           supplierName = supplier;
-          lowStockThreshold = 1; // Default threshold
+          lowStockThreshold = 1;
           unitType;
         };
         ingredientInventory.add(ingredientName, newIngredient);
@@ -462,6 +685,9 @@ actor {
   };
 
   public shared ({ caller }) func recordStockOut(ingredientName : Text, quantity : Nat, reason : Text) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can record stock out");
+    };
     let adjustedQuantity = if (quantity < 1) { 1 } else { quantity };
 
     let transaction = {
@@ -497,6 +723,9 @@ actor {
   };
 
   public shared ({ caller }) func recordWriteOff(ingredientName : Text, quantity : Nat, reason : Text) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can record write-offs");
+    };
     let adjustedQuantity = if (quantity < 1) { 1 } else { quantity };
 
     let transaction = {
@@ -531,7 +760,11 @@ actor {
     };
   };
 
-  public shared ({ caller }) func getStockStatus() : async [StockStatus] {
+  // Admin-only: Stock status
+  public query ({ caller }) func getStockStatus() : async [StockStatus] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view stock status");
+    };
     ingredientInventory.values().toArray().map(func(ingredient) {
       {
         ingredientName = ingredient.name;
@@ -544,14 +777,22 @@ actor {
     });
   };
 
-  public shared ({ caller }) func getAllStockTransactions() : async [StockTransaction] {
+  // Admin-only: Stock transactions
+  public query ({ caller }) func getAllStockTransactions() : async [StockTransaction] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view stock transactions");
+    };
     stockTransactions.values().toArray();
   };
 
-  public shared ({ caller }) func getInventoryStatus() : async {
+  // Admin-only: Inventory status
+  public query ({ caller }) func getInventoryStatus() : async {
     totalValue : Nat;
     items : [InventoryItem];
   } {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view inventory status");
+    };
     var totalValue = 0;
     let inventoryItems = ingredientInventory.values().toArray().map(func(ingredient) {
       totalValue += ingredient.quantity * ingredient.costPricePerUnit;
@@ -567,10 +808,113 @@ actor {
     };
   };
 
-  public shared ({ caller }) func getStockTransactionsByType(transactionType : StockTransactionType) : async [StockTransaction] {
+  // Admin-only: Stock transactions by type
+  public query ({ caller }) func getStockTransactionsByType(transactionType : StockTransactionType) : async [StockTransaction] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view stock transactions");
+    };
     let filteredTransactions = stockTransactions.values().toArray().filter(
       func(transaction) { transaction.transactionType == transactionType }
     );
     filteredTransactions;
+  };
+
+  // User can create own order, admin can create any order
+  public shared ({ caller }) func addOrder(
+    customerId : Nat,
+    customerName : Text,
+    phone : Text,
+    deliveryAddress : Text,
+    items : [(Text, Nat)],
+    orderTotal : Nat,
+    paymentMode : Text,
+    orderStatus : Text,
+  ) : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can create orders");
+    };
+    
+    // Check if user is creating order for themselves
+    switch (principalToCustomerId.get(caller)) {
+      case (?userCustomerId) {
+        if (userCustomerId != customerId and not AccessControl.isAdmin(accessControlState, caller)) {
+          Runtime.trap("Unauthorized: Can only create orders for yourself");
+        };
+      };
+      case (null) {
+        // If no mapping exists, only admin can create orders
+        if (not AccessControl.isAdmin(accessControlState, caller)) {
+          Runtime.trap("Unauthorized: Can only create orders for yourself");
+        };
+      };
+    };
+    
+    let orderId = nextOrderId;
+    nextOrderId += 1;
+    let order = {
+      orderId;
+      customerId;
+      customerName;
+      phone;
+      deliveryAddress;
+      items;
+      orderTotal;
+      paymentMode;
+      orderStatus;
+      orderDate = Time.now();
+    };
+    orders.add(orderId, order);
+    orderId;
+  };
+
+  // User can view own order, admin can view any order
+  public query ({ caller }) func getOrder(orderId : Nat) : async ?Order {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can view orders");
+    };
+    
+    switch (orders.get(orderId)) {
+      case (null) { null };
+      case (?order) {
+        // Check if user owns this order
+        switch (principalToCustomerId.get(caller)) {
+          case (?userCustomerId) {
+            if (userCustomerId != order.customerId and not AccessControl.isAdmin(accessControlState, caller)) {
+              Runtime.trap("Unauthorized: Can only view your own orders");
+            };
+          };
+          case (null) {
+            // If no mapping exists, only admin can view
+            if (not AccessControl.isAdmin(accessControlState, caller)) {
+              Runtime.trap("Unauthorized: Can only view your own orders");
+            };
+          };
+        };
+        ?order;
+      };
+    };
+  };
+
+  // Admin-only: View all orders
+  public query ({ caller }) func getAllOrders() : async [Order] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view all orders");
+    };
+    orders.values().toArray();
+  };
+
+  // Admin-only: Update order status
+  public shared ({ caller }) func updateOrderStatus(orderId : Nat, newStatus : Text) : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update order status");
+    };
+    switch (orders.get(orderId)) {
+      case (null) { false };
+      case (?order) {
+        let updatedOrder = { order with orderStatus = newStatus };
+        orders.add(orderId, updatedOrder);
+        true;
+      };
+    };
   };
 };

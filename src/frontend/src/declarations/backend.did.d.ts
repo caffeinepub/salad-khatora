@@ -12,10 +12,15 @@ import type { Principal } from '@icp-sdk/core/principal';
 
 export interface Customer {
   'id' : bigint,
+  'age' : bigint,
+  'heightCm' : number,
   'name' : string,
   'email' : string,
   'preferences' : string,
+  'weightKg' : number,
   'address' : string,
+  'gender' : string,
+  'calculatedBMI' : number,
   'phone' : string,
 }
 export interface Ingredient {
@@ -37,6 +42,18 @@ export interface Invoice {
   'paymentMode' : string,
   'totalPrice' : bigint,
   'itemsOrdered' : Array<[string, bigint]>,
+}
+export interface Order {
+  'customerName' : string,
+  'deliveryAddress' : string,
+  'orderStatus' : string,
+  'orderTotal' : bigint,
+  'orderDate' : Time,
+  'orderId' : bigint,
+  'paymentMode' : string,
+  'customerId' : bigint,
+  'phone' : string,
+  'items' : Array<[string, bigint]>,
 }
 export type Recipe = Array<[string, bigint]>;
 export interface SaladBowl {
@@ -86,13 +103,56 @@ export interface Subscription {
   'startDate' : Time,
 }
 export type Time = bigint;
+export interface UserProfile {
+  'age' : bigint,
+  'heightCm' : number,
+  'name' : string,
+  'email' : string,
+  'preferences' : string,
+  'weightKg' : number,
+  'address' : string,
+  'gender' : string,
+  'calculatedBMI' : number,
+  'customerId' : bigint,
+  'phone' : string,
+}
+export type UserRole = { 'admin' : null } |
+  { 'user' : null } |
+  { 'guest' : null };
 export interface _SERVICE {
+  '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addCustomer' : ActorMethod<
-    [bigint, string, string, string, string, string],
+    [
+      bigint,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      bigint,
+      number,
+      number,
+      number,
+    ],
     boolean
   >,
   'addIngredient' : ActorMethod<[Ingredient], undefined>,
+  'addOrder' : ActorMethod<
+    [
+      bigint,
+      string,
+      string,
+      string,
+      Array<[string, bigint]>,
+      bigint,
+      string,
+      string,
+    ],
+    bigint
+  >,
   'addProduct' : ActorMethod<[SaladBowl], bigint>,
+  'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'bowlSizes' : ActorMethod<
     [],
     { 'gm250' : boolean, 'gm350' : boolean, 'gm500' : boolean }
@@ -137,6 +197,7 @@ export interface _SERVICE {
   'getAllActiveProducts' : ActorMethod<[], Array<SaladBowl>>,
   'getAllCustomers' : ActorMethod<[], Array<Customer>>,
   'getAllIngredients' : ActorMethod<[], Array<Ingredient>>,
+  'getAllOrders' : ActorMethod<[], Array<Order>>,
   'getAllProductsWithInactive' : ActorMethod<[], Array<SaladBowl>>,
   'getAllStockTransactions' : ActorMethod<[], Array<StockTransaction>>,
   'getAllSubscriptions' : ActorMethod<[], Array<Subscription>>,
@@ -150,17 +211,24 @@ export interface _SERVICE {
       'dailyExpenses' : bigint,
     }
   >,
+  'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
+  'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getCustomerOrders' : ActorMethod<[bigint], Array<Order>>,
+  'getCustomerProfile' : ActorMethod<[bigint], [] | [Customer]>,
   'getIngredient' : ActorMethod<[string], [] | [Ingredient]>,
   'getInventoryStatus' : ActorMethod<
     [],
     { 'totalValue' : bigint, 'items' : Array<InventoryItem> }
   >,
+  'getOrder' : ActorMethod<[bigint], [] | [Order]>,
   'getProduct' : ActorMethod<[bigint], [] | [SaladBowl]>,
   'getStockStatus' : ActorMethod<[], Array<StockStatus>>,
   'getStockTransactionsByType' : ActorMethod<
     [StockTransactionType],
     Array<StockTransaction>
   >,
+  'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'isCallerAdmin' : ActorMethod<[], boolean>,
   'monthlyPlanDuration' : ActorMethod<[], bigint>,
   'recordStockIn' : ActorMethod<
     [string, bigint, string, bigint, string],
@@ -168,8 +236,10 @@ export interface _SERVICE {
   >,
   'recordStockOut' : ActorMethod<[string, bigint, string], boolean>,
   'recordWriteOff' : ActorMethod<[string, bigint, string], boolean>,
+  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'toggleSaladBowlAvailability' : ActorMethod<[string, boolean], undefined>,
   'updateIngredient' : ActorMethod<[string, Ingredient], boolean>,
+  'updateOrderStatus' : ActorMethod<[bigint, string], boolean>,
   'updateProduct' : ActorMethod<[bigint, SaladBowl], boolean>,
   'weeklyPlanDuration' : ActorMethod<[], bigint>,
 }

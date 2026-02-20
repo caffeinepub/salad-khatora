@@ -3,346 +3,176 @@
 @tailwind utilities;
 
 @layer base {
-    :root {
-        --radius: 0.625rem;
-        
-        /* Fresh green palette for salad business */
-        --background: 0.98 0 0;
-        --foreground: 0.15 0 0;
-        --card: 1 0 0;
-        --card-foreground: 0.15 0 0;
-        --popover: 1 0 0;
-        --popover-foreground: 0.15 0 0;
-        
-        /* Primary: Fresh green */
-        --primary: 0.55 0.15 145;
-        --primary-foreground: 0.98 0 0;
-        
-        /* Secondary: Neutral */
-        --secondary: 0.96 0 0;
-        --secondary-foreground: 0.15 0 0;
-        
-        /* Muted */
-        --muted: 0.96 0 0;
-        --muted-foreground: 0.50 0 0;
-        
-        /* Accent: Warm orange */
-        --accent: 0.75 0.15 45;
-        --accent-foreground: 0.15 0 0;
-        
-        /* Destructive */
-        --destructive: 0.55 0.22 25;
-        --destructive-foreground: 0.98 0 0;
-        
-        /* Warning */
-        --warning: 0.70 0.18 65;
-        
-        /* Border & Input */
-        --border: 0.90 0 0;
-        --input: 0.90 0 0;
-        --ring: 0.55 0.15 145;
-        
-        /* Chart colors */
-        --chart-1: 0.55 0.15 145;
-        --chart-2: 0.75 0.15 45;
-        --chart-3: 0.65 0.12 200;
-        --chart-4: 0.70 0.18 65;
-        --chart-5: 0.60 0.10 280;
-        
-        /* Custom colors for food business */
-        --fresh-50: 0.97 0.05 145;
-        --fresh-100: 0.93 0.08 145;
-        --fresh-200: 0.85 0.12 145;
-        --fresh-400: 0.65 0.15 145;
-        --fresh-500: 0.55 0.15 145;
-        --fresh-600: 0.45 0.15 145;
-        --fresh-700: 0.38 0.14 145;
-        --fresh-800: 0.30 0.12 145;
-        --fresh-900: 0.22 0.10 145;
-        
-        --warm-50: 0.97 0.05 45;
-        --warm-100: 0.93 0.08 45;
-        --warm-600: 0.65 0.15 45;
-        --warm-700: 0.55 0.15 45;
-        --warm-900: 0.30 0.12 45;
-    }
-
-    .dark {
-        --background: 0.12 0 0;
-        --foreground: 0.98 0 0;
-        --card: 0.15 0 0;
-        --card-foreground: 0.98 0 0;
-        --popover: 0.15 0 0;
-        --popover-foreground: 0.98 0 0;
-        
-        /* Primary: Fresh green (adjusted for dark) */
-        --primary: 0.65 0.15 145;
-        --primary-foreground: 0.12 0 0;
-        
-        /* Secondary */
-        --secondary: 0.20 0 0;
-        --secondary-foreground: 0.98 0 0;
-        
-        /* Muted */
-        --muted: 0.20 0 0;
-        --muted-foreground: 0.65 0 0;
-        
-        /* Accent: Warm orange (adjusted for dark) */
-        --accent: 0.70 0.15 45;
-        --accent-foreground: 0.98 0 0;
-        
-        /* Destructive */
-        --destructive: 0.60 0.22 25;
-        --destructive-foreground: 0.98 0 0;
-        
-        /* Warning */
-        --warning: 0.75 0.18 65;
-        
-        /* Border & Input */
-        --border: 0.25 0 0;
-        --input: 0.25 0 0;
-        --ring: 0.65 0.15 145;
-        
-        /* Chart colors (adjusted for dark) */
-        --chart-1: 0.65 0.15 145;
-        --chart-2: 0.75 0.15 45;
-        --chart-3: 0.70 0.12 200;
-        --chart-4: 0.75 0.18 65;
-        --chart-5: 0.70 0.10 280;
-        
-        /* Custom colors for dark mode */
-        --fresh-50: 0.22 0.10 145;
-        --fresh-100: 0.30 0.12 145;
-        --fresh-400: 0.55 0.15 145;
-        --fresh-500: 0.65 0.15 145;
-        --fresh-600: 0.70 0.15 145;
-        --fresh-900: 0.15 0.08 145;
-        
-        --warm-100: 0.30 0.12 45;
-        --warm-600: 0.70 0.15 45;
-        --warm-900: 0.15 0.08 45;
-    }
-
-    * {
-        @apply border-border;
-    }
+  :root {
+    /* Fresh green and warm orange palette for food business */
+    --background: oklch(98% 0.01 120);
+    --foreground: oklch(20% 0.02 120);
+    --card: oklch(100% 0 0);
+    --card-foreground: oklch(20% 0.02 120);
+    --popover: oklch(100% 0 0);
+    --popover-foreground: oklch(20% 0.02 120);
     
-    body {
-        @apply bg-background text-foreground;
-        font-feature-settings: "rlig" 1, "calt" 1;
-    }
+    /* Fresh green primary */
+    --primary: oklch(55% 0.15 145);
+    --primary-foreground: oklch(98% 0.01 145);
     
-    /* Mobile-friendly touch targets */
-    @media (max-width: 768px) {
-        button, a, input, select, textarea {
-            min-height: 44px;
-        }
-    }
+    /* Warm orange secondary */
+    --secondary: oklch(75% 0.12 50);
+    --secondary-foreground: oklch(20% 0.02 50);
+    
+    /* Vibrant orange accent */
+    --accent: oklch(65% 0.18 40);
+    --accent-foreground: oklch(98% 0.01 40);
+    
+    --muted: oklch(95% 0.01 120);
+    --muted-foreground: oklch(45% 0.02 120);
+    
+    --destructive: oklch(55% 0.22 25);
+    --destructive-foreground: oklch(98% 0.01 25);
+    
+    --border: oklch(90% 0.01 120);
+    --input: oklch(90% 0.01 120);
+    --ring: oklch(55% 0.15 145);
+    
+    --radius: 0.5rem;
+    
+    /* Fresh green shades */
+    --fresh-50: oklch(97% 0.02 145);
+    --fresh-100: oklch(93% 0.05 145);
+    --fresh-200: oklch(85% 0.08 145);
+    --fresh-300: oklch(75% 0.11 145);
+    --fresh-400: oklch(65% 0.13 145);
+    --fresh-500: oklch(55% 0.15 145);
+    --fresh-600: oklch(48% 0.14 145);
+    --fresh-700: oklch(40% 0.12 145);
+    --fresh-800: oklch(32% 0.10 145);
+    --fresh-900: oklch(25% 0.08 145);
+    
+    /* Warm orange shades */
+    --orange-50: oklch(97% 0.02 40);
+    --orange-100: oklch(93% 0.06 40);
+    --orange-200: oklch(85% 0.10 40);
+    --orange-300: oklch(78% 0.14 40);
+    --orange-400: oklch(70% 0.16 40);
+    --orange-500: oklch(65% 0.18 40);
+    --orange-600: oklch(58% 0.17 40);
+    --orange-700: oklch(50% 0.15 40);
+    --orange-800: oklch(42% 0.12 40);
+    --orange-900: oklch(35% 0.10 40);
+  }
+
+  .dark {
+    --background: oklch(18% 0.02 120);
+    --foreground: oklch(95% 0.01 120);
+    --card: oklch(20% 0.02 120);
+    --card-foreground: oklch(95% 0.01 120);
+    --popover: oklch(20% 0.02 120);
+    --popover-foreground: oklch(95% 0.01 120);
+    
+    --primary: oklch(60% 0.15 145);
+    --primary-foreground: oklch(18% 0.02 145);
+    
+    --secondary: oklch(30% 0.05 50);
+    --secondary-foreground: oklch(95% 0.01 50);
+    
+    --accent: oklch(65% 0.18 40);
+    --accent-foreground: oklch(18% 0.02 40);
+    
+    --muted: oklch(25% 0.02 120);
+    --muted-foreground: oklch(65% 0.02 120);
+    
+    --destructive: oklch(55% 0.22 25);
+    --destructive-foreground: oklch(95% 0.01 25);
+    
+    --border: oklch(30% 0.02 120);
+    --input: oklch(30% 0.02 120);
+    --ring: oklch(60% 0.15 145);
+  }
 }
 
-@layer utilities {
-    .text-balance {
-        text-wrap: balance;
-    }
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
 }
 
-/* Print Styles for KOT */
+/* Mobile-friendly touch targets */
+@media (max-width: 768px) {
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Print styles for KOT */
 @media print {
-    /* Hide everything except KOT content */
-    body * {
-        visibility: hidden;
-    }
-    
-    .kot-print-container,
-    .kot-print-container * {
-        visibility: visible;
-    }
-    
-    .kot-print-container {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        padding: 20px;
-        background: white;
-        color: black;
-    }
-    
-    /* Hide dialog overlay and non-essential elements */
-    [role="dialog"],
-    header,
-    nav,
-    footer,
-    button,
-    .no-print {
-        display: none !important;
-    }
-    
-    /* Show only KOT container */
-    .kot-print-container {
-        display: block !important;
-    }
-}
+  @page {
+    size: A4;
+    margin: 1cm;
+  }
 
-/* KOT Styling */
-.kot-print-container {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 24px;
-}
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
 
-.kot-header {
-    text-align: center;
-    margin-bottom: 32px;
-    padding-bottom: 16px;
-    border-bottom: 3px solid oklch(0.15 0 0);
-}
+  /* Hide everything except print content */
+  body > *:not(.print-content) {
+    display: none !important;
+  }
 
-.kot-title {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: oklch(0.15 0 0);
-}
+  .print-content {
+    display: block !important;
+  }
 
-.kot-subtitle {
-    font-size: 18px;
-    font-weight: 500;
-    color: oklch(0.40 0 0);
-    margin-bottom: 8px;
-}
+  /* Optimize table printing */
+  table {
+    page-break-inside: auto;
+  }
 
-.kot-date {
-    font-size: 14px;
-    color: oklch(0.50 0 0);
-}
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
 
-.kot-content {
-    margin-bottom: 32px;
-}
+  thead {
+    display: table-header-group;
+  }
 
-.kot-table {
+  /* Kitchen-optimized styling */
+  .print-content {
+    font-size: 14pt;
+    line-height: 1.6;
+  }
+
+  .print-content h1 {
+    font-size: 24pt;
+    font-weight: bold;
+    margin-bottom: 20pt;
+  }
+
+  .print-content table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 24px;
-}
+  }
 
-.kot-th {
-    background-color: oklch(0.93 0.08 145);
-    color: oklch(0.15 0 0);
-    padding: 12px;
+  .print-content th,
+  .print-content td {
+    border: 1px solid #000;
+    padding: 8pt;
     text-align: left;
-    font-weight: 600;
-    font-size: 14px;
-    border: 1px solid oklch(0.85 0.12 145);
-}
+  }
 
-.kot-row {
-    border-bottom: 1px solid oklch(0.90 0 0);
-}
-
-.kot-row:nth-child(even) {
-    background-color: oklch(0.98 0 0);
-}
-
-.kot-td {
-    padding: 14px 12px;
-    font-size: 15px;
-    color: oklch(0.15 0 0);
-    border: 1px solid oklch(0.90 0 0);
-}
-
-.kot-customer-name {
-    font-weight: 600;
-    font-size: 16px;
-}
-
-.kot-bowl-size {
-    font-weight: 500;
-    color: oklch(0.45 0.15 145);
-}
-
-.kot-plan-type {
-    text-transform: capitalize;
-}
-
-.kot-remaining {
-    font-weight: 500;
-    color: oklch(0.65 0.15 45);
-}
-
-.kot-summary {
-    padding: 16px;
-    background-color: oklch(0.97 0.05 145);
-    border-radius: 8px;
-    border: 2px solid oklch(0.85 0.12 145);
-}
-
-.kot-total {
-    font-size: 16px;
-    color: oklch(0.15 0 0);
-}
-
-.kot-total strong {
-    font-size: 18px;
-    font-weight: 700;
-    color: oklch(0.45 0.15 145);
-}
-
-.kot-footer {
-    text-align: center;
-    padding-top: 24px;
-    border-top: 2px solid oklch(0.90 0 0);
-    color: oklch(0.50 0 0);
-    font-size: 14px;
-}
-
-.kot-footer-note {
-    margin-top: 8px;
-    font-style: italic;
-    color: oklch(0.65 0.15 45);
-}
-
-/* Print-specific overrides */
-@media print {
-    .kot-print-container {
-        padding: 10mm;
-        max-width: 100%;
-    }
-    
-    .kot-title {
-        font-size: 24pt;
-    }
-    
-    .kot-subtitle {
-        font-size: 14pt;
-    }
-    
-    .kot-th {
-        font-size: 11pt;
-        padding: 8px;
-    }
-    
-    .kot-td {
-        font-size: 11pt;
-        padding: 10px 8px;
-    }
-    
-    .kot-customer-name {
-        font-size: 12pt;
-    }
-    
-    /* Ensure page breaks don't split rows */
-    .kot-row {
-        page-break-inside: avoid;
-    }
-    
-    /* Force black text for better print quality */
-    .kot-title,
-    .kot-td,
-    .kot-th,
-    .kot-total {
-        color: #000 !important;
-    }
+  .print-content th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+  }
 }

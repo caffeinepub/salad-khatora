@@ -30,6 +30,11 @@ export const SaladBowl = IDL.Record({
   'bowlType' : SaladBowlType,
   'recipe' : Recipe,
 });
+export const UserRole = IDL.Variant({
+  'admin' : IDL.Null,
+  'user' : IDL.Null,
+  'guest' : IDL.Null,
+});
 export const Time = IDL.Int;
 export const Invoice = IDL.Record({
   'customerName' : IDL.Text,
@@ -40,11 +45,28 @@ export const Invoice = IDL.Record({
 });
 export const Customer = IDL.Record({
   'id' : IDL.Nat,
+  'age' : IDL.Nat,
+  'heightCm' : IDL.Float64,
   'name' : IDL.Text,
   'email' : IDL.Text,
   'preferences' : IDL.Text,
+  'weightKg' : IDL.Float64,
   'address' : IDL.Text,
+  'gender' : IDL.Text,
+  'calculatedBMI' : IDL.Float64,
   'phone' : IDL.Text,
+});
+export const Order = IDL.Record({
+  'customerName' : IDL.Text,
+  'deliveryAddress' : IDL.Text,
+  'orderStatus' : IDL.Text,
+  'orderTotal' : IDL.Nat,
+  'orderDate' : Time,
+  'orderId' : IDL.Nat,
+  'paymentMode' : IDL.Text,
+  'customerId' : IDL.Nat,
+  'phone' : IDL.Text,
+  'items' : IDL.Vec(IDL.Tuple(IDL.Text, IDL.Nat)),
 });
 export const StockTransactionType = IDL.Variant({
   'writeOff' : IDL.Null,
@@ -75,6 +97,19 @@ export const Subscription = IDL.Record({
   'bowlSize' : SaladBowlType,
   'startDate' : Time,
 });
+export const UserProfile = IDL.Record({
+  'age' : IDL.Nat,
+  'heightCm' : IDL.Float64,
+  'name' : IDL.Text,
+  'email' : IDL.Text,
+  'preferences' : IDL.Text,
+  'weightKg' : IDL.Float64,
+  'address' : IDL.Text,
+  'gender' : IDL.Text,
+  'calculatedBMI' : IDL.Float64,
+  'customerId' : IDL.Nat,
+  'phone' : IDL.Text,
+});
 export const InventoryItem = IDL.Record({
   'unitType' : IDL.Text,
   'quantityInStock' : IDL.Nat,
@@ -90,13 +125,41 @@ export const StockStatus = IDL.Record({
 });
 
 export const idlService = IDL.Service({
+  '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addCustomer' : IDL.Func(
-      [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+      [
+        IDL.Nat,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Nat,
+        IDL.Float64,
+        IDL.Float64,
+        IDL.Float64,
+      ],
       [IDL.Bool],
       [],
     ),
   'addIngredient' : IDL.Func([Ingredient], [], []),
+  'addOrder' : IDL.Func(
+      [
+        IDL.Nat,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Vec(IDL.Tuple(IDL.Text, IDL.Nat)),
+        IDL.Nat,
+        IDL.Text,
+        IDL.Text,
+      ],
+      [IDL.Nat],
+      [],
+    ),
   'addProduct' : IDL.Func([SaladBowl], [IDL.Nat], []),
+  'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'bowlSizes' : IDL.Func(
       [],
       [
@@ -106,7 +169,7 @@ export const idlService = IDL.Service({
           'gm500' : IDL.Bool,
         }),
       ],
-      [],
+      ['query'],
     ),
   'createSubscription' : IDL.Func(
       [
@@ -150,8 +213,13 @@ export const idlService = IDL.Service({
   'getAllActiveProducts' : IDL.Func([], [IDL.Vec(SaladBowl)], ['query']),
   'getAllCustomers' : IDL.Func([], [IDL.Vec(Customer)], ['query']),
   'getAllIngredients' : IDL.Func([], [IDL.Vec(Ingredient)], ['query']),
+  'getAllOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
   'getAllProductsWithInactive' : IDL.Func([], [IDL.Vec(SaladBowl)], ['query']),
-  'getAllStockTransactions' : IDL.Func([], [IDL.Vec(StockTransaction)], []),
+  'getAllStockTransactions' : IDL.Func(
+      [],
+      [IDL.Vec(StockTransaction)],
+      ['query'],
+    ),
   'getAllSubscriptions' : IDL.Func([], [IDL.Vec(Subscription)], ['query']),
   'getAnalyticsMetrics' : IDL.Func(
       [],
@@ -164,8 +232,12 @@ export const idlService = IDL.Service({
           'dailyExpenses' : IDL.Nat,
         }),
       ],
-      [],
+      ['query'],
     ),
+  'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
+  'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getCustomerOrders' : IDL.Func([IDL.Nat], [IDL.Vec(Order)], ['query']),
+  'getCustomerProfile' : IDL.Func([IDL.Nat], [IDL.Opt(Customer)], ['query']),
   'getIngredient' : IDL.Func([IDL.Text], [IDL.Opt(Ingredient)], ['query']),
   'getInventoryStatus' : IDL.Func(
       [],
@@ -175,16 +247,23 @@ export const idlService = IDL.Service({
           'items' : IDL.Vec(InventoryItem),
         }),
       ],
-      [],
+      ['query'],
     ),
+  'getOrder' : IDL.Func([IDL.Nat], [IDL.Opt(Order)], ['query']),
   'getProduct' : IDL.Func([IDL.Nat], [IDL.Opt(SaladBowl)], ['query']),
-  'getStockStatus' : IDL.Func([], [IDL.Vec(StockStatus)], []),
+  'getStockStatus' : IDL.Func([], [IDL.Vec(StockStatus)], ['query']),
   'getStockTransactionsByType' : IDL.Func(
       [StockTransactionType],
       [IDL.Vec(StockTransaction)],
-      [],
+      ['query'],
     ),
-  'monthlyPlanDuration' : IDL.Func([], [IDL.Nat], []),
+  'getUserProfile' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(UserProfile)],
+      ['query'],
+    ),
+  'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'monthlyPlanDuration' : IDL.Func([], [IDL.Nat], ['query']),
   'recordStockIn' : IDL.Func(
       [IDL.Text, IDL.Nat, IDL.Text, IDL.Nat, IDL.Text],
       [IDL.Bool],
@@ -192,10 +271,12 @@ export const idlService = IDL.Service({
     ),
   'recordStockOut' : IDL.Func([IDL.Text, IDL.Nat, IDL.Text], [IDL.Bool], []),
   'recordWriteOff' : IDL.Func([IDL.Text, IDL.Nat, IDL.Text], [IDL.Bool], []),
+  'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'toggleSaladBowlAvailability' : IDL.Func([IDL.Text, IDL.Bool], [], []),
   'updateIngredient' : IDL.Func([IDL.Text, Ingredient], [IDL.Bool], []),
+  'updateOrderStatus' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Bool], []),
   'updateProduct' : IDL.Func([IDL.Nat, SaladBowl], [IDL.Bool], []),
-  'weeklyPlanDuration' : IDL.Func([], [IDL.Nat], []),
+  'weeklyPlanDuration' : IDL.Func([], [IDL.Nat], ['query']),
 });
 
 export const idlInitArgs = [];
@@ -223,6 +304,11 @@ export const idlFactory = ({ IDL }) => {
     'bowlType' : SaladBowlType,
     'recipe' : Recipe,
   });
+  const UserRole = IDL.Variant({
+    'admin' : IDL.Null,
+    'user' : IDL.Null,
+    'guest' : IDL.Null,
+  });
   const Time = IDL.Int;
   const Invoice = IDL.Record({
     'customerName' : IDL.Text,
@@ -233,11 +319,28 @@ export const idlFactory = ({ IDL }) => {
   });
   const Customer = IDL.Record({
     'id' : IDL.Nat,
+    'age' : IDL.Nat,
+    'heightCm' : IDL.Float64,
     'name' : IDL.Text,
     'email' : IDL.Text,
     'preferences' : IDL.Text,
+    'weightKg' : IDL.Float64,
     'address' : IDL.Text,
+    'gender' : IDL.Text,
+    'calculatedBMI' : IDL.Float64,
     'phone' : IDL.Text,
+  });
+  const Order = IDL.Record({
+    'customerName' : IDL.Text,
+    'deliveryAddress' : IDL.Text,
+    'orderStatus' : IDL.Text,
+    'orderTotal' : IDL.Nat,
+    'orderDate' : Time,
+    'orderId' : IDL.Nat,
+    'paymentMode' : IDL.Text,
+    'customerId' : IDL.Nat,
+    'phone' : IDL.Text,
+    'items' : IDL.Vec(IDL.Tuple(IDL.Text, IDL.Nat)),
   });
   const StockTransactionType = IDL.Variant({
     'writeOff' : IDL.Null,
@@ -268,6 +371,19 @@ export const idlFactory = ({ IDL }) => {
     'bowlSize' : SaladBowlType,
     'startDate' : Time,
   });
+  const UserProfile = IDL.Record({
+    'age' : IDL.Nat,
+    'heightCm' : IDL.Float64,
+    'name' : IDL.Text,
+    'email' : IDL.Text,
+    'preferences' : IDL.Text,
+    'weightKg' : IDL.Float64,
+    'address' : IDL.Text,
+    'gender' : IDL.Text,
+    'calculatedBMI' : IDL.Float64,
+    'customerId' : IDL.Nat,
+    'phone' : IDL.Text,
+  });
   const InventoryItem = IDL.Record({
     'unitType' : IDL.Text,
     'quantityInStock' : IDL.Nat,
@@ -283,13 +399,41 @@ export const idlFactory = ({ IDL }) => {
   });
   
   return IDL.Service({
+    '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addCustomer' : IDL.Func(
-        [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+        [
+          IDL.Nat,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Nat,
+          IDL.Float64,
+          IDL.Float64,
+          IDL.Float64,
+        ],
         [IDL.Bool],
         [],
       ),
     'addIngredient' : IDL.Func([Ingredient], [], []),
+    'addOrder' : IDL.Func(
+        [
+          IDL.Nat,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Vec(IDL.Tuple(IDL.Text, IDL.Nat)),
+          IDL.Nat,
+          IDL.Text,
+          IDL.Text,
+        ],
+        [IDL.Nat],
+        [],
+      ),
     'addProduct' : IDL.Func([SaladBowl], [IDL.Nat], []),
+    'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'bowlSizes' : IDL.Func(
         [],
         [
@@ -299,7 +443,7 @@ export const idlFactory = ({ IDL }) => {
             'gm500' : IDL.Bool,
           }),
         ],
-        [],
+        ['query'],
       ),
     'createSubscription' : IDL.Func(
         [
@@ -343,12 +487,17 @@ export const idlFactory = ({ IDL }) => {
     'getAllActiveProducts' : IDL.Func([], [IDL.Vec(SaladBowl)], ['query']),
     'getAllCustomers' : IDL.Func([], [IDL.Vec(Customer)], ['query']),
     'getAllIngredients' : IDL.Func([], [IDL.Vec(Ingredient)], ['query']),
+    'getAllOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
     'getAllProductsWithInactive' : IDL.Func(
         [],
         [IDL.Vec(SaladBowl)],
         ['query'],
       ),
-    'getAllStockTransactions' : IDL.Func([], [IDL.Vec(StockTransaction)], []),
+    'getAllStockTransactions' : IDL.Func(
+        [],
+        [IDL.Vec(StockTransaction)],
+        ['query'],
+      ),
     'getAllSubscriptions' : IDL.Func([], [IDL.Vec(Subscription)], ['query']),
     'getAnalyticsMetrics' : IDL.Func(
         [],
@@ -361,8 +510,12 @@ export const idlFactory = ({ IDL }) => {
             'dailyExpenses' : IDL.Nat,
           }),
         ],
-        [],
+        ['query'],
       ),
+    'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
+    'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getCustomerOrders' : IDL.Func([IDL.Nat], [IDL.Vec(Order)], ['query']),
+    'getCustomerProfile' : IDL.Func([IDL.Nat], [IDL.Opt(Customer)], ['query']),
     'getIngredient' : IDL.Func([IDL.Text], [IDL.Opt(Ingredient)], ['query']),
     'getInventoryStatus' : IDL.Func(
         [],
@@ -372,16 +525,23 @@ export const idlFactory = ({ IDL }) => {
             'items' : IDL.Vec(InventoryItem),
           }),
         ],
-        [],
+        ['query'],
       ),
+    'getOrder' : IDL.Func([IDL.Nat], [IDL.Opt(Order)], ['query']),
     'getProduct' : IDL.Func([IDL.Nat], [IDL.Opt(SaladBowl)], ['query']),
-    'getStockStatus' : IDL.Func([], [IDL.Vec(StockStatus)], []),
+    'getStockStatus' : IDL.Func([], [IDL.Vec(StockStatus)], ['query']),
     'getStockTransactionsByType' : IDL.Func(
         [StockTransactionType],
         [IDL.Vec(StockTransaction)],
-        [],
+        ['query'],
       ),
-    'monthlyPlanDuration' : IDL.Func([], [IDL.Nat], []),
+    'getUserProfile' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(UserProfile)],
+        ['query'],
+      ),
+    'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'monthlyPlanDuration' : IDL.Func([], [IDL.Nat], ['query']),
     'recordStockIn' : IDL.Func(
         [IDL.Text, IDL.Nat, IDL.Text, IDL.Nat, IDL.Text],
         [IDL.Bool],
@@ -389,10 +549,12 @@ export const idlFactory = ({ IDL }) => {
       ),
     'recordStockOut' : IDL.Func([IDL.Text, IDL.Nat, IDL.Text], [IDL.Bool], []),
     'recordWriteOff' : IDL.Func([IDL.Text, IDL.Nat, IDL.Text], [IDL.Bool], []),
+    'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'toggleSaladBowlAvailability' : IDL.Func([IDL.Text, IDL.Bool], [], []),
     'updateIngredient' : IDL.Func([IDL.Text, Ingredient], [IDL.Bool], []),
+    'updateOrderStatus' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Bool], []),
     'updateProduct' : IDL.Func([IDL.Nat, SaladBowl], [IDL.Bool], []),
-    'weeklyPlanDuration' : IDL.Func([], [IDL.Nat], []),
+    'weeklyPlanDuration' : IDL.Func([], [IDL.Nat], ['query']),
   });
 };
 

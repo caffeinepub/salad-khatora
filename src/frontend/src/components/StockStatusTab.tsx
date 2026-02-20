@@ -15,13 +15,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useGetStockStatus, useDeleteIngredient } from '../hooks/useQueries';
+import { useStockStatus, useDeleteIngredient } from '../hooks/useQueries';
 import EditIngredientDialog from './EditIngredientDialog';
 import IngredientForm from './IngredientForm';
 import type { Ingredient } from '../backend';
 
 export default function StockStatusTab() {
-  const { data: stockStatus = [], isLoading } = useGetStockStatus();
+  const { data: stockStatus = [], isLoading } = useStockStatus();
   const deleteIngredient = useDeleteIngredient();
   const [editingIngredient, setEditingIngredient] = useState<Ingredient | null>(null);
   const [deletingIngredient, setDeletingIngredient] = useState<Ingredient | null>(null);

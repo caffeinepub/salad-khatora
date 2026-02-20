@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Customer, Recipe, Subscription, SaladBowlType, Time, SaladBowl, Ingredient, StockTransactionType, StockStatus } from '../backend';
+import type { Customer, Recipe, Subscription, SaladBowlType, Time, SaladBowl, Ingredient, StockTransactionType, StockStatus, Order, UserProfile } from '../backend';
 import { toast } from 'sonner';
 
 // Analytics Metrics
@@ -14,6 +14,7 @@ export function useAnalyticsMetrics() {
       return actor.getAnalyticsMetrics();
     },
     enabled: !!actor && !isFetching,
+    staleTime: 30000, // 30 seconds
   });
 }
 
@@ -28,6 +29,7 @@ export function useWeeklyPlanDuration() {
       return Number(await actor.weeklyPlanDuration());
     },
     enabled: !!actor && !isFetching,
+    staleTime: Infinity,
   });
 }
 
@@ -41,6 +43,7 @@ export function useMonthlyPlanDuration() {
       return Number(await actor.monthlyPlanDuration());
     },
     enabled: !!actor && !isFetching,
+    staleTime: Infinity,
   });
 }
 
@@ -55,6 +58,7 @@ export function useBowlSizes() {
       return actor.bowlSizes();
     },
     enabled: !!actor && !isFetching,
+    staleTime: Infinity,
   });
 }
 
@@ -69,6 +73,21 @@ export function useAllProducts() {
       return actor.getAllProductsWithInactive();
     },
     enabled: !!actor && !isFetching,
+    staleTime: 60000, // 1 minute
+  });
+}
+
+export function useActiveProducts() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<SaladBowl[]>({
+    queryKey: ['activeProducts'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllActiveProducts();
+    },
+    enabled: !!actor && !isFetching,
+    staleTime: 60000, // 1 minute
   });
 }
 
@@ -83,6 +102,7 @@ export function useToggleProductAvailability() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['activeProducts'] });
     },
   });
 }
@@ -95,7 +115,6 @@ export function useUpdateProduct() {
     mutationFn: async ({ name, updatedProduct }: { name: string; updatedProduct: SaladBowl }) => {
       if (!actor) throw new Error('Actor not initialized');
       
-      // Find the product by name to get its ID
       const products = await actor.getAllProductsWithInactive();
       const productIndex = products.findIndex(p => p.name === name);
       
@@ -109,6 +128,7 @@ export function useUpdateProduct() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['activeProducts'] });
     },
   });
 }
@@ -121,7 +141,6 @@ export function useDeleteProduct() {
     mutationFn: async (name: string) => {
       if (!actor) throw new Error('Actor not initialized');
       
-      // Find the product by name to get its ID
       const products = await actor.getAllProductsWithInactive();
       const productIndex = products.findIndex(p => p.name === name);
       
@@ -135,6 +154,7 @@ export function useDeleteProduct() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['activeProducts'] });
     },
   });
 }
@@ -153,12 +173,200 @@ export function useEditRecipe() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['activeProducts'] });
     },
   });
 }
 
+// Ingredient Management
+export function useAllIngredients() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Ingredient[]>({
+    queryKey: ['ingredients'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllIngredients();
+    },
+    enabled: !!actor && !isFetching,
+    staleTime: 60000, // 1 minute
+  });
+}
+
+export function useAddIngredient() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async (ingredient: Ingredient) => {
+      if (!actor) throw new Error('Actor not initialized');
+      await actor.addIngredient(ingredient);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
+      toast.success('Ingredient added successfully');
+    },
+  });
+}
+
+export function useUpdateIngredient() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async ({ name, updatedIngredient }: { name: string; updatedIngredient: Ingredient }) => {
+      if (!actor) throw new Error('Actor not initialized');
+      const result = await actor.updateIngredient(name, updatedIngredient);
+      if (!result) throw new Error('Failed to update ingredient');
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
+      toast.success('Ingredient updated successfully');
+    },
+  });
+}
+
+export function useDeleteIngredient() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async (name: string) => {
+      if (!actor) throw new Error('Actor not initialized');
+      const result = await actor.deleteIngredient(name);
+      if (!result) throw new Error('Failed to delete ingredient');
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
+      toast.success('Ingredient deleted successfully');
+    },
+  });
+}
+
+// Stock Management
+export function useStockStatus() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<StockStatus[]>({
+    queryKey: ['stockStatus'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getStockStatus();
+    },
+    enabled: !!actor && !isFetching,
+    staleTime: 30000, // 30 seconds
+  });
+}
+
+export function useRecordStockIn() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async ({
+      ingredientName,
+      quantity,
+      supplier,
+      costPrice,
+      unitType,
+    }: {
+      ingredientName: string;
+      quantity: bigint;
+      supplier: string;
+      costPrice: bigint;
+      unitType: string;
+    }) => {
+      if (!actor) throw new Error('Actor not initialized');
+      const result = await actor.recordStockIn(ingredientName, quantity, supplier, costPrice, unitType);
+      if (!result) throw new Error('Failed to record stock in');
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
+      queryClient.invalidateQueries({ queryKey: ['stockTransactions'] });
+      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      toast.success('Stock in recorded successfully');
+    },
+  });
+}
+
+export function useRecordStockOut() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async ({
+      ingredientName,
+      quantity,
+      reason,
+    }: {
+      ingredientName: string;
+      quantity: bigint;
+      reason: string;
+    }) => {
+      if (!actor) throw new Error('Actor not initialized');
+      const result = await actor.recordStockOut(ingredientName, quantity, reason);
+      if (!result) throw new Error('Failed to record stock out');
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
+      queryClient.invalidateQueries({ queryKey: ['stockTransactions'] });
+      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      toast.success('Stock out recorded successfully');
+    },
+  });
+}
+
+export function useRecordWriteOff() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async ({
+      ingredientName,
+      quantity,
+      reason,
+    }: {
+      ingredientName: string;
+      quantity: bigint;
+      reason: string;
+    }) => {
+      if (!actor) throw new Error('Actor not initialized');
+      const result = await actor.recordWriteOff(ingredientName, quantity, reason);
+      if (!result) throw new Error('Failed to record write-off');
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
+      queryClient.invalidateQueries({ queryKey: ['stockTransactions'] });
+      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
+      toast.success('Write-off recorded successfully');
+    },
+  });
+}
+
+export function useGetStockTransactionsByType(transactionType: StockTransactionType) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery({
+    queryKey: ['stockTransactions', transactionType],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getStockTransactionsByType(transactionType);
+    },
+    enabled: !!actor && !isFetching,
+    staleTime: 30000, // 30 seconds
+  });
+}
+
 // Customer Management
-export function useCustomers() {
+export function useAllCustomers() {
   const { actor, isFetching } = useActor();
 
   return useQuery<Customer[]>({
@@ -168,6 +376,7 @@ export function useCustomers() {
       return actor.getAllCustomers();
     },
     enabled: !!actor && !isFetching,
+    staleTime: 60000, // 1 minute
   });
 }
 
@@ -176,28 +385,34 @@ export function useAddCustomer() {
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async (customer: { 
-      id: bigint; 
-      name: string; 
-      phone: string; 
-      email: string; 
-      address: string; 
-      preferences: string 
+    mutationFn: async (customer: {
+      id: bigint;
+      name: string;
+      phone: string;
+      email: string;
+      address: string;
+      preferences: string;
     }) => {
       if (!actor) throw new Error('Actor not initialized');
       const result = await actor.addCustomer(
-        customer.id, 
-        customer.name, 
-        customer.phone, 
-        customer.email, 
-        customer.address, 
-        customer.preferences
+        customer.id,
+        customer.name,
+        customer.phone,
+        customer.email,
+        customer.address,
+        customer.preferences,
+        '',
+        BigInt(0),
+        0,
+        0,
+        0
       );
       if (!result) throw new Error('Failed to add customer');
       return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
+      toast.success('Customer added successfully');
     },
   });
 }
@@ -213,6 +428,7 @@ export function useAllSubscriptions() {
       return actor.getAllSubscriptions();
     },
     enabled: !!actor && !isFetching,
+    staleTime: 60000, // 1 minute
   });
 }
 
@@ -253,6 +469,7 @@ export function useCreateSubscription() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subscriptions'] });
+      toast.success('Subscription created successfully');
     },
   });
 }
@@ -294,6 +511,7 @@ export function useEditSubscription() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subscriptions'] });
+      toast.success('Subscription updated successfully');
     },
   });
 }
@@ -311,184 +529,128 @@ export function useDeleteSubscription() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subscriptions'] });
+      toast.success('Subscription deleted successfully');
     },
   });
 }
 
-// Ingredient Management
-export function useAllIngredients() {
+// Order Management
+export function useOrders() {
   const { actor, isFetching } = useActor();
 
-  return useQuery<Ingredient[]>({
-    queryKey: ['ingredients'],
+  return useQuery<Order[]>({
+    queryKey: ['orders'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllIngredients();
+      return actor.getAllOrders();
     },
     enabled: !!actor && !isFetching,
+    staleTime: 30000, // 30 seconds
   });
 }
 
-export function useAddIngredient() {
+export function useAddOrder() {
   const queryClient = useQueryClient();
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async (ingredient: Ingredient) => {
+    mutationFn: async (order: {
+      customerId: bigint;
+      customerName: string;
+      phone: string;
+      deliveryAddress: string;
+      items: Array<[string, bigint]>;
+      orderTotal: bigint;
+      paymentMode: string;
+      orderStatus: string;
+    }) => {
       if (!actor) throw new Error('Actor not initialized');
-      await actor.addIngredient(ingredient);
+      const orderId = await actor.addOrder(
+        order.customerId,
+        order.customerName,
+        order.phone,
+        order.deliveryAddress,
+        order.items,
+        order.orderTotal,
+        order.paymentMode,
+        order.orderStatus
+      );
+      return orderId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
-      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      toast.success('Order created successfully');
     },
   });
 }
 
-export function useUpdateIngredient() {
+export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async ({ name, updatedIngredient }: { name: string; updatedIngredient: Ingredient }) => {
+    mutationFn: async ({ orderId, newStatus }: { orderId: bigint; newStatus: string }) => {
       if (!actor) throw new Error('Actor not initialized');
-      const result = await actor.updateIngredient(name, updatedIngredient);
-      if (!result) throw new Error('Failed to update ingredient');
+      const result = await actor.updateOrderStatus(orderId, newStatus);
+      if (!result) throw new Error('Failed to update order status');
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
-      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      toast.success('Order status updated');
     },
   });
 }
 
-export function useDeleteIngredient() {
-  const queryClient = useQueryClient();
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async (name: string) => {
-      if (!actor) throw new Error('Actor not initialized');
-      const result = await actor.deleteIngredient(name);
-      if (!result) throw new Error('Failed to delete ingredient');
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
-      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
-    },
-  });
-}
-
-// Stock Management
-export function useGetStockStatus() {
+// User Profile Management
+export function useGetCallerUserProfile() {
   const { actor, isFetching } = useActor();
 
-  return useQuery<StockStatus[]>({
-    queryKey: ['stockStatus'],
+  const query = useQuery<UserProfile | null>({
+    queryKey: ['currentUserProfile'],
     queryFn: async () => {
-      if (!actor) return [];
-      return actor.getStockStatus();
+      if (!actor) throw new Error('Actor not available');
+      return actor.getCallerUserProfile();
     },
     enabled: !!actor && !isFetching,
+    retry: false,
+    staleTime: 60000, // 1 minute
   });
+
+  return {
+    ...query,
+    isLoading: isFetching || query.isLoading,
+    isFetched: !!actor && query.isFetched,
+  };
 }
 
-export function useRecordStockIn() {
+export function useSaveCallerUserProfile() {
   const queryClient = useQueryClient();
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async (data: {
-      ingredientName: string;
-      quantity: bigint;
-      supplier: string;
-      costPrice: bigint;
-      unitType: string;
-    }) => {
+    mutationFn: async (profile: UserProfile) => {
       if (!actor) throw new Error('Actor not initialized');
-      const result = await actor.recordStockIn(
-        data.ingredientName,
-        data.quantity,
-        data.supplier,
-        data.costPrice,
-        data.unitType
-      );
-      if (!result) throw new Error('Failed to record stock in');
-      return result;
+      await actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
-      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
-      queryClient.invalidateQueries({ queryKey: ['stockTransactions'] });
+      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      toast.success('Profile saved successfully');
     },
   });
 }
 
-export function useRecordStockOut() {
-  const queryClient = useQueryClient();
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async (data: {
-      ingredientName: string;
-      quantity: bigint;
-      reason: string;
-    }) => {
-      if (!actor) throw new Error('Actor not initialized');
-      const result = await actor.recordStockOut(
-        data.ingredientName,
-        data.quantity,
-        data.reason
-      );
-      if (!result) throw new Error('Failed to record stock out');
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
-      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
-      queryClient.invalidateQueries({ queryKey: ['stockTransactions'] });
-    },
-  });
-}
-
-export function useRecordWriteOff() {
-  const queryClient = useQueryClient();
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async (data: {
-      ingredientName: string;
-      quantity: bigint;
-      reason: string;
-    }) => {
-      if (!actor) throw new Error('Actor not initialized');
-      const result = await actor.recordWriteOff(
-        data.ingredientName,
-        data.quantity,
-        data.reason
-      );
-      if (!result) throw new Error('Failed to record write off');
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ingredients'] });
-      queryClient.invalidateQueries({ queryKey: ['stockStatus'] });
-      queryClient.invalidateQueries({ queryKey: ['stockTransactions'] });
-    },
-  });
-}
-
-export function useGetStockTransactionsByType(transactionType: StockTransactionType) {
+// Customer Orders
+export function useGetCustomerOrders(customerId: bigint) {
   const { actor, isFetching } = useActor();
 
-  return useQuery({
-    queryKey: ['stockTransactions', transactionType],
+  return useQuery<Order[]>({
+    queryKey: ['customerOrders', customerId.toString()],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getStockTransactionsByType(transactionType);
+      return actor.getCustomerOrders(customerId);
     },
-    enabled: !!actor && !isFetching,
+    enabled: !!actor && !isFetching && customerId > BigInt(0),
+    staleTime: 30000, // 30 seconds
   });
 }

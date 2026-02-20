@@ -1,37 +1,100 @@
 {
   "kind": "build_request",
-  "title": "Revert to Version 10",
+  "title": "Fix admin authentication and page flickering issues",
+  "projectName": "Salad Khatora",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-48",
-      "text": "Revert the LoginPage component to its Version 10 state, removing the centered card layout, 'Welcome Back' heading, 'Sign in to your Salad Khatora account' subtitle, email and password input fields with icons, green 'Sign In' button, 'Don't have an account? Sign up' link, and 'Back to Home' link. Restore the previous login interface implementation that was present before Version 11.",
+      "id": "REQ-76",
+      "text": "Debug and fix the admin authentication system to enable successful login through Internet Identity on the LoginPage component located at frontend/src/pages/LoginPage.tsx",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-user-final"
         ],
         "quotes": [
-          "undo change and go back to version 10"
+          "not able to login"
         ]
       },
       "acceptanceCriteria": [
-        "LoginPage component matches Version 10 implementation",
-        "All Version 11 login design changes are removed",
-        "Internet Identity authentication functionality remains intact",
-        "Users can successfully authenticate using the restored interface"
+        "Admin users can successfully authenticate using Internet Identity",
+        "Login flow completes without errors and redirects to dashboard",
+        "Authentication state persists correctly across page refreshes"
+      ]
+    },
+    {
+      "id": "REQ-77",
+      "text": "Investigate and resolve page flickering issue occurring on admin panel pages by checking for race conditions, infinite re-renders, or authentication state changes in Layout.tsx and protected route components",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-final"
+        ],
+        "quotes": [
+          "admin side page is flickiring"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin panel pages render smoothly without visual flickering",
+        "No unnecessary re-renders occur during page load or navigation",
+        "Authentication checks execute efficiently without causing render loops"
+      ]
+    },
+    {
+      "id": "REQ-78",
+      "text": "Verify that the useInternetIdentity hook in frontend/src/hooks/useInternetIdentity.ts properly initializes authentication state and handles delegation without causing component re-mount cycles",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-final"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Internet Identity initialization completes without triggering multiple renders",
+        "Authentication state updates are batched appropriately",
+        "Hook does not cause components to unmount and remount during auth flow"
+      ]
+    },
+    {
+      "id": "REQ-79",
+      "text": "Check Layout.tsx authentication redirect logic to ensure it does not create redirect loops or unnecessary navigation attempts that could cause flickering",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-final"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Layout component checks authentication once and redirects cleanly if needed",
+        "No redirect loops occur between login page and protected routes",
+        "Loading states are displayed properly during authentication verification"
+      ]
+    },
+    {
+      "id": "REQ-80",
+      "text": "Ensure the App.tsx router configuration properly handles authentication guards without causing route flashing or multiple navigation events during initial load",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-final"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Protected routes check authentication before rendering content",
+        "No visible route transitions occur during authentication check",
+        "Router navigation is stable during the authentication initialization phase"
       ]
     }
   ],
   "constraints": [
-    "Preserve Internet Identity authentication functionality",
-    "Do not modify backend main.mo or migration.mo files",
-    "Do not change authentication flow logic in useInternetIdentity.ts or useActor.ts"
+    "Do not change the Internet Identity authentication mechanism",
+    "Maintain existing authentication flow for both admin and customer panels",
+    "Preserve all existing route configurations"
   ],
   "nonGoals": [
-    "Adding new features or functionality",
-    "Modifying other pages or components beyond LoginPage",
-    "Changing authentication system or providers"
+    "Implementing alternative authentication methods",
+    "Redesigning the login interface",
+    "Modifying backend authentication logic"
   ],
   "imageRequirements": {
     "required": [],

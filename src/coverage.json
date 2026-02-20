@@ -1,25 +1,76 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-20T02:21:16.889Z",
+  "generatedAt": "2026-02-20T04:12:01.151Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 5,
+    "implemented": 4,
     "items": [
       {
-        "id": "REQ-48",
-        "summary": "Revert the LoginPage component to its Version 10 state, removing the centered card layout, 'Welcome Back' heading, 'Sign in to your Salad Khatora account' subtitle, email and password input fields with icons, green 'Sign In' button, 'Don't have an account? Sign up' link, and 'Back to Home' link. Restore the previous login interface implementation that was present before Version 11.",
+        "id": "REQ-76",
+        "summary": "Debug and fix the admin authentication system to enable successful login through Internet Identity on the LoginPage component located at frontend/src/pages/LoginPage.tsx",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/LoginPage.tsx"
+          "frontend/src/pages/LoginPage.tsx",
+          "frontend/src/hooks/useInternetIdentity.ts",
+          "frontend/src/hooks/useActor.ts"
         ],
         "matchedFiles": [
           "frontend/src/pages/LoginPage.tsx"
         ]
+      },
+      {
+        "id": "REQ-77",
+        "summary": "Investigate and resolve page flickering issue occurring on admin panel pages by checking for race conditions, infinite re-renders, or authentication state changes in Layout.tsx and protected route components",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/Layout.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/Layout.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-78",
+        "summary": "Verify that the useInternetIdentity hook in frontend/src/hooks/useInternetIdentity.ts properly initializes authentication state and handles delegation without causing component re-mount cycles",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useInternetIdentity.ts",
+          "frontend/src/contexts/CustomerAuthContext.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/contexts/CustomerAuthContext.tsx"
+        ]
+      },
+      {
+        "id": "REQ-79",
+        "summary": "Check Layout.tsx authentication redirect logic to ensure it does not create redirect loops or unnecessary navigation attempts that could cause flickering",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/Layout.tsx",
+          "frontend/src/components/CustomerProtectedRoute.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/Layout.tsx",
+          "frontend/src/components/CustomerProtectedRoute.tsx"
+        ]
+      },
+      {
+        "id": "REQ-80",
+        "summary": "Ensure the App.tsx router configuration properly handles authentication guards without causing route flashing or multiple navigation events during initial load",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/App.tsx",
+          "frontend/src/main.tsx"
+        ],
+        "matchedFiles": []
       }
     ]
   },
@@ -28,6 +79,11 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/src/components/CustomerProtectedRoute.tsx",
+    "frontend/src/components/Layout.tsx",
+    "frontend/src/components/UserOrdersSection.tsx",
+    "frontend/src/contexts/CustomerAuthContext.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/LoginPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",

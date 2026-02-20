@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 25,
-  "summary": "Full-stack web application for Salad Khatora business with inventory management, product/recipe management (with availability toggle and recipe editing), billing/sales (product selection from menu), dashboard analytics (daily/weekly/monthly sales, cash flow, daily expenses), subscription management (weekly 6-day, monthly 24-day plans), alerts, admin auth, comprehensive reports download, customer management with push notifications, and CSV export",
+  "projectStateVersion": 31,
+  "summary": "Full-stack web application for Salad Khatora business with admin panel for inventory management, product/recipe management (with availability toggle and recipe editing), billing/sales (product selection from menu), dashboard analytics (daily/weekly/monthly sales, cash flow, daily expenses), subscription management (weekly 6-day, monthly 24-day plans), alerts, admin auth, comprehensive reports download, customer management with push notifications, and CSV export. User-facing ordering panel similar to Swiggy/Zomato for customers to browse menu, place salad bowl orders, track orders, and manage customer profiles with health information (BMI calculation), fully integrated with admin panel for order management and inventory updates.",
   "architectural_notes": [
     "Full-stack web application architecture",
     "Recipe-to-ingredient mapping for automatic inventory deduction on sales",
@@ -18,7 +18,9 @@
     "Logo image (logo.dim_256x256.png) not loading in navigation header",
     "Edit and delete functionality not working for products in products tab",
     "Edit and delete functionality not working for inventory items in inventory tab",
-    "Admin login page not appearing when opening site directly - authentication flow not enforcing login requirement"
+    "Admin login page not appearing when opening site directly - authentication flow not enforcing login requirement",
+    "Admin login functionality not working - unable to authenticate",
+    "Admin panel pages experiencing flickering/rendering issues"
   ],
   "isFixRequest": true,
   "existing_features": [
@@ -365,6 +367,214 @@
         "REQ-48"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-rename-the-existing-application-to-admin-panel-by-updating-all-references-in-layout-tsx-loginpage-tsx-and-relevant-navigation-components-to-clearly-indicate-this-is-the-administrative-interface",
+      "title": "Rename the existing application to 'Admin Panel' by updating all references in Layout.tsx, LoginPage.tsx, and relevant navigation components to clearly indicate this is the administrative interface",
+      "reqIds": [
+        "REQ-49"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-user-facing-ordering-panel-with-a-home-page-that-displays-all-available-salad-bowls-in-a-grid-layout-similar-to-swiggy-zomato-showing-product-images-names-bowl-sizes-prices-and-availability-status",
+      "title": "Create a new user-facing ordering panel with a home page that displays all available salad bowls in a grid layout similar to Swiggy/Zomato, showing product images, names, bowl sizes, prices, and availability status",
+      "reqIds": [
+        "REQ-50"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-product-detail-view-in-the-user-panel-that-displays-full-product-information-including-ingredients-nutritional-details-and-an-add-to-cart-button-when-a-user-clicks-on-a-salad-bowl",
+      "title": "Implement product detail view in the user panel that displays full product information including ingredients, nutritional details, and an 'Add to Cart' button when a user clicks on a salad bowl",
+      "reqIds": [
+        "REQ-51"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-shopping-cart-functionality-in-the-user-panel-with-ability-to-view-cart-items-adjust-quantities-remove-items-and-see-real-time-order-total-calculation",
+      "title": "Create shopping cart functionality in the user panel with ability to view cart items, adjust quantities, remove items, and see real-time order total calculation",
+      "reqIds": [
+        "REQ-52"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-checkout-flow-in-the-user-panel-with-forms-to-collect-customer-name-phone-number-delivery-address-and-payment-mode-selection-before-placing-order",
+      "title": "Implement checkout flow in the user panel with forms to collect customer name, phone number, delivery address, and payment mode selection before placing order",
+      "reqIds": [
+        "REQ-53"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-user-panel-order-submission-with-backend-to-create-order-records-and-automatically-generate-invoices-in-the-admin-billing-system-when-orders-are-placed-through-the-user-panel",
+      "title": "Integrate user panel order submission with backend to create order records and automatically generate invoices in the admin billing system when orders are placed through the user panel",
+      "reqIds": [
+        "REQ-55"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-an-orders-section-in-the-admin-panel-that-displays-all-orders-placed-through-the-user-panel-in-a-table-with-columns-for-order-id-customer-name-phone-items-total-payment-mode-status-and-order-date",
+      "title": "Create an 'Orders' section in the admin panel that displays all orders placed through the user panel in a table with columns for order ID, customer name, phone, items, total, payment mode, status, and order date",
+      "reqIds": [
+        "REQ-57"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-order-status-management-in-the-admin-panel-allowing-admins-to-update-order-status-through-a-dropdown-or-buttons-pending-preparing-ready-delivered-with-timestamps-for-each-status-change",
+      "title": "Implement order status management in the admin panel allowing admins to update order status through a dropdown or buttons (pending → preparing → ready → delivered) with timestamps for each status change",
+      "reqIds": [
+        "REQ-58"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-order-tracking-page-in-the-user-panel-where-customers-can-view-their-order-history-and-real-time-status-updates-for-active-orders-by-entering-their-phone-number-or-order-id",
+      "title": "Create order tracking page in the user panel where customers can view their order history and real-time status updates for active orders by entering their phone number or order ID",
+      "reqIds": [
+        "REQ-59"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-user-panel-routing-separate-from-admin-panel-with-distinct-base-paths-user-for-customer-interface-admin-for-administrative-interface-and-update-app-tsx-to-handle-both-route-hierarchies",
+      "title": "Implement user panel routing separate from admin panel with distinct base paths (/user for customer interface, /admin for administrative interface) and update App.tsx to handle both route hierarchies",
+      "reqIds": [
+        "REQ-60"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-visually-distinct-user-facing-layout-component-for-the-ordering-panel-with-a-modern-food-delivery-interface-including-header-with-logo-and-cart-icon-navigation-and-footer-separate-from-the-admin-panel-layout",
+      "title": "Create a visually distinct user-facing layout component for the ordering panel with a modern food delivery interface including header with logo and cart icon, navigation, and footer, separate from the admin panel layout",
+      "reqIds": [
+        "REQ-61"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-order-confirmation-page-in-the-user-panel-that-displays-order-summary-order-id-estimated-preparation-time-and-delivery-details-after-successful-order-placement",
+      "title": "Add order confirmation page in the user panel that displays order summary, order ID, estimated preparation time, and delivery details after successful order placement",
+      "reqIds": [
+        "REQ-62"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-customer-login-button-to-the-top-right-corner-of-the-user-panel-header-in-the-userlayout-component-styled-consistently-with-the-modern-food-delivery-interface",
+      "title": "Add customer login button to the top right corner of the user panel header in the UserLayout component, styled consistently with the modern food delivery interface.",
+      "reqIds": [
+        "REQ-63"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-customer-authentication-system-using-internet-identity-for-the-user-panel-separate-from-admin-authentication-allowing-customers-to-log-in-and-access-their-dashboard",
+      "title": "Implement customer authentication system using Internet Identity for the user panel, separate from admin authentication, allowing customers to log in and access their dashboard.",
+      "reqIds": [
+        "REQ-64"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-user-dashboard-page-accessible-at-user-dashboard-that-displays-three-main-sections-profile-menu-and-orders-with-navigation-tabs-or-cards-to-access-each-section",
+      "title": "Create a user dashboard page accessible at /user/dashboard that displays three main sections: Profile, Menu, and Orders, with navigation tabs or cards to access each section.",
+      "reqIds": [
+        "REQ-65"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-profile-section-in-the-user-dashboard-that-displays-and-allows-editing-of-customer-name-mobile-number-email-and-address-fields",
+      "title": "Implement Profile section in the user dashboard that displays and allows editing of customer name, mobile number, email, and address fields.",
+      "reqIds": [
+        "REQ-66"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-location-pin-map-integration-to-the-address-field-in-the-profile-section-allowing-customers-to-select-or-view-their-delivery-location-on-a-map",
+      "title": "Add location pin/map integration to the address field in the Profile section, allowing customers to select or view their delivery location on a map.",
+      "reqIds": [
+        "REQ-67"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-health-information-section-to-the-profile-with-input-fields-for-gender-dropdown-male-female-other-age-numeric-height-in-cm-numeric-and-weight-in-kg-numeric",
+      "title": "Add health information section to the Profile with input fields for gender (dropdown: Male/Female/Other), age (numeric), height in cm (numeric), and weight in kg (numeric).",
+      "reqIds": [
+        "REQ-68"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-automatic-bmi-body-mass-index-calculation-that-displays-the-calculated-bmi-value-based-on-height-and-weight-inputs-using-the-formula-bmi-weight-kg-height-m",
+      "title": "Implement automatic BMI (Body Mass Index) calculation that displays the calculated BMI value based on height and weight inputs, using the formula: BMI = weight (kg) / (height (m))².",
+      "reqIds": [
+        "REQ-69"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-user-dashboard-menu-section-to-display-the-same-salad-bowl-menu-that-is-currently-shown-on-the-usermenupage-ensuring-consistent-product-browsing-experience-within-the-dashboard",
+      "title": "Update the user dashboard Menu section to display the same salad bowl menu that is currently shown on the UserMenuPage, ensuring consistent product browsing experience within the dashboard.",
+      "reqIds": [
+        "REQ-72"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-orders-section-in-the-user-dashboard-that-displays-the-customer-s-order-history-and-active-orders-with-order-details-status-and-order-tracking-links",
+      "title": "Create Orders section in the user dashboard that displays the customer's order history and active orders with order details, status, and order tracking links.",
+      "reqIds": [
+        "REQ-73"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-protect-the-user-dashboard-route-user-dashboard-with-customer-authentication-redirecting-unauthenticated-users-to-the-customer-login-page",
+      "title": "Protect the user dashboard route (/user/dashboard) with customer authentication, redirecting unauthenticated users to the customer login page.",
+      "reqIds": [
+        "REQ-75"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-debug-and-fix-the-admin-authentication-system-to-enable-successful-login-through-internet-identity-on-the-loginpage-component-located-at-frontend-src-pages-loginpage-tsx",
+      "title": "Debug and fix the admin authentication system to enable successful login through Internet Identity on the LoginPage component located at frontend/src/pages/LoginPage.tsx",
+      "reqIds": [
+        "REQ-76"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-investigate-and-resolve-page-flickering-issue-occurring-on-admin-panel-pages-by-checking-for-race-conditions-infinite-re-renders-or-authentication-state-changes-in-layout-tsx-and-protected-route-components",
+      "title": "Investigate and resolve page flickering issue occurring on admin panel pages by checking for race conditions, infinite re-renders, or authentication state changes in Layout.tsx and protected route components",
+      "reqIds": [
+        "REQ-77"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-verify-that-the-useinternetidentity-hook-in-frontend-src-hooks-useinternetidentity-ts-properly-initializes-authentication-state-and-handles-delegation-without-causing-component-re-mount-cycles",
+      "title": "Verify that the useInternetIdentity hook in frontend/src/hooks/useInternetIdentity.ts properly initializes authentication state and handles delegation without causing component re-mount cycles",
+      "reqIds": [
+        "REQ-78"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-check-layout-tsx-authentication-redirect-logic-to-ensure-it-does-not-create-redirect-loops-or-unnecessary-navigation-attempts-that-could-cause-flickering",
+      "title": "Check Layout.tsx authentication redirect logic to ensure it does not create redirect loops or unnecessary navigation attempts that could cause flickering",
+      "reqIds": [
+        "REQ-79"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -550,6 +760,120 @@
       "id": "AR-35",
       "summary": "Add admin login/authentication requirement to access the customer management tab",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-36",
+      "summary": "Create user-facing ordering panel (similar to Swiggy/Zomato) for customers to browse salad bowl menu, view product details, add items to cart, and place orders",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-37",
+      "summary": "Implement shopping cart functionality in user panel with add/remove items, quantity adjustment, and order total calculation",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-38",
+      "summary": "Create checkout flow in user panel with customer information capture (name, phone, delivery address), payment mode selection, and order confirmation",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-39",
+      "summary": "Integrate user panel orders with admin panel billing/sales system so orders placed through user panel automatically generate invoices and deduct inventory",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-40",
+      "summary": "Add order management section in admin panel to view, manage, and update status of orders placed through user panel (pending, preparing, ready, delivered)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-41",
+      "summary": "Display only available products (based on availability toggle) in the user-facing ordering panel menu",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-42",
+      "summary": "Implement user authentication for the ordering panel to enable order tracking and customer profile management",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-48",
+      "summary": "Create backend data type for Order with fields including orderId, customerId, customerName, phone, deliveryAddress, items (array of product ID and quantity), orderTotal, paymentMode, orderStatus (pending, preparing, ready, delivered), orderDate, and create functions to add and retrieve orders",
+      "reqIds": [
+        "REQ-54"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-50",
+      "summary": "Implement automatic inventory deduction in the backend when orders are placed through the user panel, using the existing recipe-to-ingredient mapping to calculate and subtract required ingredient quantities",
+      "reqIds": [
+        "REQ-56"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-51",
+      "summary": "Add customer login/authentication option in user panel with login button at top right corner of page",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-52",
+      "summary": "Create dashboard in user panel with three sections: Profile, Menu, and Orders",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-53",
+      "summary": "Implement Profile section in user dashboard with fields for name, mobile number, email, address with location pin, and health information (gender, age, height, weight) with automatic BMI (Body Mass Index) calculation",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-61",
+      "summary": "Extend the backend Customer data type to include health information fields: gender (Text), age (Nat), height in cm (Float), weight in kg (Float), and calculatedBMI (Float).",
+      "reqIds": [
+        "REQ-70"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-62",
+      "summary": "Create backend functions to save and retrieve customer profile data including personal information (name, phone, email, address) and health information (gender, age, height, weight, BMI) for authenticated customers.",
+      "reqIds": [
+        "REQ-71"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-65",
+      "summary": "Implement backend query function to retrieve all orders for a specific authenticated customer based on their customer ID or phone number.",
+      "reqIds": [
+        "REQ-74"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-66",
+      "summary": "Fix admin login functionality and resolve page flickering issue on admin side",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-71",
+      "summary": "Ensure the App.tsx router configuration properly handles authentication guards without causing route flashing or multiple navigation events during initial load",
+      "reqIds": [
+        "REQ-80"
+      ],
       "status": "pending"
     }
   ],

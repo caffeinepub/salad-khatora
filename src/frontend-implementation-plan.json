@@ -1,22 +1,120 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Revert LoginPage to Version 10",
+  "title": "Fix admin authentication and page flickering issues",
   "requirements": [
     {
-      "id": "REQ-48",
-      "summary": "Revert LoginPage component to Version 10 state by removing the centered card layout, 'Welcome Back' heading, subtitle, email/password input fields with icons, green 'Sign In' button, 'Don't have an account? Sign up' link, and 'Back to Home' link, while preserving Internet Identity authentication functionality",
+      "id": "REQ-76",
+      "summary": "Debug and fix the admin authentication system to enable successful login through Internet Identity on the LoginPage component",
       "acceptanceCriteria": [
-        "LoginPage component matches Version 10 implementation",
-        "All Version 11 login design changes are removed",
-        "Internet Identity authentication functionality remains intact",
-        "Users can successfully authenticate using the restored interface"
+        "Admin users can successfully authenticate using Internet Identity",
+        "Login flow completes without errors and redirects to dashboard",
+        "Authentication state persists correctly across page refreshes"
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/LoginPage.tsx",
           "operation": "modify",
-          "description": "Revert LoginPage component to Version 10 implementation by removing the centered card layout with 'Welcome Back' heading, 'Sign in to your Salad Khatora account' subtitle, email and password input fields with Mail and Lock icons, green 'Sign In' button styling, 'Don't have an account? Sign up' link, and 'Back to Home' link. Restore the previous simpler login interface that existed before Version 11 while maintaining the Internet Identity authentication integration (useInternetIdentity hook, login function, and redirect logic). Ensure the component continues to use the authentication context and redirects authenticated users to the dashboard."
+          "description": "Add error boundary and detailed error logging to catch and display Internet Identity authentication failures. Implement retry logic for failed authentication attempts. Add visual feedback during the authentication process to inform users of the current state."
+        },
+        {
+          "path": "frontend/src/hooks/useInternetIdentity.ts",
+          "operation": "modify",
+          "description": "Add comprehensive error handling for AuthClient initialization failures. Implement proper cleanup in the clear() function to prevent stale authentication state. Add debugging logs to track authentication state transitions and identify where the login process fails."
+        },
+        {
+          "path": "frontend/src/hooks/useActor.ts",
+          "operation": "modify",
+          "description": "Add error handling for actor initialization failures. Ensure the actor is properly created after successful authentication. Add retry logic if actor creation fails due to timing issues with identity availability."
+        }
+      ]
+    },
+    {
+      "id": "REQ-77",
+      "summary": "Investigate and resolve page flickering issue occurring on admin panel pages by checking for race conditions, infinite re-renders, or authentication state changes",
+      "acceptanceCriteria": [
+        "Admin panel pages render smoothly without visual flickering",
+        "No unnecessary re-renders occur during page load or navigation",
+        "Authentication checks execute efficiently without causing render loops"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Optimize authentication check logic to prevent multiple rapid re-renders. Add proper loading state management to avoid content flashing. Implement useMemo or useCallback to stabilize dependencies and prevent unnecessary effect triggers. Add a stable loading screen that displays until authentication is fully verified."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Optimize route guard logic to check authentication state once during initial mount. Prevent route re-evaluation during authentication state updates. Add a root-level loading state that blocks rendering until authentication initialization completes."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Review and optimize query enabled conditions to prevent queries from refetching unnecessarily during authentication state changes. Add proper staleTime and cacheTime configurations to reduce flickering caused by aggressive refetching. Ensure queries wait for actor availability before executing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-78",
+      "summary": "Verify that the useInternetIdentity hook properly initializes authentication state and handles delegation without causing component re-mount cycles",
+      "acceptanceCriteria": [
+        "Internet Identity initialization completes without triggering multiple renders",
+        "Authentication state updates are batched appropriately",
+        "Hook does not cause components to unmount and remount during auth flow"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useInternetIdentity.ts",
+          "operation": "modify",
+          "description": "Refactor state updates to batch related changes using a single setState call or useReducer to prevent multiple render cycles. Optimize the initialization effect to run only once on mount. Add ref-based tracking to prevent duplicate initialization attempts. Ensure delegation validation doesn't trigger unnecessary state updates when delegation is still valid."
+        },
+        {
+          "path": "frontend/src/contexts/CustomerAuthContext.tsx",
+          "operation": "modify",
+          "description": "Apply the same batching and initialization optimizations used in useInternetIdentity to ensure consistent behavior across admin and customer authentication flows. Add proper memoization of context values to prevent child component re-renders."
+        }
+      ]
+    },
+    {
+      "id": "REQ-79",
+      "summary": "Check Layout.tsx authentication redirect logic to ensure it does not create redirect loops or unnecessary navigation attempts that could cause flickering",
+      "acceptanceCriteria": [
+        "Layout component checks authentication once and redirects cleanly if needed",
+        "No redirect loops occur between login page and protected routes",
+        "Loading states are displayed properly during authentication verification"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Add redirect guard to prevent multiple redirect attempts during authentication checks. Implement proper loading state that displays until isInitializing becomes false and identity is verified. Add dependency optimization to the useEffect that handles redirects to prevent it from re-running unnecessarily. Use a ref to track if a redirect has already been initiated."
+        },
+        {
+          "path": "frontend/src/components/CustomerProtectedRoute.tsx",
+          "operation": "modify",
+          "description": "Apply the same redirect optimization patterns used in Layout.tsx to ensure customer routes have consistent, flicker-free authentication guards. Add proper initialization checks before rendering content or redirecting."
+        }
+      ]
+    },
+    {
+      "id": "REQ-80",
+      "summary": "Ensure the App.tsx router configuration properly handles authentication guards without causing route flashing or multiple navigation events during initial load",
+      "acceptanceCriteria": [
+        "Protected routes check authentication before rendering content",
+        "No visible route transitions occur during authentication check",
+        "Router navigation is stable during the authentication initialization phase"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add a root-level authentication initialization check that blocks all routing until Internet Identity initialization completes. Implement a centralized loading screen that displays during initialization. Optimize beforeLoad functions in route configuration to avoid duplicate authentication checks. Add proper error boundaries for authentication failures that prevent routing errors from causing flickering."
+        },
+        {
+          "path": "frontend/src/main.tsx",
+          "operation": "modify",
+          "description": "Add a suspense boundary or initialization wrapper around the App component to ensure React Query and Internet Identity providers are fully initialized before any routes render. This prevents race conditions between provider initialization and route authentication checks."
         }
       ]
     }

@@ -1,13 +1,25 @@
 import { Link, useNavigate, useLocation } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Home, Package, ShoppingCart, CreditCard, Calendar, FileText, Users, LogOut } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Menu, Home, Package, ShoppingCart, CreditCard, Calendar, FileText, Users, LogOut, ClipboardList } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { SiCoffeescript } from 'react-icons/si';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface LayoutProps {
   children: React.ReactNode;
+}
+
+function LoadingScreen() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center space-y-4">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-fresh-600 border-t-transparent mx-auto"></div>
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    </div>
+  );
 }
 
 export default function Layout({ children }: LayoutProps) {
@@ -15,35 +27,56 @@ export default function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { clear, loginStatus, isInitializing } = useInternetIdentity();
+  const queryClient = useQueryClient();
+  const hasRedirectedRef = useRef(false);
 
   const isAuthenticated = loginStatus === 'success';
 
   // Redirect to login if not authenticated and not on login page
   useEffect(() => {
-    if (!isInitializing && !isAuthenticated && location.pathname !== '/login') {
-      navigate({ to: '/login' });
+    if (isInitializing || location.pathname === '/admin/login') {
+      return;
+    }
+
+    if (!isAuthenticated && !hasRedirectedRef.current) {
+      hasRedirectedRef.current = true;
+      navigate({ to: '/admin/login' });
     }
   }, [isAuthenticated, isInitializing, location.pathname, navigate]);
 
-  const handleLogout = () => {
-    clear();
-    navigate({ to: '/login' });
+  const handleLogout = async () => {
+    await clear();
+    queryClient.clear();
+    hasRedirectedRef.current = false;
+    navigate({ to: '/admin/login' });
   };
 
   const allNavItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: Home, requiresAuth: false },
-    { name: 'Inventory', path: '/inventory', icon: Package, requiresAuth: false },
-    { name: 'Products', path: '/products', icon: ShoppingCart, requiresAuth: false },
-    { name: 'Billing', path: '/billing', icon: CreditCard, requiresAuth: false },
-    { name: 'Subscriptions', path: '/subscriptions', icon: Calendar, requiresAuth: false },
-    { name: 'Customers', path: '/customers', icon: Users, requiresAuth: true },
-    { name: 'Reports', path: '/reports', icon: FileText, requiresAuth: false },
+    { name: 'Dashboard', path: '/admin/dashboard', icon: Home, requiresAuth: false },
+    { name: 'Inventory', path: '/admin/inventory', icon: Package, requiresAuth: false },
+    { name: 'Products', path: '/admin/products', icon: ShoppingCart, requiresAuth: false },
+    { name: 'Billing', path: '/admin/billing', icon: CreditCard, requiresAuth: false },
+    { name: 'Subscriptions', path: '/admin/subscriptions', icon: Calendar, requiresAuth: false },
+    { name: 'Orders', path: '/admin/orders', icon: ClipboardList, requiresAuth: false },
+    { name: 'Customers', path: '/admin/customers', icon: Users, requiresAuth: true },
+    { name: 'Reports', path: '/admin/reports', icon: FileText, requiresAuth: false },
   ];
 
   const navItems = allNavItems.filter(item => !item.requiresAuth || isAuthenticated);
 
-  if (location.pathname === '/login') {
+  // Show loading screen during initialization
+  if (isInitializing) {
+    return <LoadingScreen />;
+  }
+
+  // Don't wrap login page
+  if (location.pathname === '/admin/login') {
     return <>{children}</>;
+  }
+
+  // Show loading if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return <LoadingScreen />;
   }
 
   return (
@@ -83,17 +116,16 @@ export default function Layout({ children }: LayoutProps) {
               </SheetContent>
             </Sheet>
 
-            <Link to="/dashboard" className="flex items-center gap-2">
+            <Link to="/admin/dashboard" className="flex items-center gap-2">
               <img 
                 src="/assets/Salad Khatora.jpeg" 
                 alt="Salad Khatora" 
                 className="h-10 w-10 object-contain rounded"
                 onError={(e) => {
-                  // Fallback if image fails to load
                   e.currentTarget.style.display = 'none';
                 }}
               />
-              <span className="font-bold text-xl hidden sm:inline-block">Salad Khatora</span>
+              <span className="font-bold text-xl hidden sm:inline-block">Salad Khatora Admin Panel</span>
             </Link>
           </div>
 
@@ -118,12 +150,10 @@ export default function Layout({ children }: LayoutProps) {
             })}
           </nav>
 
-          {isAuthenticated && (
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
-          )}
+          <Button variant="ghost" size="sm" onClick={handleLogout}>
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
         </div>
       </header>
 
