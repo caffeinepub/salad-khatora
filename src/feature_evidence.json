@@ -1,4 +1,62 @@
 {
   "kind": "feature_evidence_report",
-  "features": []
+  "features": [
+    {
+      "featureId": "feature-debug-and-resolve-the-continuous-flickering-and-auto-reloading-issue-on-the-admin-page-by-examining-the-layout-component-frontend-src-components-layout-tsx-for-infinite-re-render-loops-race-conditions-in-authentication-state-checks-or-repeated-navigation-attempts-that-cause-the-page-to-reload-continuously",
+      "featureTitle": "Debug and resolve the continuous flickering and auto-reloading issue on the admin page by examining the Layout component (frontend/src/components/Layout.tsx) for infinite re-render loops, race conditions in authentication state checks, or repeated navigation attempts that cause the page to reload continuously.",
+      "files": [
+        "frontend/src/components/Layout.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-91"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-check-the-app-tsx-router-configuration-to-ensure-that-route-guards-and-authentication-checks-do-not-create-redirect-loops-or-repeated-navigation-attempts-when-accessing-admin-panel-routes-which-would-cause-the-page-to-continuously-reload",
+      "featureTitle": "Check the App.tsx router configuration to ensure that route guards and authentication checks do not create redirect loops or repeated navigation attempts when accessing admin panel routes, which would cause the page to continuously reload.",
+      "files": [
+        "frontend/src/App.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-93"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-examine-the-useeffect-hooks-in-layout-tsx-that-handle-authentication-redirects-to-ensure-they-have-proper-dependency-arrays-and-cleanup-functions-to-prevent-infinite-loops-or-repeated-execution-that-would-cause-page-flickering",
+      "featureTitle": "Examine the useEffect hooks in Layout.tsx that handle authentication redirects to ensure they have proper dependency arrays and cleanup functions to prevent infinite loops or repeated execution that would cause page flickering.",
+      "files": [
+        "frontend/src/components/Layout.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-94"
+      ],
+      "confidence": "high"
+    }
+  ]
 }

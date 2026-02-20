@@ -3,13 +3,13 @@ import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { Shield, Lock, Fingerprint } from 'lucide-react';
+import { Shield, Lock, Fingerprint, LogIn } from 'lucide-react';
 
 export default function LoginPage() {
-  const { login, loginStatus, isInitializing, loginError } = useInternetIdentity();
+  const { login, identity, loginStatus, isInitializing, loginError } = useInternetIdentity();
   const navigate = useNavigate();
 
-  const isAuthenticated = loginStatus === 'success';
+  const isAuthenticated = !!identity;
   const isLoggingIn = loginStatus === 'logging-in';
 
   useEffect(() => {
@@ -81,29 +81,34 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {loginError && (
+          {loginError && loginError.message !== 'User is already authenticated' && (
             <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
               <p className="text-sm text-destructive">{loginError.message}</p>
             </div>
           )}
 
-          <Button
-            onClick={handleLogin}
-            disabled={isLoggingIn}
-            className="w-full bg-fresh-600 hover:bg-fresh-700 text-white"
-            size="lg"
-          >
-            {isLoggingIn ? (
-              <>
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></div>
-                Connecting...
-              </>
-            ) : (
-              'Login with Internet Identity'
-            )}
-          </Button>
+          <div className="pt-2">
+            <Button
+              onClick={handleLogin}
+              disabled={isLoggingIn}
+              className="w-full bg-fresh-600 hover:bg-fresh-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              size="lg"
+            >
+              {isLoggingIn ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></div>
+                  Connecting to Internet Identity...
+                </>
+              ) : (
+                <>
+                  <LogIn className="h-5 w-5 mr-2" />
+                  Login with Internet Identity
+                </>
+              )}
+            </Button>
+          </div>
 
-          <p className="text-xs text-center text-muted-foreground">
+          <p className="text-xs text-center text-muted-foreground pt-2">
             By logging in, you agree to use this admin panel responsibly
           </p>
         </CardContent>

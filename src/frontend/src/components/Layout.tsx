@@ -26,23 +26,37 @@ export default function Layout({ children }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { clear, loginStatus, isInitializing } = useInternetIdentity();
+  const { clear, identity, isInitializing } = useInternetIdentity();
   const queryClient = useQueryClient();
   const hasRedirectedRef = useRef(false);
+  const isAuthenticatedRef = useRef(false);
 
-  const isAuthenticated = loginStatus === 'success';
+  const isAuthenticated = !!identity;
+
+  // Update ref when authentication state changes
+  useEffect(() => {
+    isAuthenticatedRef.current = isAuthenticated;
+  }, [isAuthenticated]);
 
   // Redirect to login if not authenticated and not on login page
   useEffect(() => {
-    if (isInitializing || location.pathname === '/admin/login') {
+    // Skip if still initializing
+    if (isInitializing) {
       return;
     }
 
+    // Skip if already on login page
+    if (location.pathname === '/admin/login') {
+      hasRedirectedRef.current = false;
+      return;
+    }
+
+    // Only redirect once when not authenticated
     if (!isAuthenticated && !hasRedirectedRef.current) {
       hasRedirectedRef.current = true;
       navigate({ to: '/admin/login' });
     }
-  }, [isAuthenticated, isInitializing, location.pathname, navigate]);
+  }, [isAuthenticated, isInitializing, location.pathname]);
 
   const handleLogout = async () => {
     await clear();

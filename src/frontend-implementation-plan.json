@@ -1,43 +1,72 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Update Admin Panel Login UI to Match New Design",
+  "title": "Fix admin page continuous flickering and reloading issue",
   "requirements": [
     {
-      "id": "REQ-85",
-      "summary": "Update LoginPage component to match the uploaded design mockup with centered card layout, logo, heading, subtitle, three feature sections with icons, and disclaimer text",
+      "id": "REQ-91",
+      "summary": "Debug and resolve continuous flickering in Layout component by fixing infinite re-render loops and authentication state race conditions",
       "acceptanceCriteria": [
-        "The LoginPage displays the Salad Khatora logo centered at the top",
-        "The heading 'Admin Panel Login' is displayed below the logo",
-        "The subtitle 'Secure authentication for administrative access' appears below the heading",
-        "Three feature sections are displayed with shield, lock, and fingerprint icons",
-        "Each feature section shows the title and description as shown in the mockup",
-        "The disclaimer text 'By logging in, you agree to use this admin panel responsibly' appears at the bottom",
-        "The Internet Identity login functionality remains functional",
-        "The layout is responsive and works on mobile devices"
+        "Admin page loads without flickering or auto-reloading",
+        "Layout component authentication checks do not trigger infinite re-renders",
+        "Navigation state remains stable after initial authentication check",
+        "Admin panel pages render consistently without rapid component remounting"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/LoginPage.tsx",
+          "path": "frontend/src/components/Layout.tsx",
           "operation": "modify",
-          "description": "Replace the existing layout with a centered card design. Add the Salad Khatora logo at the top (use the existing logo reference from frontend/public/Salad Khatora.jpeg). Update the heading to 'Admin Panel Login' and add the subtitle 'Secure authentication for administrative access'. Replace the current feature list with three feature sections displaying icons (Shield icon for 'Secure Authentication', Lock icon for 'No Passwords', Fingerprint icon for 'Biometric Support') and their respective descriptions from the design mockup. Add the disclaimer text 'By logging in, you agree to use this admin panel responsibly' at the bottom of the card. Maintain the existing Internet Identity authentication flow using the useInternetIdentity hook and the login button functionality. Ensure the layout is centered on the page and responsive for mobile devices. Preserve the existing navigation redirect to the dashboard on successful authentication."
+          "description": "Fix infinite re-render loop in Layout component by stabilizing authentication checks. Add proper dependency arrays to useEffect hooks that handle authentication redirects. Ensure navigation logic executes only when authentication state actually changes, not on every render. Replace any authentication polling patterns with event-driven state updates. Add early return guards to prevent render cycles during authentication initialization."
         }
       ]
     },
     {
-      "id": "REQ-86",
-      "summary": "Maintain existing Internet Identity authentication integration and ensure successful login redirects to admin dashboard",
+      "id": "REQ-92",
+      "summary": "Ensure useInternetIdentity hook provides stable authentication state without repeated emissions during the same session",
       "acceptanceCriteria": [
-        "The Internet Identity login flow is triggered when the user attempts to log in",
-        "Successful authentication redirects users to the admin dashboard",
-        "The authentication state is properly managed using the existing useInternetIdentity hook",
-        "No authentication functionality is broken by the UI changes"
+        "Authentication state remains stable after initial authentication check",
+        "useInternetIdentity hook does not emit repeated state changes for the same authentication status",
+        "Layout component does not re-mount due to authentication context changes"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/LoginPage.tsx",
+          "path": "frontend/src/hooks/useInternetIdentity.ts",
           "operation": "modify",
-          "description": "Verify that the useInternetIdentity hook integration remains intact during the UI restructuring. Ensure the login button or clickable area triggers the login() function from useInternetIdentity. Maintain the existing redirect logic that navigates authenticated users to '/dashboard'. Preserve the authentication state checks and loading states (loginStatus === 'logging-in'). Test that the error handling for login failures remains functional. Do not modify the authentication logic itself, only ensure it continues to work correctly with the new UI structure."
+          "description": "Stabilize authentication state emissions to prevent unnecessary re-renders. Ensure the InternetIdentityProvider context does not trigger state updates when the authentication status has not actually changed. Add memoization or ref tracking to prevent identity object recreation on every render. Verify that the login status transitions (idle -> logging-in -> success/error) occur exactly once per authentication attempt without repeated state emissions."
+        }
+      ]
+    },
+    {
+      "id": "REQ-93",
+      "summary": "Fix router configuration to eliminate redirect loops and repeated navigation attempts in admin routes",
+      "acceptanceCriteria": [
+        "Router configuration does not create redirect loops between /admin/login and /admin/dashboard",
+        "Protected routes check authentication state only once per navigation",
+        "No repeated navigation events occur after successful authentication",
+        "Route transitions complete without triggering additional navigations"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Eliminate redirect loops in admin route configuration. Ensure protected route guards check authentication state exactly once per navigation without triggering additional navigation events. Verify that the Layout wrapper does not cause route re-evaluation after authentication completes. Add navigation guards that short-circuit when already on the correct route to prevent repeated redirects between /admin/login and /admin/dashboard."
+        }
+      ]
+    },
+    {
+      "id": "REQ-94",
+      "summary": "Fix useEffect dependency arrays and cleanup functions in Layout component to prevent infinite execution loops",
+      "acceptanceCriteria": [
+        "useEffect hooks in Layout.tsx have correct dependency arrays",
+        "Authentication redirect logic executes only when authentication state changes",
+        "No cleanup functions trigger additional renders or navigation attempts",
+        "Component lifecycle hooks do not cause repeated mounting/unmounting cycles"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Audit all useEffect hooks in Layout component to ensure correct dependency arrays. Remove any dependencies that cause the effect to re-run unnecessarily (e.g., navigation functions, stable objects). Ensure cleanup functions do not trigger state updates or navigation. Use useRef to track whether redirect logic has already executed to prevent repeated execution. Verify that authentication state checks use stable references and do not cause effect re-execution on every render."
         }
       ]
     }

@@ -22,6 +22,7 @@ import CustomerLoginPage from './pages/CustomerLoginPage';
 import UserDashboardPage from './pages/UserDashboardPage';
 import CustomerProtectedRoute from './components/CustomerProtectedRoute';
 import { CartProvider } from './contexts/CartContext';
+import { useRef } from 'react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,14 +47,16 @@ function LoadingScreen() {
 
 // Protected route wrapper component for admin routes
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { loginStatus, isInitializing } = useInternetIdentity();
-  const isAuthenticated = loginStatus === 'success';
+  const { identity, isInitializing } = useInternetIdentity();
+  const redirectedRef = useRef(false);
+  const isAuthenticated = !!identity;
 
   if (isInitializing) {
     return <LoadingScreen />;
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !redirectedRef.current) {
+    redirectedRef.current = true;
     window.location.href = '/admin/login';
     return null;
   }
@@ -95,88 +98,56 @@ const adminLoginRoute = createRoute({
 const adminDashboardRoute = createRoute({
   getParentRoute: () => adminRootRoute,
   path: '/dashboard',
-  component: () => (
-    <ProtectedRoute>
-      <DashboardPage />
-    </ProtectedRoute>
-  ),
+  component: DashboardPage,
 });
 
 // Admin inventory route
 const adminInventoryRoute = createRoute({
   getParentRoute: () => adminRootRoute,
   path: '/inventory',
-  component: () => (
-    <ProtectedRoute>
-      <InventoryPage />
-    </ProtectedRoute>
-  ),
+  component: InventoryPage,
 });
 
 // Admin products route
 const adminProductsRoute = createRoute({
   getParentRoute: () => adminRootRoute,
   path: '/products',
-  component: () => (
-    <ProtectedRoute>
-      <ProductsPage />
-    </ProtectedRoute>
-  ),
+  component: ProductsPage,
 });
 
 // Admin billing route
 const adminBillingRoute = createRoute({
   getParentRoute: () => adminRootRoute,
   path: '/billing',
-  component: () => (
-    <ProtectedRoute>
-      <BillingPage />
-    </ProtectedRoute>
-  ),
+  component: BillingPage,
 });
 
 // Admin subscriptions route
 const adminSubscriptionsRoute = createRoute({
   getParentRoute: () => adminRootRoute,
   path: '/subscriptions',
-  component: () => (
-    <ProtectedRoute>
-      <SubscriptionsPage />
-    </ProtectedRoute>
-  ),
+  component: SubscriptionsPage,
 });
 
 // Admin reports route
 const adminReportsRoute = createRoute({
   getParentRoute: () => adminRootRoute,
   path: '/reports',
-  component: () => (
-    <ProtectedRoute>
-      <ReportsPage />
-    </ProtectedRoute>
-  ),
+  component: ReportsPage,
 });
 
 // Admin customers route
 const adminCustomersRoute = createRoute({
   getParentRoute: () => adminRootRoute,
   path: '/customers',
-  component: () => (
-    <ProtectedRoute>
-      <CustomersPage />
-    </ProtectedRoute>
-  ),
+  component: CustomersPage,
 });
 
 // Admin orders route
 const adminOrdersRoute = createRoute({
   getParentRoute: () => adminRootRoute,
   path: '/orders',
-  component: () => (
-    <ProtectedRoute>
-      <OrdersPage />
-    </ProtectedRoute>
-  ),
+  component: OrdersPage,
 });
 
 // User root route with CustomerAuthProvider, CartProvider, and UserLayout

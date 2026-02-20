@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 35,
+  "projectStateVersion": 41,
   "summary": "Full-stack web application for Salad Khatora business with admin panel for inventory management, product/recipe management (with availability toggle and recipe editing), billing/sales (product selection from menu), dashboard analytics (daily/weekly/monthly sales, cash flow, daily expenses), subscription management (weekly 6-day, monthly 24-day plans), alerts, admin auth, comprehensive reports download, customer management with push notifications, and CSV export. User-facing ordering panel similar to Swiggy/Zomato for customers to browse menu, place salad bowl orders, track orders, and manage customer profiles with health information (BMI calculation), fully integrated with admin panel for order management and inventory updates.",
   "architectural_notes": [
     "Full-stack web application architecture",
@@ -21,7 +21,10 @@
     "Admin login page not appearing when opening site directly - authentication flow not enforcing login requirement",
     "Admin login functionality not working - unable to authenticate",
     "Admin panel pages experiencing flickering/rendering issues",
-    "Admin login not working in production - user unable to access admin panel"
+    "Admin login not working in production - user unable to access admin panel",
+    "Admin login page missing visible login button - authentication cannot be triggered",
+    "User authenticated but not redirected to admin dashboard - authentication succeeds but navigation fails",
+    "Admin page continuously flickering and auto-reloading - page rendering instability issue"
   ],
   "isFixRequest": true,
   "existing_features": [
@@ -600,6 +603,54 @@
         "REQ-84"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-prominent-login-with-internet-identity-button-to-the-loginpage-component-frontend-src-pages-loginpage-tsx-positioned-below-the-three-feature-descriptions-and-above-the-responsibility-agreement-text-the-button-must-be-centered-use-the-fresh-green-color-10b981-or-equivalent-from-the-theme-have-clear-padding-and-hover-states-and-trigger-the-internet-identity-authentication-flow-when-clicked",
+      "title": "Add a prominent 'Login with Internet Identity' button to the LoginPage component (frontend/src/pages/LoginPage.tsx) positioned below the three feature descriptions and above the responsibility agreement text. The button must be centered, use the fresh green color (#10b981 or equivalent from the theme), have clear padding and hover states, and trigger the Internet Identity authentication flow when clicked.",
+      "reqIds": [
+        "REQ-87"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-loginpage-component-frontend-src-pages-loginpage-tsx-to-properly-redirect-authenticated-users-to-the-admin-dashboard-admin-dashboard-instead-of-displaying-user-is-already-authenticated-message-when-authentication-succeeds",
+      "title": "Fix the LoginPage component (frontend/src/pages/LoginPage.tsx) to properly redirect authenticated users to the admin dashboard (/admin/dashboard) instead of displaying 'User is already authenticated' message when authentication succeeds",
+      "reqIds": [
+        "REQ-88"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-useeffect-hook-in-loginpage-that-checks-authentication-state-to-call-navigate-admin-dashboard-when-isauthenticated-becomes-true-replacing-the-current-behavior-that-only-displays-a-message",
+      "title": "Update the useEffect hook in LoginPage that checks authentication state to call navigate('/admin/dashboard') when isAuthenticated becomes true, replacing the current behavior that only displays a message",
+      "reqIds": [
+        "REQ-89"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-debug-and-resolve-the-continuous-flickering-and-auto-reloading-issue-on-the-admin-page-by-examining-the-layout-component-frontend-src-components-layout-tsx-for-infinite-re-render-loops-race-conditions-in-authentication-state-checks-or-repeated-navigation-attempts-that-cause-the-page-to-reload-continuously",
+      "title": "Debug and resolve the continuous flickering and auto-reloading issue on the admin page by examining the Layout component (frontend/src/components/Layout.tsx) for infinite re-render loops, race conditions in authentication state checks, or repeated navigation attempts that cause the page to reload continuously.",
+      "reqIds": [
+        "REQ-91"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-check-the-app-tsx-router-configuration-to-ensure-that-route-guards-and-authentication-checks-do-not-create-redirect-loops-or-repeated-navigation-attempts-when-accessing-admin-panel-routes-which-would-cause-the-page-to-continuously-reload",
+      "title": "Check the App.tsx router configuration to ensure that route guards and authentication checks do not create redirect loops or repeated navigation attempts when accessing admin panel routes, which would cause the page to continuously reload.",
+      "reqIds": [
+        "REQ-93"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-examine-the-useeffect-hooks-in-layout-tsx-that-handle-authentication-redirects-to-ensure-they-have-proper-dependency-arrays-and-cleanup-functions-to-prevent-infinite-loops-or-repeated-execution-that-would-cause-page-flickering",
+      "title": "Examine the useEffect hooks in Layout.tsx that handle authentication redirects to ensure they have proper dependency arrays and cleanup functions to prevent infinite loops or repeated execution that would cause page flickering.",
+      "reqIds": [
+        "REQ-94"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -922,6 +973,28 @@
       "summary": "Maintain the existing Internet Identity authentication integration in the LoginPage component. Ensure that clicking the login button or area triggers the Internet Identity authentication flow using the useInternetIdentity hook, and successfully authenticated users are redirected to the admin dashboard.",
       "reqIds": [
         "REQ-86"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-76",
+      "summary": "Fix the AdminLogin page by adding a visible and functional 'Login with Internet Identity' button to enable admin authentication",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-79",
+      "summary": "Verify that the App.tsx router configuration allows navigation from /admin/login to /admin/dashboard without authentication blocks or redirect loops",
+      "reqIds": [
+        "REQ-90"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-81",
+      "summary": "Verify that the useInternetIdentity hook (frontend/src/hooks/useInternetIdentity.ts) does not cause authentication state to change repeatedly during the same session, triggering unnecessary component re-renders in the Layout component.",
+      "reqIds": [
+        "REQ-92"
       ],
       "status": "pending"
     }

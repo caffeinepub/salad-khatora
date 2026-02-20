@@ -1,13 +1,13 @@
 {
-  "frontend/src/App.tsx": "Main application component with routing for admin panel (/admin/*) and user panel (/user/*) routes, including CustomerAuthProvider wrapping user routes and new /user/login and /user/dashboard routes with protection.",
-  "frontend/src/pages/LoginPage.tsx": "Admin login page with Internet Identity authentication, proper loading states during initialization, and automatic redirect to dashboard after successful login.",
+  "frontend/src/App.tsx": "Main application component with routing for admin and user panels, using consistent identity-based authentication checks and refs to prevent redirect loops.",
+  "frontend/src/pages/LoginPage.tsx": "Admin login page with Internet Identity authentication that checks for identity presence instead of loginStatus to properly redirect already-authenticated users to the dashboard, and filters out the \"User is already authenticated\" error message from display.",
   "frontend/src/pages/DashboardPage.tsx": "Dashboard page displaying hero banner, alert panel, metrics, and sales charts for business overview.",
   "frontend/src/pages/InventoryPage.tsx": "Inventory management page with tabbed interface for Stock Status, Stock In, Stock Out, and Write Off sub-tabs using shadcn/ui Tabs component.",
   "frontend/src/pages/ProductsPage.tsx": "Product management page for salad bowls with recipe configuration and product list.",
   "frontend/src/pages/BillingPage.tsx": "Billing page with tabs for creating new invoices and viewing invoice history.",
   "frontend/src/pages/SubscriptionsPage.tsx": "Subscription management page with form to add subscriptions, list of active/expiring subscriptions, and Print KOT button that opens a preview dialog and triggers browser print functionality.",
   "frontend/src/pages/ReportsPage.tsx": "Reports page with CSV export functionality for inventory, sales, subscriptions, and expenses reports with note about Excel format coming soon.",
-  "frontend/src/components/Layout.tsx": "Admin panel layout with optimized authentication checks using refs to prevent redirect loops, displays loading screen during initialization, and only renders content when fully authenticated.",
+  "frontend/src/components/Layout.tsx": "Admin panel layout with stable authentication redirect logic that prevents infinite re-render loops by removing navigate from useEffect dependencies and using refs to track redirect state.",
   "frontend/src/components/AlertPanel.tsx": "Alert panel displaying low stock warnings and expiring subscription notifications with placeholder for email integration (fixed missing import).",
   "frontend/src/components/DashboardMetrics.tsx": "Dashboard metrics component displaying five key metrics (daily sales, weekly sales, monthly sales, cash flow, daily expenses) fetched from backend analytics.",
   "frontend/src/components/SalesChart.tsx": "Sales and profit visualization charts using Recharts with daily, weekly, and monthly views.",
@@ -58,6 +58,6 @@
   "frontend/src/components/UserMenuSection.tsx": "Menu section component for user dashboard displaying active salad bowls in a grid with add-to-cart functionality.",
   "frontend/src/components/UserOrdersSection.tsx": "Orders section component displaying customer's order history with order details, status badges, and formatted dates; uses BigInt(0) as default customerId to satisfy TypeScript type requirements.",
   "frontend/src/pages/UserDashboardPage.tsx": "User dashboard page with tabbed interface for Profile, Menu, and Orders sections using shadcn/ui Tabs component.",
-  "frontend/src/hooks/useInternetIdentity.ts": "Internet Identity authentication hook with optimized initialization that runs only once on mount, prevents duplicate auth client creation, and batches state updates to eliminate flickering.",
-  "frontend/src/hooks/useActor.ts": "Actor initialization hook that creates backend actor with identity, tracks principal changes via ref to prevent unnecessary query invalidations, and only refetches dependent queries when principal actually changes."
+  "frontend/src/hooks/useInternetIdentity.ts": "Internet Identity authentication hook with initialization that runs only once on mount using a ref guard to prevent duplicate auth client creation and state update loops.",
+  "frontend/src/hooks/useActor.ts": "Actor initialization hook that only invalidates queries when the principal actually changes (tracked via ref) instead of on every actor update, preventing unnecessary refetches."
 }
