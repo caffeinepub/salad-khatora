@@ -1,11 +1,15 @@
 # Specification
 
 ## Summary
-**Goal:** Enforce authentication requirement and redirect unauthenticated users to the login page.
+**Goal:** Redesign the login interface to match the uploaded design mockup while maintaining Internet Identity authentication.
 
 **Planned changes:**
-- Update App.tsx router configuration to redirect unauthenticated users from protected routes to /login
-- Update Layout component to check authentication state and redirect unauthenticated users to /login
-- Document admin Internet Identity credentials and authentication instructions
+- Update LoginPage component to display centered card layout with "Welcome Back" heading and "Sign in to your Salad Khatora account" subtitle
+- Add email input field with envelope icon and placeholder "you@example.com"
+- Add password input field with lock icon and placeholder "Enter your password"
+- Style Sign In button with green background (#4ade80) and white text
+- Add footer with "Don't have an account? Sign up" text (Sign up in green) and "Back to Home" link
+- Style card with white background and rounded corners matching the mockup
+- Connect Sign In button to Internet Identity authentication flow (email/password fields are visual only)
 
-**User-visible outcome:** Users attempting to access the application without authentication will be automatically redirected to the login page. After successful Internet Identity authentication, users will be redirected to the dashboard and can access all protected routes.
+**User-visible outcome:** Users see a modern, traditional-looking login interface with email and password fields, but clicking Sign In triggers Internet Identity authentication as before.

@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-app-tsx-router-configuration-to-enforce-authentication-checks-on-all-protected-routes-dashboard-inventory-products-billing-subscriptions-reports-customers-unauthenticated-users-must-be-redirected-to-the-login-page-login-before-accessing-any-protected-page",
-      "featureTitle": "Update the App.tsx router configuration to enforce authentication checks on all protected routes (dashboard, inventory, products, billing, subscriptions, reports, customers). Unauthenticated users must be redirected to the login page (/login) before accessing any protected page.",
+      "featureId": "feature-update-the-loginpage-component-to-match-the-uploaded-design-mockup-with-centered-card-layout-welcome-back-heading-sign-in-to-your-salad-khatora-account-subtitle-email-and-password-input-fields-with-icons-green-sign-in-button-don-t-have-an-account-sign-up-link-and-back-to-home-link-at-the-bottom",
+      "featureTitle": "Update the LoginPage component to match the uploaded design mockup with centered card layout, 'Welcome Back' heading, 'Sign in to your Salad Khatora account' subtitle, email and password input fields with icons, green 'Sign In' button, 'Don't have an account? Sign up' link, and 'Back to Home' link at the bottom",
       "files": [
-        "frontend/src/App.tsx"
+        "frontend/src/pages/LoginPage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -15,15 +15,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-43"
+        "REQ-46"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-layout-component-to-check-authentication-state-and-redirect-unauthenticated-users-to-the-login-page-if-they-attempt-to-access-protected-routes-through-direct-navigation-or-url-entry",
-      "featureTitle": "Update the Layout component to check authentication state and redirect unauthenticated users to the login page if they attempt to access protected routes through direct navigation or URL entry.",
+      "featureId": "feature-continue-using-internet-identity-authentication-for-the-actual-login-functionality-while-styling-the-interface-to-match-the-traditional-email-password-design-shown-in-the-mockup",
+      "featureTitle": "Continue using Internet Identity authentication for the actual login functionality while styling the interface to match the traditional email/password design shown in the mockup",
       "files": [
-        "frontend/src/components/Layout.tsx"
+        "frontend/src/pages/LoginPage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -33,25 +33,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-44"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-document-the-admin-internet-identity-credentials-in-the-project-documentation-or-provide-them-in-a-secure-manner-to-the-user-for-accessing-the-application",
-      "featureTitle": "Document the admin Internet Identity credentials in the project documentation or provide them in a secure manner to the user for accessing the application.",
-      "files": [
-        "frontend/README.md"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-45"
+        "REQ-47"
       ],
       "confidence": "high"
     }

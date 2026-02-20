@@ -2,8 +2,10 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Salad } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Mail, Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const { login, isLoggingIn, identity } = useInternetIdentity();
@@ -16,29 +18,55 @@ export default function LoginPage() {
   }, [identity, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-fresh-50 to-fresh-100 dark:from-background dark:to-accent p-4">
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-20 h-20 bg-fresh-500 rounded-full flex items-center justify-center">
-            <Salad className="w-12 h-12 text-white" />
-          </div>
-          <CardTitle className="text-3xl font-bold text-fresh-800 dark:text-fresh-400">
-            Salad Khatora
-          </CardTitle>
-          <CardDescription className="text-base">
-            Business Management System
-          </CardDescription>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-background dark:to-accent p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="text-center space-y-2 pb-6">
+          <h1 className="text-3xl font-bold text-[#2d5f3f] dark:text-fresh-400">
+            Welcome Back
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Sign in to your Salad Khatora account
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="text-center text-sm text-muted-foreground">
-            <p>Manage your salad business with ease.</p>
-            <p className="mt-2">Track inventory, sales, and subscriptions all in one place.</p>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">
+                Email
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-fresh-600" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  className="pl-10 h-12"
+                  disabled
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-gray-700 dark:text-gray-300">
+                Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-fresh-600" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  className="pl-10 h-12"
+                  disabled
+                />
+              </div>
+            </div>
           </div>
+
           <Button
             onClick={login}
             disabled={isLoggingIn}
-            className="w-full h-12 text-base bg-fresh-600 hover:bg-fresh-700 text-white"
-            size="lg"
+            className="w-full h-12 text-base bg-[#4ade80] hover:bg-[#3bc970] text-white font-medium"
           >
             {isLoggingIn ? (
               <>
@@ -46,12 +74,27 @@ export default function LoginPage() {
                 Connecting...
               </>
             ) : (
-              'Login to Continue'
+              'Sign In'
             )}
           </Button>
-          <p className="text-xs text-center text-muted-foreground">
-            Secure authentication powered by Internet Identity
-          </p>
+
+          <div className="text-center space-y-2">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Don't have an account?{' '}
+              <button
+                onClick={login}
+                className="text-[#4ade80] hover:text-[#3bc970] font-medium"
+              >
+                Sign up
+              </button>
+            </p>
+            <button
+              onClick={() => navigate({ to: '/dashboard' })}
+              className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            >
+              Back to Home
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>

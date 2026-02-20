@@ -1,6 +1,6 @@
 {
   "frontend/src/App.tsx": "Main application component with TanStack Router setup including proper React component wrappers for all routes with authentication guards using a reusable ProtectedRoute component that redirects unauthenticated users to /login with loading states during initialization.",
-  "frontend/src/pages/LoginPage.tsx": "Login page with Internet Identity authentication, featuring Salad Khatora branding and secure login flow that redirects to /dashboard after successful authentication.",
+  "frontend/src/pages/LoginPage.tsx": "Login page redesigned to match the uploaded mockup with \"Welcome Back\" heading, decorative email/password input fields with icons, green \"Sign In\" button that triggers Internet Identity authentication, and footer links for sign up and back to home.",
   "frontend/src/pages/DashboardPage.tsx": "Dashboard page displaying hero banner, alert panel, metrics, and sales charts for business overview.",
   "frontend/src/pages/InventoryPage.tsx": "Inventory management page with tabbed interface for Stock Status, Stock In, Stock Out, and Write Off sub-tabs using shadcn/ui Tabs component.",
   "frontend/src/pages/ProductsPage.tsx": "Product management page for salad bowls with recipe configuration and product list.",

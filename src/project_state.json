@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 21,
+  "projectStateVersion": 23,
   "summary": "Full-stack web application for Salad Khatora business with inventory management, product/recipe management (with availability toggle and recipe editing), billing/sales (product selection from menu), dashboard analytics (daily/weekly/monthly sales, cash flow, daily expenses), subscription management (weekly 6-day, monthly 24-day plans), alerts, admin auth, comprehensive reports download, customer management with push notifications, and CSV export",
   "architectural_notes": [
     "Full-stack web application architecture",
@@ -341,6 +341,22 @@
         "REQ-45"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-loginpage-component-to-match-the-uploaded-design-mockup-with-centered-card-layout-welcome-back-heading-sign-in-to-your-salad-khatora-account-subtitle-email-and-password-input-fields-with-icons-green-sign-in-button-don-t-have-an-account-sign-up-link-and-back-to-home-link-at-the-bottom",
+      "title": "Update the LoginPage component to match the uploaded design mockup with centered card layout, 'Welcome Back' heading, 'Sign in to your Salad Khatora account' subtitle, email and password input fields with icons, green 'Sign In' button, 'Don't have an account? Sign up' link, and 'Back to Home' link at the bottom",
+      "reqIds": [
+        "REQ-46"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-continue-using-internet-identity-authentication-for-the-actual-login-functionality-while-styling-the-interface-to-match-the-traditional-email-password-design-shown-in-the-mockup",
+      "title": "Continue using Internet Identity authentication for the actual login functionality while styling the interface to match the traditional email/password design shown in the mockup",
+      "reqIds": [
+        "REQ-47"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -525,6 +541,12 @@
     {
       "id": "AR-35",
       "summary": "Add admin login/authentication requirement to access the customer management tab",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-36",
+      "summary": "Create a traditional username/password login interface instead of Internet Identity for admin authentication",
       "reqIds": [],
       "status": "pending"
     }
