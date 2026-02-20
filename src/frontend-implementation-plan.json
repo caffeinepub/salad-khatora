@@ -1,45 +1,22 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Redesign login interface to match uploaded design mockup",
+  "title": "Revert LoginPage to Version 10",
   "requirements": [
     {
-      "id": "REQ-46",
-      "summary": "Update LoginPage component to match design mockup with centered card layout, Welcome Back heading, email/password input fields with icons, green Sign In button, and footer links",
+      "id": "REQ-48",
+      "summary": "Revert LoginPage component to Version 10 state by removing the centered card layout, 'Welcome Back' heading, subtitle, email/password input fields with icons, green 'Sign In' button, 'Don't have an account? Sign up' link, and 'Back to Home' link, while preserving Internet Identity authentication functionality",
       "acceptanceCriteria": [
-        "Login page displays 'Welcome Back' as the main heading in dark green color",
-        "Subtitle reads 'Sign in to your Salad Khatora account' in gray text",
-        "Email input field has an envelope icon and placeholder 'you@example.com'",
-        "Password input field has a lock icon and placeholder 'Enter your password'",
-        "Sign In button is styled with green background (#4ade80 or similar) and white text",
-        "Footer includes 'Don't have an account? Sign up' with 'Sign up' in green color",
-        "Footer includes 'Back to Home' link below the sign up text",
-        "Layout is centered on the page with white card background and rounded corners",
-        "Design maintains consistency with the uploaded image-1.png mockup"
+        "LoginPage component matches Version 10 implementation",
+        "All Version 11 login design changes are removed",
+        "Internet Identity authentication functionality remains intact",
+        "Users can successfully authenticate using the restored interface"
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/LoginPage.tsx",
           "operation": "modify",
-          "description": "Redesign the LoginPage component to match the uploaded design mockup (frontend/public/assets/image-1.png). Replace the current layout with a centered card layout featuring: 'Welcome Back' heading in dark green (#2d5f3f or similar), 'Sign in to your Salad Khatora account' subtitle in gray text, decorative email input field with envelope icon and 'you@example.com' placeholder, decorative password input field with lock icon and 'Enter your password' placeholder, green 'Sign In' button (#4ade80) that triggers Internet Identity authentication, footer with 'Don't have an account? Sign up' text (with 'Sign up' in green color), and 'Back to Home' link. The email and password fields are visual-only elements for design consistency and do not handle actual input. Use shadcn/ui Card, Input, and Button components with Tailwind CSS for styling. Ensure the layout is responsive and mobile-friendly with proper spacing and rounded corners on the card container."
-        }
-      ]
-    },
-    {
-      "id": "REQ-47",
-      "summary": "Maintain Internet Identity authentication flow while displaying traditional email/password design elements",
-      "acceptanceCriteria": [
-        "Clicking the 'Sign In' button triggers Internet Identity authentication flow",
-        "Email and password fields are visual elements only (non-functional inputs for design consistency)",
-        "Authentication continues to use the existing useInternetIdentity hook",
-        "User is redirected to dashboard after successful Internet Identity authentication",
-        "No backend changes are required for authentication logic"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/LoginPage.tsx",
-          "operation": "modify",
-          "description": "Ensure the 'Sign In' button onClick handler calls the login() function from useInternetIdentity hook to trigger the Internet Identity authentication flow. Keep the existing navigation logic that redirects authenticated users to the dashboard. The email and password input fields should be styled as regular input fields but do not need onChange handlers or state management since they are decorative only. Maintain the existing authentication architecture without modifications to useInternetIdentity hook or backend authentication logic."
+          "description": "Revert LoginPage component to Version 10 implementation by removing the centered card layout with 'Welcome Back' heading, 'Sign in to your Salad Khatora account' subtitle, email and password input fields with Mail and Lock icons, green 'Sign In' button styling, 'Don't have an account? Sign up' link, and 'Back to Home' link. Restore the previous simpler login interface that existed before Version 11 while maintaining the Internet Identity authentication integration (useInternetIdentity hook, login function, and redirect logic). Ensure the component continues to use the authentication context and redirects authenticated users to the dashboard."
         }
       ]
     }

@@ -2,8 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-loginpage-component-to-match-the-uploaded-design-mockup-with-centered-card-layout-welcome-back-heading-sign-in-to-your-salad-khatora-account-subtitle-email-and-password-input-fields-with-icons-green-sign-in-button-don-t-have-an-account-sign-up-link-and-back-to-home-link-at-the-bottom",
-      "featureTitle": "Update the LoginPage component to match the uploaded design mockup with centered card layout, 'Welcome Back' heading, 'Sign in to your Salad Khatora account' subtitle, email and password input fields with icons, green 'Sign In' button, 'Don't have an account? Sign up' link, and 'Back to Home' link at the bottom",
+      "featureId": "feature-revert-the-loginpage-component-to-its-version-10-state-removing-the-centered-card-layout-welcome-back-heading-sign-in-to-your-salad-khatora-account-subtitle-email-and-password-input-fields-with-icons-green-sign-in-button-don-t-have-an-account-sign-up-link-and-back-to-home-link-restore-the-previous-login-interface-implementation-that-was-present-before-version-11",
+      "featureTitle": "Revert the LoginPage component to its Version 10 state, removing the centered card layout, 'Welcome Back' heading, 'Sign in to your Salad Khatora account' subtitle, email and password input fields with icons, green 'Sign In' button, 'Don't have an account? Sign up' link, and 'Back to Home' link. Restore the previous login interface implementation that was present before Version 11.",
       "files": [
         "frontend/src/pages/LoginPage.tsx"
       ],
@@ -15,25 +15,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-46"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-continue-using-internet-identity-authentication-for-the-actual-login-functionality-while-styling-the-interface-to-match-the-traditional-email-password-design-shown-in-the-mockup",
-      "featureTitle": "Continue using Internet Identity authentication for the actual login functionality while styling the interface to match the traditional email/password design shown in the mockup",
-      "files": [
-        "frontend/src/pages/LoginPage.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-47"
+        "REQ-48"
       ],
       "confidence": "high"
     }

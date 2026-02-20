@@ -1,29 +1,18 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-20T02:10:10.392Z",
+  "generatedAt": "2026-02-20T02:21:16.889Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-46",
-        "summary": "Update the LoginPage component to match the uploaded design mockup with centered card layout, 'Welcome Back' heading, 'Sign in to your Salad Khatora account' subtitle, email and password input fields with icons, green 'Sign In' button, 'Don't have an account? Sign up' link, and 'Back to Home' link at the bottom",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/LoginPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/LoginPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-47",
-        "summary": "Continue using Internet Identity authentication for the actual login functionality while styling the interface to match the traditional email/password design shown in the mockup",
+        "id": "REQ-48",
+        "summary": "Revert the LoginPage component to its Version 10 state, removing the centered card layout, 'Welcome Back' heading, 'Sign in to your Salad Khatora account' subtitle, email and password input fields with icons, green 'Sign In' button, 'Don't have an account? Sign up' link, and 'Back to Home' link. Restore the previous login interface implementation that was present before Version 11.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/LoginPage.tsx"

@@ -1,62 +1,37 @@
 {
   "kind": "build_request",
-  "title": "Redesign login interface to match uploaded design mockup",
-  "projectName": "Salad Khatora",
-  "priority": "normal",
+  "title": "Revert to Version 10",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-46",
-      "text": "Update the LoginPage component to match the uploaded design mockup with centered card layout, 'Welcome Back' heading, 'Sign in to your Salad Khatora account' subtitle, email and password input fields with icons, green 'Sign In' button, 'Don't have an account? Sign up' link, and 'Back to Home' link at the bottom",
+      "id": "REQ-48",
+      "text": "Revert the LoginPage component to its Version 10 state, removing the centered card layout, 'Welcome Back' heading, 'Sign in to your Salad Khatora account' subtitle, email and password input fields with icons, green 'Sign In' button, 'Don't have an account? Sign up' link, and 'Back to Home' link. Restore the previous login interface implementation that was present before Version 11.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-last"
+          "msg-user-final"
         ],
         "quotes": [
-          "create like this login interface"
+          "undo change and go back to version 10"
         ]
       },
       "acceptanceCriteria": [
-        "Login page displays 'Welcome Back' as the main heading in dark green color",
-        "Subtitle reads 'Sign in to your Salad Khatora account' in gray text",
-        "Email input field has an envelope icon and placeholder 'you@example.com'",
-        "Password input field has a lock icon and placeholder 'Enter your password'",
-        "Sign In button is styled with green background (#4ade80 or similar) and white text",
-        "Footer includes 'Don't have an account? Sign up' with 'Sign up' in green color",
-        "Footer includes 'Back to Home' link below the sign up text",
-        "Layout is centered on the page with white card background and rounded corners",
-        "Design maintains consistency with the uploaded image-1.png mockup"
-      ]
-    },
-    {
-      "id": "REQ-47",
-      "text": "Continue using Internet Identity authentication for the actual login functionality while styling the interface to match the traditional email/password design shown in the mockup",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Clicking the 'Sign In' button triggers Internet Identity authentication flow",
-        "Email and password fields are visual elements only (non-functional inputs for design consistency)",
-        "Authentication continues to use the existing useInternetIdentity hook",
-        "User is redirected to dashboard after successful Internet Identity authentication",
-        "No backend changes are required for authentication logic"
+        "LoginPage component matches Version 10 implementation",
+        "All Version 11 login design changes are removed",
+        "Internet Identity authentication functionality remains intact",
+        "Users can successfully authenticate using the restored interface"
       ]
     }
   ],
   "constraints": [
-    "Must maintain Internet Identity authentication system - do not implement traditional username/password authentication",
-    "Do not modify backend authentication logic",
-    "Do not modify frontend/src/hooks/useInternetIdentity.ts",
-    "Design must be responsive and mobile-friendly"
+    "Preserve Internet Identity authentication functionality",
+    "Do not modify backend main.mo or migration.mo files",
+    "Do not change authentication flow logic in useInternetIdentity.ts or useActor.ts"
   ],
   "nonGoals": [
-    "Implementing traditional email/password authentication system",
-    "Creating user registration functionality",
-    "Adding forgot password feature",
-    "Modifying backend authentication architecture"
+    "Adding new features or functionality",
+    "Modifying other pages or components beyond LoginPage",
+    "Changing authentication system or providers"
   ],
   "imageRequirements": {
     "required": [],
