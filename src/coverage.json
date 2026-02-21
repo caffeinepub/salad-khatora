@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-20T16:20:46.235Z",
+  "generatedAt": "2026-02-21T04:27:35.187Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -11,56 +11,70 @@
     "implemented": 3,
     "items": [
       {
-        "id": "REQ-91",
-        "summary": "Debug and resolve the continuous flickering and auto-reloading issue on the admin page by examining the Layout component (frontend/src/components/Layout.tsx) for infinite re-render loops, race conditions in authentication state checks, or repeated navigation attempts that cause the page to reload continuously.",
+        "id": "REQ-1",
+        "summary": "In the Inventory tab Stock Status view, display only ingredients that have stock available (quantity > 0). Highlight rows where stock is below the low stock threshold.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/Layout.tsx"
+          "frontend/src/components/StockStatusTab.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/Layout.tsx"
+          "frontend/src/components/StockStatusTab.tsx"
         ]
       },
       {
-        "id": "REQ-92",
-        "summary": "Verify that the useInternetIdentity hook (frontend/src/hooks/useInternetIdentity.ts) does not cause authentication state to change repeatedly during the same session, triggering unnecessary component re-renders in the Layout component.",
+        "id": "REQ-2",
+        "summary": "In the Inventory tab Stock In form, fix the ingredient name input field so users can type and select ingredient names properly.",
         "status": "missing",
         "plannedFiles": [
-          "frontend/src/hooks/useInternetIdentity.ts"
+          "frontend/src/components/StockInTab.tsx"
         ],
         "matchedFiles": []
       },
       {
-        "id": "REQ-93",
-        "summary": "Check the App.tsx router configuration to ensure that route guards and authentication checks do not create redirect loops or repeated navigation attempts when accessing admin panel routes, which would cause the page to continuously reload.",
+        "id": "REQ-3",
+        "summary": "In the Products tab, ensure that newly added bowl products appear in the product list immediately after creation.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/App.tsx"
+          "frontend/src/components/ProductForm.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/ProductList.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/App.tsx"
+          "frontend/src/components/ProductForm.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ]
       },
       {
-        "id": "REQ-94",
-        "summary": "Examine the useEffect hooks in Layout.tsx that handle authentication redirects to ensure they have proper dependency arrays and cleanup functions to prevent infinite loops or repeated execution that would cause page flickering.",
+        "id": "REQ-4",
+        "summary": "In the Customers tab, resolve the 'Failed to add customer' error that occurs when attempting to add new customers. Investigate and fix the backend customer creation logic and frontend error handling.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/Layout.tsx"
+          "frontend/src/components/CustomerForm.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/CustomerList.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/Layout.tsx"
+          "frontend/src/components/CustomerForm.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/components/Layout.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/CustomerForm.tsx",
+    "frontend/src/components/ProductForm.tsx",
+    "frontend/src/components/StockStatusTab.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

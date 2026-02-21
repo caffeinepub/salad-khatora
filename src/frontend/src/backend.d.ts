@@ -123,7 +123,7 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
-    addCustomer(id: bigint, name: string, phone: string, email: string, address: string, preferences: string, gender: string, age: bigint, heightCm: number, weightKg: number, calculatedBMI: number): Promise<boolean>;
+    addCustomer(name: string, phone: string, email: string, address: string, preferences: string, gender: string, age: bigint, heightCm: number, weightKg: number, calculatedBMI: number): Promise<bigint>;
     addIngredient(ingredient: Ingredient): Promise<void>;
     addOrder(customerId: bigint, customerName: string, phone: string, deliveryAddress: string, items: Array<[string, bigint]>, orderTotal: bigint, paymentMode: string, orderStatus: string): Promise<bigint>;
     addProduct(product: SaladBowl): Promise<bigint>;

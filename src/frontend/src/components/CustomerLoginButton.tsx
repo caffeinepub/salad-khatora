@@ -7,25 +7,23 @@ export default function CustomerLoginButton() {
   const { login, logout, loginStatus, isAuthenticated } = useCustomerAuth();
   const queryClient = useQueryClient();
 
-  const handleAuth = async () => {
+  const handleAuth = () => {
+    console.log('CustomerLoginButton clicked', { isAuthenticated, loginStatus });
+    
     if (isAuthenticated) {
-      await logout();
+      console.log('Logging out...');
+      logout();
       queryClient.clear();
     } else {
-      try {
-        await login();
-      } catch (error: any) {
-        console.error('Login error:', error);
-        if (error.message === 'User is already authenticated') {
-          await logout();
-          setTimeout(() => login(), 300);
-        }
-      }
+      console.log('Attempting login...');
+      login();
     }
   };
 
   const disabled = loginStatus === 'logging-in';
   const text = loginStatus === 'logging-in' ? 'Logging in...' : isAuthenticated ? 'Logout' : 'Login';
+
+  console.log('CustomerLoginButton render', { disabled, text, loginStatus, isAuthenticated });
 
   return (
     <Button
@@ -33,7 +31,7 @@ export default function CustomerLoginButton() {
       disabled={disabled}
       variant={isAuthenticated ? 'outline' : 'default'}
       size="sm"
-      className="gap-2"
+      className={isAuthenticated ? 'gap-2' : 'gap-2 bg-green-600 hover:bg-green-700 text-white'}
     >
       {isAuthenticated ? <LogOut className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
       {text}

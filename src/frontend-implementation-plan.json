@@ -1,72 +1,90 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix admin page continuous flickering and reloading issue",
+  "title": "Fix admin panel issues in inventory, products, and customers",
   "requirements": [
     {
-      "id": "REQ-91",
-      "summary": "Debug and resolve continuous flickering in Layout component by fixing infinite re-render loops and authentication state race conditions",
+      "id": "REQ-1",
+      "summary": "Filter Stock Status view to show only available stock (quantity > 0) and highlight low stock items",
       "acceptanceCriteria": [
-        "Admin page loads without flickering or auto-reloading",
-        "Layout component authentication checks do not trigger infinite re-renders",
-        "Navigation state remains stable after initial authentication check",
-        "Admin panel pages render consistently without rapid component remounting"
+        "Stock Status table filters out ingredients with zero quantity",
+        "Ingredients below low stock threshold are visually highlighted (e.g., different background color or border)",
+        "The total value calculation reflects only available stock"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/Layout.tsx",
+          "path": "frontend/src/components/StockStatusTab.tsx",
           "operation": "modify",
-          "description": "Fix infinite re-render loop in Layout component by stabilizing authentication checks. Add proper dependency arrays to useEffect hooks that handle authentication redirects. Ensure navigation logic executes only when authentication state actually changes, not on every render. Replace any authentication polling patterns with event-driven state updates. Add early return guards to prevent render cycles during authentication initialization."
+          "description": "Modify the component to filter stockStatus data to only include items where currentQuantity > 0. Update the table rendering to apply conditional styling (e.g., yellow/orange background or border) to rows where isLowStock is true. Ensure the totalValue calculation uses only the filtered available stock items."
         }
       ]
     },
     {
-      "id": "REQ-92",
-      "summary": "Ensure useInternetIdentity hook provides stable authentication state without repeated emissions during the same session",
+      "id": "REQ-2",
+      "summary": "Fix the ingredient name input field in Stock In form to allow proper text input and selection",
       "acceptanceCriteria": [
-        "Authentication state remains stable after initial authentication check",
-        "useInternetIdentity hook does not emit repeated state changes for the same authentication status",
-        "Layout component does not re-mount due to authentication context changes"
+        "Ingredient name input field is editable and accepts text input",
+        "Users can select ingredients from the dropdown",
+        "Selected ingredient populates correctly in the form"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useInternetIdentity.ts",
+          "path": "frontend/src/components/StockInTab.tsx",
           "operation": "modify",
-          "description": "Stabilize authentication state emissions to prevent unnecessary re-renders. Ensure the InternetIdentityProvider context does not trigger state updates when the authentication status has not actually changed. Add memoization or ref tracking to prevent identity object recreation on every render. Verify that the login status transitions (idle -> logging-in -> success/error) occur exactly once per authentication attempt without repeated state emissions."
+          "description": "Review and fix the ingredient name input implementation. Ensure the Select component from shadcn/ui allows proper text input for filtering and selection. Verify that the value binding, onChange handlers, and Select trigger are correctly configured. Replace any non-editable implementation with a properly functioning Select that supports typing and dropdown selection. Populate the selected ingredient name in the form state correctly."
         }
       ]
     },
     {
-      "id": "REQ-93",
-      "summary": "Fix router configuration to eliminate redirect loops and repeated navigation attempts in admin routes",
+      "id": "REQ-3",
+      "summary": "Ensure newly added bowl products appear in the product list immediately after creation",
       "acceptanceCriteria": [
-        "Router configuration does not create redirect loops between /admin/login and /admin/dashboard",
-        "Protected routes check authentication state only once per navigation",
-        "No repeated navigation events occur after successful authentication",
-        "Route transitions complete without triggering additional navigations"
+        "After successfully submitting the product form, the new product appears in the product list",
+        "The product list refreshes automatically after product creation",
+        "Product data persists and is retrievable from backend"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/ProductForm.tsx",
           "operation": "modify",
-          "description": "Eliminate redirect loops in admin route configuration. Ensure protected route guards check authentication state exactly once per navigation without triggering additional navigation events. Verify that the Layout wrapper does not cause route re-evaluation after authentication completes. Add navigation guards that short-circuit when already on the correct route to prevent repeated redirects between /admin/login and /admin/dashboard."
+          "description": "Review the useAddProduct mutation onSuccess handler. Ensure that after successfully adding a product, the relevant query keys are invalidated (e.g., ['products'], ['activeProducts']) to trigger an automatic refetch of the product list. Verify that the form closes and resets state properly after successful submission."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Review the useAddProduct mutation to ensure it properly invalidates the product-related query keys (['products'], ['activeProducts'], ['allProductsWithInactive']) in the onSuccess callback. Verify that the mutation returns the product ID from the backend and handles success/error states appropriately."
+        },
+        {
+          "path": "frontend/src/components/ProductList.tsx",
+          "operation": "modify",
+          "description": "Verify that the ProductList component uses the correct query hook (useGetAllProductsWithInactive or useGetAllActiveProducts) that will be invalidated by the add product mutation. Ensure the component properly handles loading and data update states to display newly added products immediately."
         }
       ]
     },
     {
-      "id": "REQ-94",
-      "summary": "Fix useEffect dependency arrays and cleanup functions in Layout component to prevent infinite execution loops",
+      "id": "REQ-4",
+      "summary": "Resolve the 'Failed to add customer' error by fixing the customer creation form and backend integration",
       "acceptanceCriteria": [
-        "useEffect hooks in Layout.tsx have correct dependency arrays",
-        "Authentication redirect logic executes only when authentication state changes",
-        "No cleanup functions trigger additional renders or navigation attempts",
-        "Component lifecycle hooks do not cause repeated mounting/unmounting cycles"
+        "Customer form successfully submits without errors",
+        "New customers are persisted to backend storage",
+        "Newly added customers appear in the customer list",
+        "Appropriate error messages are displayed if validation fails"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/Layout.tsx",
+          "path": "frontend/src/components/CustomerForm.tsx",
           "operation": "modify",
-          "description": "Audit all useEffect hooks in Layout component to ensure correct dependency arrays. Remove any dependencies that cause the effect to re-run unnecessarily (e.g., navigation functions, stable objects). Ensure cleanup functions do not trigger state updates or navigation. Use useRef to track whether redirect logic has already executed to prevent repeated execution. Verify that authentication state checks use stable references and do not cause effect re-execution on every render."
+          "description": "Review the form validation and submission logic in the useAddCustomer mutation call. Ensure all required fields (name, phone, email, address, preferences, gender, age, heightCm, weightKg, calculatedBMI) are properly validated and converted to the correct types before calling the backend. Verify that numeric fields are parsed as BigInt or Number as expected by the backend interface. Add proper error handling to display specific validation errors to the user. Ensure the form resets and the customer list query is invalidated on successful submission."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Review the useAddCustomer mutation to ensure it correctly passes all parameters to actor.addCustomer in the right order and format (name, phone, email, address, preferences, gender, age as bigint, heightCm as number, weightKg as number, calculatedBMI as number). Add comprehensive error handling with try-catch to capture and expose backend errors. Ensure the mutation invalidates the ['customers'] query key on success to refresh the customer list."
+        },
+        {
+          "path": "frontend/src/components/CustomerList.tsx",
+          "operation": "modify",
+          "description": "Verify that the CustomerList component properly refetches data when the ['customers'] query is invalidated. Ensure the component handles loading states and displays newly added customers immediately after successful creation."
         }
       ]
     }

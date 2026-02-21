@@ -12,10 +12,10 @@ import Runtime "mo:core/Runtime";
 
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import Migration "migration";
 
 // Specify the data migration function in with-clause
-
-
+(with migration = Migration.run)
 actor {
   // Integrate authorization system
   let accessControlState = AccessControl.initState();
@@ -224,7 +224,7 @@ actor {
     };
     userProfiles.add(caller, profile);
     principalToCustomerId.add(caller, profile.customerId);
-    
+
     // Also update the customer record
     let customer = {
       id = profile.customerId;
@@ -354,10 +354,12 @@ actor {
   };
 
   // Admin-only: Add customer
-  public shared ({ caller }) func addCustomer(id : Nat, name : Text, phone : Text, email : Text, address : Text, preferences : Text, gender : Text, age : Nat, heightCm : Float, weightKg : Float, calculatedBMI : Float) : async Bool {
+  public shared ({ caller }) func addCustomer(name : Text, phone : Text, email : Text, address : Text, preferences : Text, gender : Text, age : Nat, heightCm : Float, weightKg : Float, calculatedBMI : Float) : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can add customers");
     };
+    let id = nextCustomerId;
+    nextCustomerId += 1;
     let newCustomer = {
       id;
       name;
@@ -372,7 +374,7 @@ actor {
       calculatedBMI;
     };
     customers.add(id, newCustomer);
-    true;
+    id;
   };
 
   // Admin-only: Get all customers
@@ -388,7 +390,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can view profiles");
     };
-    
+
     // Check if user is viewing their own profile
     switch (principalToCustomerId.get(caller)) {
       case (?userCustomerId) {
@@ -403,7 +405,7 @@ actor {
         };
       };
     };
-    
+
     customers.get(customerId);
   };
 
@@ -507,7 +509,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can view orders");
     };
-    
+
     // Check if user is viewing their own orders
     switch (principalToCustomerId.get(caller)) {
       case (?userCustomerId) {
@@ -522,7 +524,7 @@ actor {
         };
       };
     };
-    
+
     let customerOrders = orders.values().toArray().filter(
       func(order) { order.customerId == customerId }
     );
@@ -833,7 +835,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can create orders");
     };
-    
+
     // Check if user is creating order for themselves
     switch (principalToCustomerId.get(caller)) {
       case (?userCustomerId) {
@@ -848,7 +850,7 @@ actor {
         };
       };
     };
-    
+
     let orderId = nextOrderId;
     nextOrderId += 1;
     let order = {
@@ -872,7 +874,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can view orders");
     };
-    
+
     switch (orders.get(orderId)) {
       case (null) { null };
       case (?order) {

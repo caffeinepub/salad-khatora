@@ -16,6 +16,7 @@ export default function CustomerLoginPage() {
   }, [isAuthenticated, navigate]);
 
   const handleLogin = () => {
+    console.log('CustomerLoginPage: Login button clicked');
     login();
   };
 
@@ -56,7 +57,7 @@ export default function CustomerLoginPage() {
           <Button
             onClick={handleLogin}
             disabled={loginStatus === 'logging-in'}
-            className="w-full"
+            className="w-full bg-green-600 hover:bg-green-700 text-white"
             size="lg"
           >
             {loginStatus === 'logging-in' ? 'Connecting...' : 'Login with Internet Identity'}

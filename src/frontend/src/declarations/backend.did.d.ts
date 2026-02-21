@@ -123,7 +123,6 @@ export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addCustomer' : ActorMethod<
     [
-      bigint,
       string,
       string,
       string,
@@ -135,7 +134,7 @@ export interface _SERVICE {
       number,
       number,
     ],
-    boolean
+    bigint
   >,
   'addIngredient' : ActorMethod<[Ingredient], undefined>,
   'addOrder' : ActorMethod<

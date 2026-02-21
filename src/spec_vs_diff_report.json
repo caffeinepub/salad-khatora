@@ -1,15 +1,34 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-20T16:20:46.231Z",
-  "summary": "The diff addresses all four requirements by implementing authentication state stabilization and redirect loop prevention mechanisms. App.tsx uses refs to prevent repeated redirects, Layout.tsx removes navigate from useEffect dependencies and uses refs to track redirect state, preventing infinite re-render loops. The changes directly target the flickering/reloading issues described in the BuildRequest.",
-  "missing_requirements": [],
-  "hallucinated_features": [],
-  "confidence": 0.95,
+  "generatedAt": "2026-02-21T04:27:35.184Z",
+  "summary": "The diff implements all four required fixes: REQ-1 filters stock to show only available items (quantity > 0) with low stock highlighting; REQ-2 is not directly addressed in the diff (StockInTab.tsx not shown); REQ-3 adds proper query invalidation to refresh product lists after creation; REQ-4 fixes customer creation with backend migration logic, form validation, and proper error handling.",
+  "missing_requirements": [
+    {
+      "id": "REQ-2",
+      "requirement": "Fix the ingredient name input field in Stock In form so users can type and select ingredient names properly",
+      "reason": "The diff does not include changes to StockInTab.tsx or any component handling the Stock In form ingredient name input field. Without evidence of changes to this specific component, this requirement appears unimplemented.",
+      "evidence": []
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Backend migration module (migration.mo) that recalculates nextCustomerId based on existing customer IDs",
+      "reason": "The BuildRequest does not mention fixing customer ID sequencing or adding migration logic. This appears to be an implementation detail beyond the scope of fixing the 'Failed to add customer' error.",
+      "evidence": [
+        "backend/migration.mo"
+      ]
+    }
+  ],
+  "confidence": 0.75,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
-    "frontend/src/components/Layout.tsx",
+    "frontend/src/components/CustomerForm.tsx",
+    "frontend/src/components/ProductForm.tsx",
+    "frontend/src/components/StockStatusTab.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]
 }

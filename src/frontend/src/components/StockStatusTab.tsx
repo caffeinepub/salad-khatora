@@ -27,7 +27,10 @@ export default function StockStatusTab() {
   const [deletingIngredient, setDeletingIngredient] = useState<Ingredient | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  const totalValue = stockStatus.reduce(
+  // Filter to show only available stock (quantity > 0)
+  const availableStock = stockStatus.filter(item => Number(item.currentQuantity) > 0);
+
+  const totalValue = availableStock.reduce(
     (sum, item) => sum + Number(item.currentQuantity) * Number(item.costPricePerUnit),
     0
   );
@@ -88,9 +91,9 @@ export default function StockStatusTab() {
           <CardTitle>Current Stock Status</CardTitle>
         </CardHeader>
         <CardContent>
-          {stockStatus.length === 0 ? (
+          {availableStock.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              No ingredients added yet. Add your first ingredient to get started.
+              No ingredients in stock. Add ingredients to get started.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -106,13 +109,16 @@ export default function StockStatusTab() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {stockStatus.map((item, index) => {
+                  {availableStock.map((item, index) => {
                     const quantity = Number(item.currentQuantity);
                     const costPerUnit = Number(item.costPricePerUnit);
                     const totalValue = quantity * costPerUnit;
 
                     return (
-                      <TableRow key={index}>
+                      <TableRow 
+                        key={index}
+                        className={item.isLowStock ? 'bg-orange-50 dark:bg-orange-950/20 border-l-4 border-l-orange-500' : ''}
+                      >
                         <TableCell className="font-medium">{item.ingredientName}</TableCell>
                         <TableCell>
                           {quantity} {item.unitType}

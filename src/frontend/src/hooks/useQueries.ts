@@ -91,6 +91,27 @@ export function useActiveProducts() {
   });
 }
 
+export function useAddProduct() {
+  const queryClient = useQueryClient();
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async (product: SaladBowl) => {
+      if (!actor) throw new Error('Actor not initialized');
+      const productId = await actor.addProduct(product);
+      return productId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['activeProducts'] });
+      toast.success('Product added successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to add product');
+    },
+  });
+}
+
 export function useToggleProductAvailability() {
   const queryClient = useQueryClient();
   const { actor } = useActor();
@@ -386,33 +407,41 @@ export function useAddCustomer() {
 
   return useMutation({
     mutationFn: async (customer: {
-      id: bigint;
       name: string;
       phone: string;
       email: string;
       address: string;
       preferences: string;
+      gender: string;
+      age: bigint;
+      heightCm: number;
+      weightKg: number;
+      calculatedBMI: number;
     }) => {
       if (!actor) throw new Error('Actor not initialized');
-      const result = await actor.addCustomer(
-        customer.id,
+      
+      const customerId = await actor.addCustomer(
         customer.name,
         customer.phone,
         customer.email,
         customer.address,
         customer.preferences,
-        '',
-        BigInt(0),
-        0,
-        0,
-        0
+        customer.gender,
+        customer.age,
+        customer.heightCm,
+        customer.weightKg,
+        customer.calculatedBMI
       );
-      if (!result) throw new Error('Failed to add customer');
-      return result;
+      
+      return customerId;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       toast.success('Customer added successfully');
+    },
+    onError: (error: any) => {
+      console.error('Add customer error:', error);
+      toast.error(error.message || 'Failed to add customer');
     },
   });
 }
@@ -614,7 +643,6 @@ export function useGetCallerUserProfile() {
     },
     enabled: !!actor && !isFetching,
     retry: false,
-    staleTime: 60000, // 1 minute
   });
 
   return {
@@ -635,12 +663,12 @@ export function useSaveCallerUserProfile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
       toast.success('Profile saved successfully');
     },
   });
 }
 
-// Customer Orders
 export function useGetCustomerOrders(customerId: bigint) {
   const { actor, isFetching } = useActor();
 
@@ -651,6 +679,6 @@ export function useGetCustomerOrders(customerId: bigint) {
       return actor.getCustomerOrders(customerId);
     },
     enabled: !!actor && !isFetching && customerId > BigInt(0),
-    staleTime: 30000, // 30 seconds
+    staleTime: 30000,
   });
 }

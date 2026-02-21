@@ -1,12 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the continuous flickering and auto-reloading issue on the admin page.
+**Goal:** Fix admin panel issues in inventory stock status filtering, stock-in ingredient input, product list display, and customer creation.
 
 **Planned changes:**
-- Debug and resolve infinite re-render loops in the Layout component (frontend/src/components/Layout.tsx)
-- Verify that useInternetIdentity hook does not cause repeated authentication state changes
-- Check router configuration in App.tsx for redirect loops or repeated navigation attempts on admin routes
-- Examine useEffect hooks in Layout.tsx for proper dependency arrays and cleanup functions to prevent infinite loops
+- Filter Stock Status view to show only ingredients with quantity > 0 and highlight low stock items
+- Fix ingredient name input field in Stock In form to allow typing and selection
+- Ensure newly added bowl products appear immediately in the product list
+- Resolve "Failed to add customer" error and fix customer creation flow
 
-**User-visible outcome:** Admin page loads smoothly without flickering or continuous reloading, allowing stable access to admin panel features.
+**User-visible outcome:** Admin users can view accurate stock status with low stock warnings, successfully add stock entries by typing ingredient names, see newly created products in the list immediately, and add new customers without errors.

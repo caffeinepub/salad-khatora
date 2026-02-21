@@ -206,7 +206,7 @@ export enum UserRole {
 }
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
-    addCustomer(id: bigint, name: string, phone: string, email: string, address: string, preferences: string, gender: string, age: bigint, heightCm: number, weightKg: number, calculatedBMI: number): Promise<boolean>;
+    addCustomer(name: string, phone: string, email: string, address: string, preferences: string, gender: string, age: bigint, heightCm: number, weightKg: number, calculatedBMI: number): Promise<bigint>;
     addIngredient(ingredient: Ingredient): Promise<void>;
     addOrder(customerId: bigint, customerName: string, phone: string, deliveryAddress: string, items: Array<[string, bigint]>, orderTotal: bigint, paymentMode: string, orderStatus: string): Promise<bigint>;
     addProduct(product: SaladBowl): Promise<bigint>;
@@ -280,17 +280,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async addCustomer(arg0: bigint, arg1: string, arg2: string, arg3: string, arg4: string, arg5: string, arg6: string, arg7: bigint, arg8: number, arg9: number, arg10: number): Promise<boolean> {
+    async addCustomer(arg0: string, arg1: string, arg2: string, arg3: string, arg4: string, arg5: string, arg6: bigint, arg7: number, arg8: number, arg9: number): Promise<bigint> {
         if (this.processError) {
             try {
-                const result = await this.actor.addCustomer(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+                const result = await this.actor.addCustomer(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.addCustomer(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+            const result = await this.actor.addCustomer(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
             return result;
         }
     }

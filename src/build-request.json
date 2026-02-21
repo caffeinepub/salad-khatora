@@ -1,96 +1,90 @@
 {
   "kind": "build_request",
-  "title": "Fix admin page continuous flickering and reloading issue",
+  "title": "Fix admin panel issues in inventory, products, and customers",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-91",
-      "text": "Debug and resolve the continuous flickering and auto-reloading issue on the admin page by examining the Layout component (frontend/src/components/Layout.tsx) for infinite re-render loops, race conditions in authentication state checks, or repeated navigation attempts that cause the page to reload continuously.",
+      "id": "REQ-1",
+      "text": "In the Inventory tab Stock Status view, display only ingredients that have stock available (quantity > 0). Highlight rows where stock is below the low stock threshold.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-final"
+          "msg-7"
         ],
         "quotes": [
-          "not able to load the admin page always flikring and reloading on its own"
+          "stock status should show only the stock available with low stock highlight"
         ]
       },
       "acceptanceCriteria": [
-        "Admin page loads without flickering or auto-reloading",
-        "Layout component authentication checks do not trigger infinite re-renders",
-        "Navigation state remains stable after initial authentication check",
-        "Admin panel pages render consistently without rapid component remounting"
+        "Stock Status table filters out ingredients with zero quantity",
+        "Ingredients below low stock threshold are visually highlighted (e.g., different background color or border)",
+        "The total value calculation reflects only available stock"
       ]
     },
     {
-      "id": "REQ-92",
-      "text": "Verify that the useInternetIdentity hook (frontend/src/hooks/useInternetIdentity.ts) does not cause authentication state to change repeatedly during the same session, triggering unnecessary component re-renders in the Layout component.",
+      "id": "REQ-2",
+      "text": "In the Inventory tab Stock In form, fix the ingredient name input field so users can type and select ingredient names properly.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-final"
+          "msg-7"
         ],
         "quotes": [
-          "not able to load the admin page always flikring and reloading on its own"
+          "In stock in not able to write ingredient name"
         ]
       },
       "acceptanceCriteria": [
-        "Authentication state remains stable after initial authentication check",
-        "useInternetIdentity hook does not emit repeated state changes for the same authentication status",
-        "Layout component does not re-mount due to authentication context changes"
+        "Ingredient name input field is editable and accepts text input",
+        "Users can select ingredients from the dropdown",
+        "Selected ingredient populates correctly in the form"
       ]
     },
     {
-      "id": "REQ-93",
-      "text": "Check the App.tsx router configuration to ensure that route guards and authentication checks do not create redirect loops or repeated navigation attempts when accessing admin panel routes, which would cause the page to continuously reload.",
-      "target": "frontend",
+      "id": "REQ-3",
+      "text": "In the Products tab, ensure that newly added bowl products appear in the product list immediately after creation.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-user-final"
+          "msg-7"
         ],
         "quotes": [
-          "not able to load the admin page always flikring and reloading on its own"
+          "In products after adding bowl it is not displayed"
         ]
       },
       "acceptanceCriteria": [
-        "Router configuration does not create redirect loops between /admin/login and /admin/dashboard",
-        "Protected routes check authentication state only once per navigation",
-        "No repeated navigation events occur after successful authentication",
-        "Route transitions complete without triggering additional navigations"
+        "After successfully submitting the product form, the new product appears in the product list",
+        "The product list refreshes automatically after product creation",
+        "Product data persists and is retrievable from backend"
       ]
     },
     {
-      "id": "REQ-94",
-      "text": "Examine the useEffect hooks in Layout.tsx that handle authentication redirects to ensure they have proper dependency arrays and cleanup functions to prevent infinite loops or repeated execution that would cause page flickering.",
-      "target": "frontend",
+      "id": "REQ-4",
+      "text": "In the Customers tab, resolve the 'Failed to add customer' error that occurs when attempting to add new customers. Investigate and fix the backend customer creation logic and frontend error handling.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-user-final"
+          "msg-7"
         ],
         "quotes": [
-          "not able to load the admin page always flikring and reloading on its own"
+          "In customers tab while adding customer showing error failed to add customer"
         ]
       },
       "acceptanceCriteria": [
-        "useEffect hooks in Layout.tsx have correct dependency arrays",
-        "Authentication redirect logic executes only when authentication state changes",
-        "No cleanup functions trigger additional renders or navigation attempts",
-        "Component lifecycle hooks do not cause repeated mounting/unmounting cycles"
+        "Customer form successfully submits without errors",
+        "New customers are persisted to backend storage",
+        "Newly added customers appear in the customer list",
+        "Appropriate error messages are displayed if validation fails"
       ]
     }
   ],
   "constraints": [
-    "Do not modify the useInternetIdentity hook implementation in frontend/src/hooks/useInternetIdentity.ts unless absolutely necessary",
-    "Preserve existing Internet Identity authentication flow and delegation logic",
-    "Do not change the single-actor backend architecture",
-    "Maintain existing routing structure with separate /admin and /user paths"
+    "Maintain the existing single-actor backend architecture",
+    "Do not modify immutable frontend paths: useInternetIdentity hooks, useActor.ts, main.tsx, or components/ui directory"
   ],
   "nonGoals": [
     "Redesigning the admin panel UI layout",
-    "Changing the Internet Identity authentication provider",
-    "Modifying backend authentication logic",
-    "Adding new authentication methods or providers",
-    "Changing the routing structure or path hierarchy"
+    "Adding new features beyond fixing the reported issues",
+    "Changing the authentication system"
   ],
   "imageRequirements": {
     "required": [],

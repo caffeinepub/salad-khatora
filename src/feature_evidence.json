@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-debug-and-resolve-the-continuous-flickering-and-auto-reloading-issue-on-the-admin-page-by-examining-the-layout-component-frontend-src-components-layout-tsx-for-infinite-re-render-loops-race-conditions-in-authentication-state-checks-or-repeated-navigation-attempts-that-cause-the-page-to-reload-continuously",
-      "featureTitle": "Debug and resolve the continuous flickering and auto-reloading issue on the admin page by examining the Layout component (frontend/src/components/Layout.tsx) for infinite re-render loops, race conditions in authentication state checks, or repeated navigation attempts that cause the page to reload continuously.",
+      "featureId": "feature-in-the-inventory-tab-stock-status-view-display-only-ingredients-that-have-stock-available-quantity-0-highlight-rows-where-stock-is-below-the-low-stock-threshold",
+      "featureTitle": "In the Inventory tab Stock Status view, display only ingredients that have stock available (quantity > 0). Highlight rows where stock is below the low stock threshold.",
       "files": [
-        "frontend/src/components/Layout.tsx"
+        "frontend/src/components/StockStatusTab.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -16,15 +16,16 @@
         "authorization@4.0.0"
       ],
       "testIds": [
-        "REQ-91"
+        "REQ-1"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-check-the-app-tsx-router-configuration-to-ensure-that-route-guards-and-authentication-checks-do-not-create-redirect-loops-or-repeated-navigation-attempts-when-accessing-admin-panel-routes-which-would-cause-the-page-to-continuously-reload",
-      "featureTitle": "Check the App.tsx router configuration to ensure that route guards and authentication checks do not create redirect loops or repeated navigation attempts when accessing admin panel routes, which would cause the page to continuously reload.",
+      "featureId": "feature-in-the-products-tab-ensure-that-newly-added-bowl-products-appear-in-the-product-list-immediately-after-creation",
+      "featureTitle": "In the Products tab, ensure that newly added bowl products appear in the product list immediately after creation.",
       "files": [
-        "frontend/src/App.tsx"
+        "frontend/src/components/ProductForm.tsx",
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -35,15 +36,16 @@
         "authorization@4.0.0"
       ],
       "testIds": [
-        "REQ-93"
+        "REQ-3"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-examine-the-useeffect-hooks-in-layout-tsx-that-handle-authentication-redirects-to-ensure-they-have-proper-dependency-arrays-and-cleanup-functions-to-prevent-infinite-loops-or-repeated-execution-that-would-cause-page-flickering",
-      "featureTitle": "Examine the useEffect hooks in Layout.tsx that handle authentication redirects to ensure they have proper dependency arrays and cleanup functions to prevent infinite loops or repeated execution that would cause page flickering.",
+      "featureId": "feature-in-the-customers-tab-resolve-the-failed-to-add-customer-error-that-occurs-when-attempting-to-add-new-customers-investigate-and-fix-the-backend-customer-creation-logic-and-frontend-error-handling",
+      "featureTitle": "In the Customers tab, resolve the 'Failed to add customer' error that occurs when attempting to add new customers. Investigate and fix the backend customer creation logic and frontend error handling.",
       "files": [
-        "frontend/src/components/Layout.tsx"
+        "frontend/src/components/CustomerForm.tsx",
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -54,7 +56,7 @@
         "authorization@4.0.0"
       ],
       "testIds": [
-        "REQ-94"
+        "REQ-4"
       ],
       "confidence": "high"
     }

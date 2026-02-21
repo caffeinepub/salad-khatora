@@ -1,151 +1,39 @@
 import Map "mo:core/Map";
 import Nat "mo:core/Nat";
-import List "mo:core/List";
+import Array "mo:core/Array";
 
 module {
+  type Customer = {
+    id : Nat;
+    name : Text;
+    phone : Text;
+    email : Text;
+    address : Text;
+    preferences : Text;
+    gender : Text;
+    age : Nat;
+    heightCm : Float;
+    weightKg : Float;
+    calculatedBMI : Float;
+  };
+
   type OldActor = {
-    ingredientInventory : Map.Map<Text, {
-      name : Text;
-      quantity : Nat;
-      costPricePerUnit : Nat;
-      supplierName : Text;
-      lowStockThreshold : Nat;
-    }>;
-    saladBowlProducts : Map.Map<Text, {
-      name : Text;
-      bowlType : {
-        #gm250;
-        #gm350;
-        #gm500;
-        #custom;
-      };
-      price : Nat;
-      recipe : [(Text, Nat)];
-      active : Bool;
-    }>;
-    invoices : List.List<{
-      customerName : Text;
-      itemsOrdered : [(Text, Nat)];
-      totalPrice : Nat;
-      paymentMode : Text;
-      timestamp : Int;
-    }>;
-    customers : Map.Map<Nat, {
-      id : Nat;
-      name : Text;
-      contactDetails : Text;
-      preferences : Text;
-    }>;
-    availablePlans : Map.Map<Text, {
-      #weekly : { duration : Nat };
-      #monthly : { duration : Nat };
-    }>;
-    subscriptions : Map.Map<Nat, {
-      id : Nat;
-      name : Text;
-      customerName : Text;
-      phoneNumber : Text;
-      planType : Text;
-      bowlSize : { #gm250; #gm350; #gm500; #custom };
-      price : Nat;
-      isPaid : Bool;
-      startDate : Int;
-      endDate : Int;
-      remainingDeliveries : Int;
-    }>;
-    products : Map.Map<Nat, {
-      name : Text;
-      bowlType : { #gm250; #gm350; #gm500; #custom };
-      price : Nat;
-      recipe : [(Text, Nat)];
-      active : Bool;
-    }>;
-    nextProductId : Nat;
+    customers : Map.Map<Nat, Customer>;
+    nextCustomerId : Nat;
   };
 
   type NewActor = {
-    ingredientInventory : Map.Map<Text, {
-      name : Text;
-      quantity : Nat;
-      costPricePerUnit : Nat;
-      supplierName : Text;
-      lowStockThreshold : Nat;
-      unitType : Text;
-    }>;
-    saladBowlProducts : Map.Map<Text, {
-      name : Text;
-      bowlType : {
-        #gm250;
-        #gm350;
-        #gm500;
-        #custom;
-      };
-      price : Nat;
-      recipe : [(Text, Nat)];
-      active : Bool;
-    }>;
-    invoices : List.List<{
-      customerName : Text;
-      itemsOrdered : [(Text, Nat)];
-      totalPrice : Nat;
-      paymentMode : Text;
-      timestamp : Int;
-    }>;
-    customers : Map.Map<Nat, {
-      id : Nat;
-      name : Text;
-      contactDetails : Text;
-      preferences : Text;
-    }>;
-    availablePlans : Map.Map<Text, {
-      #weekly : { duration : Nat };
-      #monthly : { duration : Nat };
-    }>;
-    subscriptions : Map.Map<Nat, {
-      id : Nat;
-      name : Text;
-      customerName : Text;
-      phoneNumber : Text;
-      planType : Text;
-      bowlSize : { #gm250; #gm350; #gm500; #custom };
-      price : Nat;
-      isPaid : Bool;
-      startDate : Int;
-      endDate : Int;
-      remainingDeliveries : Int;
-    }>;
-    products : Map.Map<Nat, {
-      name : Text;
-      bowlType : {
-        #gm250;
-        #gm350;
-        #gm500;
-        #custom;
-      };
-      price : Nat;
-      recipe : [(Text, Nat)];
-      active : Bool;
-    }>;
-    nextProductId : Nat;
+    customers : Map.Map<Nat, Customer>;
+    nextCustomerId : Nat;
   };
 
   public func run(old : OldActor) : NewActor {
-    {
-      ingredientInventory = old.ingredientInventory.map(
-        func(_k, oldIngredient) {
-          {
-            oldIngredient with
-            unitType = "gram";
-          };
-        }
-      );
-      saladBowlProducts = old.saladBowlProducts;
-      invoices = old.invoices;
-      customers = old.customers;
-      availablePlans = old.availablePlans;
-      subscriptions = old.subscriptions;
-      products = old.products;
-      nextProductId = old.nextProductId;
-    };
+    var maxId = 0;
+    let _ = old.customers.values().toArray().map(func(customer) {
+      if (customer.id > maxId) {
+        maxId := customer.id;
+      };
+    });
+    { old with nextCustomerId = maxId + 1 };
   };
 };

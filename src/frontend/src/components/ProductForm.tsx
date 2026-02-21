@@ -6,7 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useBowlSizes } from '../hooks/useQueries';
+import { useBowlSizes, useAllIngredients, useAddProduct } from '../hooks/useQueries';
+import { SaladBowlType } from '../backend';
 
 interface IngredientRecipe {
   ingredientName: string;
@@ -18,16 +19,17 @@ interface ProductFormProps {
 }
 
 export default function ProductForm({ onSuccess }: ProductFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: bowlSizes } = useBowlSizes();
+  const { data: ingredients = [] } = useAllIngredients();
+  const addProduct = useAddProduct();
+
   const [formData, setFormData] = useState({
     name: '',
-    bowlType: '250gm',
+    bowlType: 'gm250' as SaladBowlType,
     price: '',
     active: true,
   });
   const [recipe, setRecipe] = useState<IngredientRecipe[]>([{ ingredientName: '', quantity: '' }]);
-
-  const { data: bowlSizes } = useBowlSizes();
 
   const addIngredient = () => {
     setRecipe([...recipe, { ingredientName: '', quantity: '' }]);
@@ -45,20 +47,47 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+
+    // Validate form
+    if (!formData.name.trim()) {
+      toast.error('Please enter a product name');
+      return;
+    }
+
+    const price = parseInt(formData.price);
+    if (isNaN(price) || price <= 0) {
+      toast.error('Please enter a valid price');
+      return;
+    }
+
+    // Validate recipe
+    const validRecipe = recipe.filter(r => r.ingredientName && r.quantity);
+    if (validRecipe.length === 0) {
+      toast.error('Please add at least one ingredient to the recipe');
+      return;
+    }
+
+    // Convert recipe to backend format
+    const recipeArray: Array<[string, bigint]> = validRecipe.map(r => [
+      r.ingredientName,
+      BigInt(parseInt(r.quantity) || 0)
+    ]);
 
     try {
-      // TODO: Call backend API once available
-      // await actor.addSaladBowl({...formData, recipe});
-      
-      toast.success('Product added successfully');
-      setFormData({ name: '', bowlType: '250gm', price: '', active: true });
+      await addProduct.mutateAsync({
+        name: formData.name,
+        bowlType: formData.bowlType,
+        price: BigInt(price),
+        recipe: recipeArray,
+        active: formData.active,
+      });
+
+      // Reset form
+      setFormData({ name: '', bowlType: SaladBowlType.gm250, price: '', active: true });
       setRecipe([{ ingredientName: '', quantity: '' }]);
       onSuccess?.();
     } catch (error) {
-      toast.error('Failed to add product');
-    } finally {
-      setIsSubmitting(false);
+      console.error('Failed to add product:', error);
     }
   };
 
@@ -78,15 +107,18 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="bowlType">Bowl Type *</Label>
-          <Select value={formData.bowlType} onValueChange={(value) => setFormData({ ...formData, bowlType: value })}>
+          <Select 
+            value={formData.bowlType} 
+            onValueChange={(value) => setFormData({ ...formData, bowlType: value as SaladBowlType })}
+          >
             <SelectTrigger id="bowlType">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {bowlSizes?.gm250 && <SelectItem value="250gm">250gm Bowl</SelectItem>}
-              {bowlSizes?.gm350 && <SelectItem value="350gm">350gm Bowl</SelectItem>}
-              {bowlSizes?.gm500 && <SelectItem value="500gm">500gm Bowl</SelectItem>}
-              <SelectItem value="custom">Custom Bowl</SelectItem>
+              {bowlSizes?.gm250 && <SelectItem value={SaladBowlType.gm250}>250gm Bowl</SelectItem>}
+              {bowlSizes?.gm350 && <SelectItem value={SaladBowlType.gm350}>350gm Bowl</SelectItem>}
+              {bowlSizes?.gm500 && <SelectItem value={SaladBowlType.gm500}>500gm Bowl</SelectItem>}
+              <SelectItem value={SaladBowlType.custom}>Custom Bowl</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -108,52 +140,70 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Recipe Ingredients</CardTitle>
+            <CardTitle>Recipe Configuration</CardTitle>
             <Button type="button" variant="outline" size="sm" onClick={addIngredient}>
-              <Plus className="h-4 w-4 mr-1" />
+              <Plus className="mr-2 h-4 w-4" />
               Add Ingredient
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           {recipe.map((item, index) => (
-            <div key={index} className="flex gap-2">
-              <div className="flex-1">
-                <Input
-                  placeholder="Ingredient name"
+            <div key={index} className="flex gap-4 items-end">
+              <div className="flex-1 space-y-2">
+                <Label htmlFor={`ingredient-${index}`}>Ingredient</Label>
+                <Select
                   value={item.ingredientName}
-                  onChange={(e) => updateIngredient(index, 'ingredientName', e.target.value)}
-                  required
-                />
+                  onValueChange={(value) => updateIngredient(index, 'ingredientName', value)}
+                >
+                  <SelectTrigger id={`ingredient-${index}`}>
+                    <SelectValue placeholder="Select ingredient" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ingredients.map((ingredient) => (
+                      <SelectItem key={ingredient.name} value={ingredient.name}>
+                        {ingredient.name} ({ingredient.unitType})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="w-32">
+
+              <div className="w-32 space-y-2">
+                <Label htmlFor={`quantity-${index}`}>Quantity</Label>
                 <Input
+                  id={`quantity-${index}`}
                   type="number"
-                  placeholder="Quantity (g)"
                   value={item.quantity}
                   onChange={(e) => updateIngredient(index, 'quantity', e.target.value)}
-                  required
+                  placeholder="0"
                   min="0"
                 />
               </div>
-              {recipe.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeIngredient(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => removeIngredient(index)}
+                disabled={recipe.length === 1}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           ))}
         </CardContent>
       </Card>
 
-      <Button type="submit" disabled={isSubmitting} className="w-full bg-fresh-600 hover:bg-fresh-700">
-        {isSubmitting ? 'Adding...' : 'Add Product'}
-      </Button>
+      <div className="flex justify-end gap-4">
+        <Button 
+          type="submit" 
+          disabled={addProduct.isPending}
+          className="bg-fresh-600 hover:bg-fresh-700"
+        >
+          {addProduct.isPending ? 'Adding Product...' : 'Add Product'}
+        </Button>
+      </div>
     </form>
   );
 }

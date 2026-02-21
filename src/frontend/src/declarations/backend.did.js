@@ -128,7 +128,6 @@ export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addCustomer' : IDL.Func(
       [
-        IDL.Nat,
         IDL.Text,
         IDL.Text,
         IDL.Text,
@@ -140,7 +139,7 @@ export const idlService = IDL.Service({
         IDL.Float64,
         IDL.Float64,
       ],
-      [IDL.Bool],
+      [IDL.Nat],
       [],
     ),
   'addIngredient' : IDL.Func([Ingredient], [], []),
@@ -402,7 +401,6 @@ export const idlFactory = ({ IDL }) => {
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addCustomer' : IDL.Func(
         [
-          IDL.Nat,
           IDL.Text,
           IDL.Text,
           IDL.Text,
@@ -414,7 +412,7 @@ export const idlFactory = ({ IDL }) => {
           IDL.Float64,
           IDL.Float64,
         ],
-        [IDL.Bool],
+        [IDL.Nat],
         [],
       ),
     'addIngredient' : IDL.Func([Ingredient], [], []),
