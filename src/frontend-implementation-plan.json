@@ -1,90 +1,144 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix admin panel issues in inventory, products, and customers",
+  "title": "Restore Version 22 Features",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Filter Stock Status view to show only available stock (quantity > 0) and highlight low stock items",
+      "summary": "Remove customer reference field from frontend forms and displays",
       "acceptanceCriteria": [
-        "Stock Status table filters out ingredients with zero quantity",
-        "Ingredients below low stock threshold are visually highlighted (e.g., different background color or border)",
-        "The total value calculation reflects only available stock"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/StockStatusTab.tsx",
-          "operation": "modify",
-          "description": "Modify the component to filter stockStatus data to only include items where currentQuantity > 0. Update the table rendering to apply conditional styling (e.g., yellow/orange background or border) to rows where isLowStock is true. Ensure the totalValue calculation uses only the filtered available stock items."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Fix the ingredient name input field in Stock In form to allow proper text input and selection",
-      "acceptanceCriteria": [
-        "Ingredient name input field is editable and accepts text input",
-        "Users can select ingredients from the dropdown",
-        "Selected ingredient populates correctly in the form"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/StockInTab.tsx",
-          "operation": "modify",
-          "description": "Review and fix the ingredient name input implementation. Ensure the Select component from shadcn/ui allows proper text input for filtering and selection. Verify that the value binding, onChange handlers, and Select trigger are correctly configured. Replace any non-editable implementation with a properly functioning Select that supports typing and dropdown selection. Populate the selected ingredient name in the form state correctly."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Ensure newly added bowl products appear in the product list immediately after creation",
-      "acceptanceCriteria": [
-        "After successfully submitting the product form, the new product appears in the product list",
-        "The product list refreshes automatically after product creation",
-        "Product data persists and is retrievable from backend"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/ProductForm.tsx",
-          "operation": "modify",
-          "description": "Review the useAddProduct mutation onSuccess handler. Ensure that after successfully adding a product, the relevant query keys are invalidated (e.g., ['products'], ['activeProducts']) to trigger an automatic refetch of the product list. Verify that the form closes and resets state properly after successful submission."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Review the useAddProduct mutation to ensure it properly invalidates the product-related query keys (['products'], ['activeProducts'], ['allProductsWithInactive']) in the onSuccess callback. Verify that the mutation returns the product ID from the backend and handles success/error states appropriately."
-        },
-        {
-          "path": "frontend/src/components/ProductList.tsx",
-          "operation": "modify",
-          "description": "Verify that the ProductList component uses the correct query hook (useGetAllProductsWithInactive or useGetAllActiveProducts) that will be invalidated by the add product mutation. Ensure the component properly handles loading and data update states to display newly added products immediately."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Resolve the 'Failed to add customer' error by fixing the customer creation form and backend integration",
-      "acceptanceCriteria": [
-        "Customer form successfully submits without errors",
-        "New customers are persisted to backend storage",
-        "Newly added customers appear in the customer list",
-        "Appropriate error messages are displayed if validation fails"
+        "Customer records no longer include a reference field",
+        "CustomerForm does not display or accept a reference field",
+        "CustomerList does not show the reference column"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/CustomerForm.tsx",
           "operation": "modify",
-          "description": "Review the form validation and submission logic in the useAddCustomer mutation call. Ensure all required fields (name, phone, email, address, preferences, gender, age, heightCm, weightKg, calculatedBMI) are properly validated and converted to the correct types before calling the backend. Verify that numeric fields are parsed as BigInt or Number as expected by the backend interface. Add proper error handling to display specific validation errors to the user. Ensure the form resets and the customer list query is invalidated on successful submission."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Review the useAddCustomer mutation to ensure it correctly passes all parameters to actor.addCustomer in the right order and format (name, phone, email, address, preferences, gender, age as bigint, heightCm as number, weightKg as number, calculatedBMI as number). Add comprehensive error handling with try-catch to capture and expose backend errors. Ensure the mutation invalidates the ['customers'] query key on success to refresh the customer list."
+          "description": "Remove the reference field input from the customer form component. Remove any state management, validation, or form submission logic related to the reference field."
         },
         {
           "path": "frontend/src/components/CustomerList.tsx",
           "operation": "modify",
-          "description": "Verify that the CustomerList component properly refetches data when the ['customers'] query is invalidated. Ensure the component handles loading states and displays newly added customers immediately after successful creation."
+          "description": "Remove the reference column from the customer list table. Remove the table header and corresponding data cell that displays customer reference values."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Remove audible order notification system from the frontend",
+      "acceptanceCriteria": [
+        "useOrderNotifications hook is removed or disabled",
+        "No audio alert plays when new orders arrive",
+        "Order polling functionality is removed from the Layout component"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useOrderNotifications.ts",
+          "operation": "delete",
+          "description": "Delete the useOrderNotifications hook that polls for new orders and plays audio alerts."
+        },
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Remove the useOrderNotifications hook import and invocation from the Layout component. Remove any UI elements or logic that depend on order notifications."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Remove UPI QR code generation from billing system",
+      "acceptanceCriteria": [
+        "BillingForm no longer displays UPI QR codes",
+        "UPIQRCode component is not rendered in billing flow",
+        "Payment mode selection does not trigger QR code generation"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/BillingForm.tsx",
+          "operation": "modify",
+          "description": "Remove UPIQRCode component import and rendering from the billing form. Remove any state management, conditional logic, or event handlers related to UPI QR code generation."
+        },
+        {
+          "path": "frontend/src/components/UPIQRCode.tsx",
+          "operation": "delete",
+          "description": "Delete the UPIQRCode component that generates and displays UPI payment QR codes."
+        },
+        {
+          "path": "frontend/src/utils/upiQRGenerator.ts",
+          "operation": "delete",
+          "description": "Delete the utility module that generates UPI payment URLs for QR codes."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Restore inventory navigation and routes to the application",
+      "acceptanceCriteria": [
+        "Inventory link appears in the sidebar navigation",
+        "Inventory page route is accessible at /admin/inventory",
+        "Navigation includes all inventory management functionality"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Add an Inventory navigation link to the sidebar that routes to /admin/inventory. Place it in the appropriate position within the existing navigation structure."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add a route for /admin/inventory that renders the InventoryPage component. Import the InventoryPage and register it in the router configuration."
+        },
+        {
+          "path": "frontend/src/pages/InventoryPage.tsx",
+          "operation": "modify",
+          "description": "Implement the InventoryPage component with tabs for stock status, stock-in transactions, stock-out transactions, and write-offs. Wire in the stock management components (StockStatusTab, StockInTab, StockOutTab, WriteOffTab) and ensure proper layout and navigation."
+        },
+        {
+          "path": "frontend/src/components/StockStatusTab.tsx",
+          "operation": "modify",
+          "description": "Implement the StockStatusTab component to display current inventory levels using the getInventoryStatus backend capability. Show ingredient names, quantities, unit types, stock status indicators, and low stock warnings."
+        },
+        {
+          "path": "frontend/src/components/StockInTab.tsx",
+          "operation": "modify",
+          "description": "Implement the StockInTab component with a form to record stock-in transactions including ingredient selection, quantity, supplier name, cost price, and reason. Use the recordStockTransaction backend capability with stockIn transaction type."
+        },
+        {
+          "path": "frontend/src/components/StockOutTab.tsx",
+          "operation": "modify",
+          "description": "Implement the StockOutTab component with a form to record stock-out transactions including ingredient selection, quantity, and reason. Use the recordStockTransaction backend capability with stockOut transaction type."
+        },
+        {
+          "path": "frontend/src/components/WriteOffTab.tsx",
+          "operation": "modify",
+          "description": "Implement the WriteOffTab component with a form to record write-off transactions including ingredient selection, quantity, and reason for write-off. Use the recordStockTransaction backend capability with writeOff transaction type."
+        },
+        {
+          "path": "frontend/src/components/StockTransactionTable.tsx",
+          "operation": "modify",
+          "description": "Implement the StockTransactionTable component to display a history of all stock transactions. Fetch data using getAllStockTransactions backend capability and display transaction ID, date, ingredient, type, quantity, supplier, cost price, and reason in a sortable table."
+        },
+        {
+          "path": "frontend/src/components/IngredientForm.tsx",
+          "operation": "modify",
+          "description": "Implement the IngredientForm component for adding new ingredients with fields for name, unit type, low stock threshold, supplier name, initial quantity, and cost price per unit. Use the addIngredient backend capability."
+        },
+        {
+          "path": "frontend/src/components/IngredientList.tsx",
+          "operation": "modify",
+          "description": "Implement the IngredientList component to display all ingredients in a table showing name, quantity, unit type, supplier, cost price, and low stock threshold. Include edit and delete functionality using updateIngredient and deleteIngredient backend capabilities."
+        },
+        {
+          "path": "frontend/src/components/EditIngredientDialog.tsx",
+          "operation": "modify",
+          "description": "Implement the EditIngredientDialog component as a modal dialog for editing existing ingredient details. Pre-populate fields with current values and submit updates using the updateIngredient backend capability."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add React Query hooks for inventory management operations: useGetAllIngredients, useAddIngredient, useUpdateIngredient, useDeleteIngredient, useGetInventoryStatus, useGetAllStockTransactions, and useRecordStockTransaction. Include proper error handling and toast notifications."
         }
       ]
     }

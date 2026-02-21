@@ -31,11 +31,6 @@ export interface Ingredient {
   'quantity' : bigint,
   'costPricePerUnit' : bigint,
 }
-export interface InventoryItem {
-  'unitType' : string,
-  'quantityInStock' : bigint,
-  'ingredientName' : string,
-}
 export interface Invoice {
   'customerName' : string,
   'timestamp' : Time,
@@ -55,14 +50,21 @@ export interface Order {
   'phone' : string,
   'items' : Array<[string, bigint]>,
 }
-export type Recipe = Array<[string, bigint]>;
-export interface SaladBowl {
+export interface Product {
+  'fat' : bigint,
+  'fiber' : bigint,
   'active' : boolean,
+  'carbs' : bigint,
+  'calories' : bigint,
   'name' : string,
+  'sugar' : bigint,
+  'category' : string,
   'price' : bigint,
   'bowlType' : SaladBowlType,
+  'protein' : bigint,
   'recipe' : Recipe,
 }
+export type Recipe = Array<[string, bigint]>;
 export type SaladBowlType = { 'custom' : null } |
   { 'gm250' : null } |
   { 'gm350' : null } |
@@ -121,126 +123,48 @@ export type UserRole = { 'admin' : null } |
   { 'guest' : null };
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
-  'addCustomer' : ActorMethod<
-    [
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      bigint,
-      number,
-      number,
-      number,
-    ],
-    bigint
-  >,
+  'addCustomer' : ActorMethod<[Customer], bigint>,
   'addIngredient' : ActorMethod<[Ingredient], undefined>,
-  'addOrder' : ActorMethod<
-    [
-      bigint,
-      string,
-      string,
-      string,
-      Array<[string, bigint]>,
-      bigint,
-      string,
-      string,
-    ],
-    bigint
-  >,
-  'addProduct' : ActorMethod<[SaladBowl], bigint>,
+  'addProduct' : ActorMethod<[Product], bigint>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'bowlSizes' : ActorMethod<
+  'bulkUploadProducts' : ActorMethod<[Array<Product>], bigint>,
+  'createInvoice' : ActorMethod<[Invoice], undefined>,
+  'createOrder' : ActorMethod<[Order], bigint>,
+  'createSubscription' : ActorMethod<[Subscription], bigint>,
+  'deleteCustomer' : ActorMethod<[bigint], undefined>,
+  'deleteIngredient' : ActorMethod<[string], undefined>,
+  'deleteProduct' : ActorMethod<[bigint], undefined>,
+  'deleteSubscription' : ActorMethod<[bigint], undefined>,
+  'getAllCustomers' : ActorMethod<[], Array<[bigint, Customer]>>,
+  'getAllIngredients' : ActorMethod<[], Array<[string, Ingredient]>>,
+  'getAllInvoices' : ActorMethod<[], Array<Invoice>>,
+  'getAllOrders' : ActorMethod<[], Array<[bigint, Order]>>,
+  'getAllProducts' : ActorMethod<[], Array<[bigint, Product]>>,
+  'getAllStockTransactions' : ActorMethod<
     [],
-    { 'gm250' : boolean, 'gm350' : boolean, 'gm500' : boolean }
+    Array<[bigint, StockTransaction]>
   >,
-  'createSubscription' : ActorMethod<
-    [
-      bigint,
-      string,
-      string,
-      string,
-      string,
-      SaladBowlType,
-      bigint,
-      boolean,
-      Time,
-      Time,
-      bigint,
-    ],
-    boolean
-  >,
-  'deductIngredientsOnSale' : ActorMethod<[Invoice], undefined>,
-  'deleteIngredient' : ActorMethod<[string], boolean>,
-  'deleteProduct' : ActorMethod<[bigint], boolean>,
-  'deleteSubscription' : ActorMethod<[bigint], boolean>,
-  'editSaladBowlRecipe' : ActorMethod<[string, Recipe], boolean>,
-  'editSubscription' : ActorMethod<
-    [
-      bigint,
-      string,
-      string,
-      string,
-      string,
-      SaladBowlType,
-      bigint,
-      boolean,
-      Time,
-      Time,
-      bigint,
-    ],
-    boolean
-  >,
-  'getAllActiveProducts' : ActorMethod<[], Array<SaladBowl>>,
-  'getAllCustomers' : ActorMethod<[], Array<Customer>>,
-  'getAllIngredients' : ActorMethod<[], Array<Ingredient>>,
-  'getAllOrders' : ActorMethod<[], Array<Order>>,
-  'getAllProductsWithInactive' : ActorMethod<[], Array<SaladBowl>>,
-  'getAllStockTransactions' : ActorMethod<[], Array<StockTransaction>>,
-  'getAllSubscriptions' : ActorMethod<[], Array<Subscription>>,
-  'getAnalyticsMetrics' : ActorMethod<
-    [],
-    {
-      'monthlySales' : bigint,
-      'dailySales' : bigint,
-      'weeklySales' : bigint,
-      'cashFlow' : bigint,
-      'dailyExpenses' : bigint,
-    }
-  >,
+  'getAllSubscriptions' : ActorMethod<[], Array<[bigint, Subscription]>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
-  'getCustomerOrders' : ActorMethod<[bigint], Array<Order>>,
-  'getCustomerProfile' : ActorMethod<[bigint], [] | [Customer]>,
+  'getCustomer' : ActorMethod<[bigint], [] | [Customer]>,
   'getIngredient' : ActorMethod<[string], [] | [Ingredient]>,
-  'getInventoryStatus' : ActorMethod<
-    [],
-    { 'totalValue' : bigint, 'items' : Array<InventoryItem> }
-  >,
+  'getInventoryStatus' : ActorMethod<[], Array<StockStatus>>,
+  'getInvoicesByPeriod' : ActorMethod<[bigint], Array<Invoice>>,
+  'getMyOrders' : ActorMethod<[], Array<Order>>,
   'getOrder' : ActorMethod<[bigint], [] | [Order]>,
-  'getProduct' : ActorMethod<[bigint], [] | [SaladBowl]>,
-  'getStockStatus' : ActorMethod<[], Array<StockStatus>>,
-  'getStockTransactionsByType' : ActorMethod<
-    [StockTransactionType],
-    Array<StockTransaction>
-  >,
+  'getProduct' : ActorMethod<[bigint], [] | [Product]>,
+  'getStockTransaction' : ActorMethod<[bigint], [] | [StockTransaction]>,
+  'getSubscription' : ActorMethod<[bigint], [] | [Subscription]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'monthlyPlanDuration' : ActorMethod<[], bigint>,
-  'recordStockIn' : ActorMethod<
-    [string, bigint, string, bigint, string],
-    boolean
-  >,
-  'recordStockOut' : ActorMethod<[string, bigint, string], boolean>,
-  'recordWriteOff' : ActorMethod<[string, bigint, string], boolean>,
+  'recordStockTransaction' : ActorMethod<[StockTransaction], bigint>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'toggleSaladBowlAvailability' : ActorMethod<[string, boolean], undefined>,
-  'updateIngredient' : ActorMethod<[string, Ingredient], boolean>,
-  'updateOrderStatus' : ActorMethod<[bigint, string], boolean>,
-  'updateProduct' : ActorMethod<[bigint, SaladBowl], boolean>,
-  'weeklyPlanDuration' : ActorMethod<[], bigint>,
+  'updateCustomer' : ActorMethod<[bigint, Customer], undefined>,
+  'updateIngredient' : ActorMethod<[string, Ingredient], undefined>,
+  'updateOrderStatus' : ActorMethod<[bigint, string], undefined>,
+  'updateProduct' : ActorMethod<[bigint, Product], undefined>,
+  'updateSubscription' : ActorMethod<[bigint, Subscription], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

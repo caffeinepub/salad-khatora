@@ -1,170 +1,126 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAllIngredients, useRecordWriteOff, useGetStockTransactionsByType } from '../hooks/useQueries';
-import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
+import { useGetAllIngredients, useRecordStockTransaction, useGetStockTransactionsByType } from '../hooks/useQueries';
+import type { StockTransaction } from '../backend';
 import StockTransactionTable from './StockTransactionTable';
-import { StockTransactionType } from '../backend';
+import { toast } from 'sonner';
 
 export default function WriteOffTab() {
-  const { data: ingredients = [] } = useAllIngredients();
-  const recordWriteOff = useRecordWriteOff();
-  const { data: transactions = [], isLoading: isLoadingTransactions } = useGetStockTransactionsByType(StockTransactionType.writeOff);
+  const [ingredientName, setIngredientName] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [reason, setReason] = useState('');
 
-  const [formData, setFormData] = useState({
-    ingredientName: '',
-    quantity: '',
-    reason: '',
-    date: new Date().toISOString().split('T')[0],
-  });
+  const { data: ingredients } = useGetAllIngredients();
+  const recordTransactionMutation = useRecordStockTransaction();
+  const { data: writeOffTransactions } = useGetStockTransactionsByType('writeOff');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const quantity = parseInt(formData.quantity);
+    const ingredient = ingredients?.find(([name]) => name === ingredientName);
+    if (!ingredient) return;
 
-    if (!formData.ingredientName) {
-      toast.error('Please select an ingredient');
+    const availableQuantity = Number(ingredient[1].quantity);
+    const requestedQuantity = Number(quantity);
+
+    if (requestedQuantity > availableQuantity) {
+      toast.error(`Insufficient stock. Available: ${availableQuantity} ${ingredient[1].unitType}`);
       return;
     }
 
-    if (isNaN(quantity) || quantity <= 0) {
-      toast.error('Please enter a valid quantity');
-      return;
-    }
+    const transaction: StockTransaction = {
+      transactionId: BigInt(0),
+      ingredientName,
+      quantity: BigInt(quantity),
+      transactionType: { writeOff: null } as any,
+      reason,
+      date: BigInt(Date.now() * 1000000),
+      supplier: undefined,
+      costPrice: undefined,
+      unitType: ingredient[1].unitType,
+    };
 
-    if (!formData.reason.trim()) {
-      toast.error('Please enter a reason');
-      return;
-    }
+    await recordTransactionMutation.mutateAsync(transaction);
 
-    const selectedIngredient = ingredients.find(i => i.name === formData.ingredientName);
-    if (!selectedIngredient) {
-      toast.error('Selected ingredient not found');
-      return;
-    }
-
-    if (selectedIngredient.quantity < BigInt(quantity)) {
-      toast.error(`Insufficient stock. Available: ${selectedIngredient.quantity}`);
-      return;
-    }
-
-    try {
-      await recordWriteOff.mutateAsync({
-        ingredientName: formData.ingredientName,
-        quantity: BigInt(quantity),
-        reason: formData.reason,
-      });
-
-      toast.success('Write-off recorded successfully');
-      setFormData({
-        ingredientName: '',
-        quantity: '',
-        reason: '',
-        date: new Date().toISOString().split('T')[0],
-      });
-    } catch (error) {
-      toast.error('Failed to record write-off');
-      console.error('Write-off error:', error);
-    }
+    // Reset form
+    setIngredientName('');
+    setQuantity('');
+    setReason('');
   };
+
+  const selectedIngredient = ingredients?.find(([name]) => name === ingredientName);
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Record Write-Off</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="ingredient">Ingredient *</Label>
-                <Select
-                  value={formData.ingredientName}
-                  onValueChange={(value) => setFormData({ ...formData, ingredientName: value })}
-                >
-                  <SelectTrigger id="ingredient">
-                    <SelectValue placeholder="Select ingredient" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ingredients.map((ingredient) => (
-                      <SelectItem key={ingredient.name} value={ingredient.name}>
-                        {ingredient.name} (Available: {ingredient.quantity.toString()})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+      <form onSubmit={handleSubmit} className="bg-card p-6 rounded-lg border border-border space-y-4">
+        <h2 className="text-xl font-semibold">Record Write Off</h2>
 
-              <div className="space-y-2">
-                <Label htmlFor="quantity">Quantity *</Label>
-                <Input
-                  id="quantity"
-                  type="number"
-                  value={formData.quantity}
-                  onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                  placeholder="Enter quantity"
-                  min="1"
-                  required
-                />
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="ingredient">Ingredient *</Label>
+            <Select value={ingredientName} onValueChange={setIngredientName} required>
+              <SelectTrigger id="ingredient">
+                <SelectValue placeholder="Select ingredient" />
+              </SelectTrigger>
+              <SelectContent>
+                {ingredients?.map(([name, ingredient]) => (
+                  <SelectItem key={name} value={name}>
+                    {name} ({ingredient.quantity.toString()} {ingredient.unitType} available)
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="reason">Reason *</Label>
-                <Textarea
-                  id="reason"
-                  value={formData.reason}
-                  onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  placeholder="e.g., Expired, Damaged, Spoiled, etc."
-                  rows={3}
-                  required
-                />
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="quantity">Quantity *</Label>
+            <Input
+              id="quantity"
+              type="number"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              required
+              min="1"
+              max={selectedIngredient ? Number(selectedIngredient[1].quantity) : undefined}
+              placeholder="Enter quantity"
+            />
+            {selectedIngredient && (
+              <p className="text-sm text-muted-foreground">
+                Available: {selectedIngredient[1].quantity.toString()} {selectedIngredient[1].unitType}
+              </p>
+            )}
+          </div>
+        </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="date">Date *</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
+        <div className="space-y-2">
+          <Label htmlFor="reason">Reason for Write Off *</Label>
+          <Textarea
+            id="reason"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            required
+            placeholder="Enter reason (e.g., damaged, expired, spoiled)"
+            rows={2}
+          />
+        </div>
 
-            <div className="flex justify-end pt-4">
-              <Button 
-                type="submit" 
-                disabled={recordWriteOff.isPending}
-                className="bg-fresh-600 hover:bg-fresh-700"
-              >
-                {recordWriteOff.isPending ? 'Recording...' : 'Record Write-Off'}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+        <Button
+          type="submit"
+          disabled={recordTransactionMutation.isPending}
+          className="w-full bg-fresh-600 hover:bg-fresh-700"
+        >
+          {recordTransactionMutation.isPending ? 'Recording...' : 'Record Write Off'}
+        </Button>
+      </form>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Write-Off History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoadingTransactions ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Loading transactions...
-            </div>
-          ) : (
-            <StockTransactionTable transactions={transactions} />
-          )}
-        </CardContent>
-      </Card>
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Write Off History</h3>
+        <StockTransactionTable transactions={writeOffTransactions || []} />
+      </div>
     </div>
   );
 }

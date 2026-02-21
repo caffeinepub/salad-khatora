@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-in-the-inventory-tab-stock-status-view-display-only-ingredients-that-have-stock-available-quantity-0-highlight-rows-where-stock-is-below-the-low-stock-threshold",
-      "featureTitle": "In the Inventory tab Stock Status view, display only ingredients that have stock available (quantity > 0). Highlight rows where stock is below the low stock threshold.",
+      "featureId": "feature-remove-the-customer-reference-field-from-the-customer-management-system-including-the-database-schema-backend-api-and-all-frontend-forms-and-displays",
+      "featureTitle": "Remove the customer reference field from the customer management system, including the database schema, backend API, and all frontend forms and displays",
       "files": [
-        "frontend/src/components/StockStatusTab.tsx"
+        "frontend/src/components/CustomerForm.tsx",
+        "frontend/src/components/CustomerList.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -13,7 +14,9 @@
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0"
+        "authorization@4.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0"
       ],
       "testIds": [
         "REQ-1"
@@ -21,11 +24,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-in-the-products-tab-ensure-that-newly-added-bowl-products-appear-in-the-product-list-immediately-after-creation",
-      "featureTitle": "In the Products tab, ensure that newly added bowl products appear in the product list immediately after creation.",
+      "featureId": "feature-remove-the-audible-order-notification-system-that-plays-alert-sounds-when-new-orders-are-detected",
+      "featureTitle": "Remove the audible order notification system that plays alert sounds when new orders are detected",
       "files": [
-        "frontend/src/components/ProductForm.tsx",
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/components/Layout.tsx",
+        "frontend/src/hooks/useOrderNotifications.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -33,7 +36,32 @@
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0"
+        "authorization@4.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-remove-upi-qr-code-generation-functionality-from-the-billing-system",
+      "featureTitle": "Remove UPI QR code generation functionality from the billing system",
+      "files": [
+        "frontend/src/components/BillingForm.tsx",
+        "frontend/src/components/UPIQRCode.tsx",
+        "frontend/src/utils/upiQRGenerator.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0"
       ],
       "testIds": [
         "REQ-3"
@@ -41,11 +69,20 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-in-the-customers-tab-resolve-the-failed-to-add-customer-error-that-occurs-when-attempting-to-add-new-customers-investigate-and-fix-the-backend-customer-creation-logic-and-frontend-error-handling",
-      "featureTitle": "In the Customers tab, resolve the 'Failed to add customer' error that occurs when attempting to add new customers. Investigate and fix the backend customer creation logic and frontend error handling.",
+      "featureId": "feature-restore-the-inventory-navigation-and-routes-that-were-previously-removed",
+      "featureTitle": "Restore the inventory navigation and routes that were previously removed",
       "files": [
-        "frontend/src/components/CustomerForm.tsx",
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/App.tsx",
+        "frontend/src/components/EditIngredientDialog.tsx",
+        "frontend/src/components/IngredientForm.tsx",
+        "frontend/src/components/Layout.tsx",
+        "frontend/src/components/StockInTab.tsx",
+        "frontend/src/components/StockOutTab.tsx",
+        "frontend/src/components/StockStatusTab.tsx",
+        "frontend/src/components/StockTransactionTable.tsx",
+        "frontend/src/components/WriteOffTab.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/InventoryPage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -53,7 +90,9 @@
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0"
+        "authorization@4.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0"
       ],
       "testIds": [
         "REQ-4"

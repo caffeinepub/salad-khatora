@@ -3,50 +3,44 @@
   "projectStateVersion": 3,
   "summary": "New project",
   "architectural_notes": [],
-  "known_issues": [
-    "Admin panel - Inventory tab: Stock status should only show available stock with low stock highlighting",
-    "Admin panel - Inventory tab: Cannot write ingredient name in stock input field",
-    "Admin panel - Products tab: Added bowl products not displaying in the list",
-    "Admin panel - Customers tab: 'Failed to add customer' error when attempting to add new customers"
-  ],
+  "known_issues": [],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-in-the-inventory-tab-stock-status-view-display-only-ingredients-that-have-stock-available-quantity-0-highlight-rows-where-stock-is-below-the-low-stock-threshold",
-      "title": "In the Inventory tab Stock Status view, display only ingredients that have stock available (quantity > 0). Highlight rows where stock is below the low stock threshold.",
+      "id": "feature-remove-the-customer-reference-field-from-the-customer-management-system-including-the-database-schema-backend-api-and-all-frontend-forms-and-displays",
+      "title": "Remove the customer reference field from the customer management system, including the database schema, backend API, and all frontend forms and displays",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-in-the-products-tab-ensure-that-newly-added-bowl-products-appear-in-the-product-list-immediately-after-creation",
-      "title": "In the Products tab, ensure that newly added bowl products appear in the product list immediately after creation.",
+      "id": "feature-remove-the-audible-order-notification-system-that-plays-alert-sounds-when-new-orders-are-detected",
+      "title": "Remove the audible order notification system that plays alert sounds when new orders are detected",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-upi-qr-code-generation-functionality-from-the-billing-system",
+      "title": "Remove UPI QR code generation functionality from the billing system",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-in-the-customers-tab-resolve-the-failed-to-add-customer-error-that-occurs-when-attempting-to-add-new-customers-investigate-and-fix-the-backend-customer-creation-logic-and-frontend-error-handling",
-      "title": "In the Customers tab, resolve the 'Failed to add customer' error that occurs when attempting to add new customers. Investigate and fix the backend customer creation logic and frontend error handling.",
+      "id": "feature-restore-the-inventory-navigation-and-routes-that-were-previously-removed",
+      "title": "Restore the inventory navigation and routes that were previously removed",
       "reqIds": [
         "REQ-4"
       ],
       "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-2",
-      "summary": "In the Inventory tab Stock In form, fix the ingredient name input field so users can type and select ingredient names properly.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "status": "pending"
-    }
-  ],
-  "projectName": "Fix admin panel issues in inventory, products, and customers",
+  "new_feature_requests": [],
+  "projectName": "Salad Khatora",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

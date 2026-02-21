@@ -1,191 +1,121 @@
-import { Link, useNavigate, useLocation } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Home, Package, ShoppingCart, CreditCard, Calendar, FileText, Users, LogOut, ClipboardList } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { Outlet, useNavigate, useLocation } from '@tanstack/react-router';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { SiCoffeescript } from 'react-icons/si';
 import { useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { Toaster } from '@/components/ui/sonner';
+import {
+  Users,
+  ShoppingCart,
+  CreditCard,
+  Menu,
+  Package,
+} from 'lucide-react';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-function LoadingScreen() {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center space-y-4">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-fresh-600 border-t-transparent mx-auto"></div>
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
-    </div>
-  );
-}
-
-export default function Layout({ children }: LayoutProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+export default function Layout() {
+  const { identity, clear, login, loginStatus } = useInternetIdentity();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
-  const { clear, identity, isInitializing } = useInternetIdentity();
-  const queryClient = useQueryClient();
-  const hasRedirectedRef = useRef(false);
-  const isAuthenticatedRef = useRef(false);
-
   const isAuthenticated = !!identity;
 
-  // Update ref when authentication state changes
   useEffect(() => {
-    isAuthenticatedRef.current = isAuthenticated;
-  }, [isAuthenticated]);
-
-  // Redirect to login if not authenticated and not on login page
-  useEffect(() => {
-    // Skip if still initializing
-    if (isInitializing) {
-      return;
-    }
-
-    // Skip if already on login page
-    if (location.pathname === '/admin/login') {
-      hasRedirectedRef.current = false;
-      return;
-    }
-
-    // Only redirect once when not authenticated
-    if (!isAuthenticated && !hasRedirectedRef.current) {
-      hasRedirectedRef.current = true;
+    if (!isAuthenticated && !location.pathname.includes('/admin/login')) {
       navigate({ to: '/admin/login' });
     }
-  }, [isAuthenticated, isInitializing, location.pathname]);
+  }, [isAuthenticated, location.pathname, navigate]);
 
-  const handleLogout = async () => {
-    await clear();
-    queryClient.clear();
-    hasRedirectedRef.current = false;
-    navigate({ to: '/admin/login' });
+  const handleAuth = async () => {
+    if (isAuthenticated) {
+      await clear();
+      queryClient.clear();
+      navigate({ to: '/admin/login' });
+    } else {
+      try {
+        await login();
+      } catch (error: any) {
+        console.error('Login error:', error);
+        if (error.message === 'User is already authenticated') {
+          await clear();
+          setTimeout(() => login(), 300);
+        }
+      }
+    }
   };
 
-  const allNavItems = [
-    { name: 'Dashboard', path: '/admin/dashboard', icon: Home, requiresAuth: false },
-    { name: 'Inventory', path: '/admin/inventory', icon: Package, requiresAuth: false },
-    { name: 'Products', path: '/admin/products', icon: ShoppingCart, requiresAuth: false },
-    { name: 'Billing', path: '/admin/billing', icon: CreditCard, requiresAuth: false },
-    { name: 'Subscriptions', path: '/admin/subscriptions', icon: Calendar, requiresAuth: false },
-    { name: 'Orders', path: '/admin/orders', icon: ClipboardList, requiresAuth: false },
-    { name: 'Customers', path: '/admin/customers', icon: Users, requiresAuth: true },
-    { name: 'Reports', path: '/admin/reports', icon: FileText, requiresAuth: false },
+  const navItems = [
+    { path: '/admin/customers', label: 'Customers', icon: Users },
+    { path: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+    { path: '/admin/billing', label: 'Billing', icon: CreditCard },
+    { path: '/admin/menu', label: 'Menu', icon: Menu },
+    { path: '/admin/inventory', label: 'Inventory', icon: Package },
   ];
 
-  const navItems = allNavItems.filter(item => !item.requiresAuth || isAuthenticated);
-
-  // Show loading screen during initialization
-  if (isInitializing) {
-    return <LoadingScreen />;
-  }
-
-  // Don't wrap login page
-  if (location.pathname === '/admin/login') {
-    return <>{children}</>;
-  }
-
-  // Show loading if not authenticated (will redirect)
-  if (!isAuthenticated) {
-    return <LoadingScreen />;
+  if (location.pathname.includes('/admin/login')) {
+    return (
+      <>
+        <Outlet />
+        <Toaster />
+      </>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-4">
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-64">
-                <nav className="flex flex-col gap-2 mt-8">
-                  {navItems.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = location.pathname === item.path;
-                    return (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-                          isActive
-                            ? 'bg-fresh-100 dark:bg-fresh-900/20 text-fresh-700 dark:text-fresh-400'
-                            : 'hover:bg-muted'
-                        }`}
-                      >
-                        <Icon className="h-5 w-5" />
-                        <span>{item.name}</span>
-                      </Link>
-                    );
-                  })}
-                </nav>
-              </SheetContent>
-            </Sheet>
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar */}
+      <aside className="w-64 bg-card border-r border-border flex flex-col">
+        <div className="p-6 border-b border-border">
+          <h1 className="text-2xl font-bold text-fresh-600">Salad Khatora</h1>
+          <p className="text-sm text-muted-foreground">Admin Panel</p>
+        </div>
 
-            <Link to="/admin/dashboard" className="flex items-center gap-2">
-              <img 
-                src="/assets/Salad Khatora.jpeg" 
-                alt="Salad Khatora" 
-                className="h-10 w-10 object-contain rounded"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-              <span className="font-bold text-xl hidden sm:inline-block">Salad Khatora Admin Panel</span>
-            </Link>
-          </div>
-
-          <nav className="hidden md:flex items-center gap-1">
+        <nav className="flex-1 p-4">
+          <ul className="space-y-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
               return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors text-sm ${
-                    isActive
-                      ? 'bg-fresh-100 dark:bg-fresh-900/20 text-fresh-700 dark:text-fresh-400'
-                      : 'hover:bg-muted'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{item.name}</span>
-                </Link>
+                <li key={item.path}>
+                  <button
+                    onClick={() => navigate({ to: item.path })}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      isActive
+                        ? 'bg-fresh-100 text-fresh-700 font-medium'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span>{item.label}</span>
+                  </button>
+                </li>
               );
             })}
-          </nav>
+          </ul>
+        </nav>
 
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
+        <div className="p-4 border-t border-border">
+          <button
+            onClick={handleAuth}
+            disabled={loginStatus === 'logging-in'}
+            className="w-full px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium transition-colors disabled:opacity-50"
+          >
+            {loginStatus === 'logging-in' ? 'Logging out...' : 'Logout'}
+          </button>
         </div>
-      </header>
+      </aside>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-6 md:py-8">
-        {children}
-      </main>
+      <div className="flex-1 flex flex-col">
+        <main className="flex-1 p-8">
+          <Outlet />
+        </main>
 
-      {/* Footer */}
-      <footer className="border-t mt-12">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} Salad Khatora. All rights reserved.</p>
-            <p className="flex items-center gap-1">
-              Built with <SiCoffeescript className="h-4 w-4 text-fresh-600" /> using{' '}
+        <footer className="border-t border-border bg-card py-6">
+          <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+            <p>
+              © {new Date().getFullYear()} Salad Khatora. Built with love using{' '}
               <a
                 href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(
-                  typeof window !== 'undefined' ? window.location.hostname : 'salad-khatora'
+                  window.location.hostname
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -195,8 +125,10 @@ export default function Layout({ children }: LayoutProps) {
               </a>
             </p>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
+
+      <Toaster />
     </div>
   );
 }

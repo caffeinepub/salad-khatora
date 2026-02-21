@@ -1,12 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Fix admin panel issues in inventory stock status filtering, stock-in ingredient input, product list display, and customer creation.
+**Goal:** Restore the application to version 22 by removing customer reference fields, audible order notifications, UPI QR code generation, and restoring inventory navigation.
 
 **Planned changes:**
-- Filter Stock Status view to show only ingredients with quantity > 0 and highlight low stock items
-- Fix ingredient name input field in Stock In form to allow typing and selection
-- Ensure newly added bowl products appear immediately in the product list
-- Resolve "Failed to add customer" error and fix customer creation flow
+- Remove customer reference field from database schema, backend API, and all frontend forms and displays
+- Remove audible order notification system that plays alert sounds for new orders
+- Remove UPI QR code generation functionality from the billing system
+- Restore inventory navigation links and routes that were previously removed
 
-**User-visible outcome:** Admin users can view accurate stock status with low stock warnings, successfully add stock entries by typing ingredient names, see newly created products in the list immediately, and add new customers without errors.
+**User-visible outcome:** Users will have a simpler customer management system without reference fields, no audio alerts for orders, no UPI QR codes in billing, and restored access to the inventory management page.

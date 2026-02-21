@@ -5,133 +5,87 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAddCustomer } from '../hooks/useQueries';
-import { toast } from 'sonner';
+import type { Customer } from '../backend';
 
-interface CustomerFormProps {
-  onSuccess?: () => void;
-}
+export default function CustomerForm() {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
+  const [preferences, setPreferences] = useState('');
+  const [gender, setGender] = useState('');
+  const [age, setAge] = useState('');
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
 
-export default function CustomerForm({ onSuccess }: CustomerFormProps) {
-  const addCustomer = useAddCustomer();
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
-    preferences: '',
-    gender: '',
-    age: '',
-    heightCm: '',
-    weightKg: '',
-  });
+  const addCustomerMutation = useAddCustomer();
 
-  const calculateBMI = (weight: number, height: number): number => {
-    if (height <= 0 || weight <= 0) return 0;
-    const heightInMeters = height / 100;
-    return weight / (heightInMeters * heightInMeters);
+  const calculateBMI = (weightKg: number, heightCm: number): number => {
+    if (heightCm <= 0 || weightKg <= 0) return 0;
+    const heightM = heightCm / 100;
+    return weightKg / (heightM * heightM);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate required fields
-    if (!formData.name.trim()) {
-      toast.error('Please enter customer name');
-      return;
-    }
+    const weightKg = parseFloat(weight);
+    const heightCm = parseFloat(height);
+    const ageNum = parseInt(age);
+    const bmi = calculateBMI(weightKg, heightCm);
 
-    if (!formData.phone.trim()) {
-      toast.error('Please enter phone number');
-      return;
-    }
+    const customer: Customer = {
+      id: BigInt(0),
+      name,
+      phone,
+      email,
+      address,
+      preferences,
+      gender,
+      age: BigInt(ageNum),
+      heightCm,
+      weightKg,
+      calculatedBMI: bmi,
+    };
 
-    // Validate email format if provided
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      toast.error('Please enter a valid email address');
-      return;
-    }
+    await addCustomerMutation.mutateAsync(customer);
 
-    // Parse numeric fields
-    const age = formData.age ? parseInt(formData.age) : 0;
-    const heightCm = formData.heightCm ? parseFloat(formData.heightCm) : 0;
-    const weightKg = formData.weightKg ? parseFloat(formData.weightKg) : 0;
-
-    // Validate numeric fields
-    if (formData.age && (isNaN(age) || age < 0 || age > 150)) {
-      toast.error('Please enter a valid age');
-      return;
-    }
-
-    if (formData.heightCm && (isNaN(heightCm) || heightCm <= 0)) {
-      toast.error('Please enter a valid height');
-      return;
-    }
-
-    if (formData.weightKg && (isNaN(weightKg) || weightKg <= 0)) {
-      toast.error('Please enter a valid weight');
-      return;
-    }
-
-    // Calculate BMI
-    const calculatedBMI = calculateBMI(weightKg, heightCm);
-
-    try {
-      await addCustomer.mutateAsync({
-        name: formData.name,
-        phone: formData.phone,
-        email: formData.email,
-        address: formData.address,
-        preferences: formData.preferences,
-        gender: formData.gender || '',
-        age: BigInt(age),
-        heightCm,
-        weightKg,
-        calculatedBMI,
-      });
-
-      // Reset form
-      setFormData({
-        name: '',
-        phone: '',
-        email: '',
-        address: '',
-        preferences: '',
-        gender: '',
-        age: '',
-        heightCm: '',
-        weightKg: '',
-      });
-
-      onSuccess?.();
-    } catch (error: any) {
-      console.error('Failed to add customer:', error);
-      toast.error(error.message || 'Failed to add customer');
-    }
+    // Reset form
+    setName('');
+    setPhone('');
+    setEmail('');
+    setAddress('');
+    setPreferences('');
+    setGender('');
+    setAge('');
+    setHeight('');
+    setWeight('');
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2">
+    <form onSubmit={handleSubmit} className="space-y-6 bg-card p-6 rounded-lg border border-border">
+      <h2 className="text-xl font-semibold text-foreground">Add New Customer</h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="name">Name *</Label>
           <Input
             id="name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="Enter customer name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
+            placeholder="Enter customer name"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="phone">Mobile Number *</Label>
+          <Label htmlFor="phone">Phone *</Label>
           <Input
             id="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            placeholder="Enter mobile number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             required
+            placeholder="Enter phone number"
           />
         </div>
 
@@ -140,15 +94,15 @@ export default function CustomerForm({ onSuccess }: CustomerFormProps) {
           <Input
             id="email"
             type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter email address"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="gender">Gender</Label>
-          <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })}>
+          <Label htmlFor="gender">Gender *</Label>
+          <Select value={gender} onValueChange={setGender} required>
             <SelectTrigger id="gender">
               <SelectValue placeholder="Select gender" />
             </SelectTrigger>
@@ -161,41 +115,43 @@ export default function CustomerForm({ onSuccess }: CustomerFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="age">Age</Label>
+          <Label htmlFor="age">Age *</Label>
           <Input
             id="age"
             type="number"
-            value={formData.age}
-            onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            required
             placeholder="Enter age"
-            min="0"
-            max="150"
+            min="1"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="heightCm">Height (cm)</Label>
+          <Label htmlFor="height">Height (cm) *</Label>
           <Input
-            id="heightCm"
+            id="height"
             type="number"
             step="0.1"
-            value={formData.heightCm}
-            onChange={(e) => setFormData({ ...formData, heightCm: e.target.value })}
+            value={height}
+            onChange={(e) => setHeight(e.target.value)}
+            required
             placeholder="Enter height in cm"
-            min="0"
+            min="1"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="weightKg">Weight (kg)</Label>
+          <Label htmlFor="weight">Weight (kg) *</Label>
           <Input
-            id="weightKg"
+            id="weight"
             type="number"
             step="0.1"
-            value={formData.weightKg}
-            onChange={(e) => setFormData({ ...formData, weightKg: e.target.value })}
+            value={weight}
+            onChange={(e) => setWeight(e.target.value)}
+            required
             placeholder="Enter weight in kg"
-            min="0"
+            min="1"
           />
         </div>
       </div>
@@ -204,8 +160,8 @@ export default function CustomerForm({ onSuccess }: CustomerFormProps) {
         <Label htmlFor="address">Address</Label>
         <Textarea
           id="address"
-          value={formData.address}
-          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
           placeholder="Enter delivery address"
           rows={2}
         />
@@ -215,22 +171,20 @@ export default function CustomerForm({ onSuccess }: CustomerFormProps) {
         <Label htmlFor="preferences">Dietary Preferences</Label>
         <Textarea
           id="preferences"
-          value={formData.preferences}
-          onChange={(e) => setFormData({ ...formData, preferences: e.target.value })}
-          placeholder="e.g., Vegan, No nuts, Extra protein"
+          value={preferences}
+          onChange={(e) => setPreferences(e.target.value)}
+          placeholder="Enter dietary preferences or restrictions"
           rows={2}
         />
       </div>
 
-      <div className="flex justify-end pt-4">
-        <Button 
-          type="submit" 
-          disabled={addCustomer.isPending}
-          className="bg-fresh-600 hover:bg-fresh-700"
-        >
-          {addCustomer.isPending ? 'Adding Customer...' : 'Add Customer'}
-        </Button>
-      </div>
+      <Button
+        type="submit"
+        disabled={addCustomerMutation.isPending}
+        className="w-full bg-fresh-600 hover:bg-fresh-700"
+      >
+        {addCustomerMutation.isPending ? 'Adding Customer...' : 'Add Customer'}
+      </Button>
     </form>
   );
 }

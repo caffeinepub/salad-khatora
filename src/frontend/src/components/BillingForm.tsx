@@ -3,240 +3,206 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAllProducts, useCreateInvoice } from '../hooks/useQueries';
 import { Plus, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
+import type { Invoice } from '../backend';
 
-interface InvoiceItem {
+interface OrderItem {
   productName: string;
-  quantity: string;
-  price: string;
+  quantity: number;
+  price: number;
 }
 
-// TODO: Replace with actual data from backend
-const availableProducts = [
-  { name: 'Classic Garden Bowl', price: 150, bowlType: '250gm', available: true },
-  { name: 'Premium Veggie Bowl', price: 200, bowlType: '350gm', available: true },
-  { name: 'Deluxe Bowl', price: 250, bowlType: '500gm', available: true },
-  { name: 'Custom Mix Bowl', price: 180, bowlType: 'custom', available: true },
-];
+export default function BillingForm() {
+  const [customerName, setCustomerName] = useState('');
+  const [paymentMode, setPaymentMode] = useState('');
+  const [items, setItems] = useState<OrderItem[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState('');
 
-interface BillingFormProps {
-  onSuccess?: () => void;
-}
+  const { data: products } = useAllProducts();
+  const createInvoiceMutation = useCreateInvoice();
 
-export default function BillingForm({ onSuccess }: BillingFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    customerName: '',
-    phoneNumber: '',
-    paymentMode: 'cash',
-    discount: '',
-  });
-  const [items, setItems] = useState<InvoiceItem[]>([{ productName: '', quantity: '1', price: '' }]);
+  const availableProducts = products?.filter(([_, product]) => product.active) || [];
 
   const addItem = () => {
-    setItems([...items, { productName: '', quantity: '1', price: '' }]);
-  };
+    if (!selectedProduct) return;
 
-  const removeItem = (index: number) => {
-    setItems(items.filter((_, i) => i !== index));
-  };
+    const product = availableProducts.find(([_, p]) => p.name === selectedProduct);
+    if (!product) return;
 
-  const updateItem = (index: number, field: keyof InvoiceItem, value: string) => {
-    const updated = [...items];
-    updated[index][field] = value;
+    const [_, productData] = product;
+    const existingItem = items.find((item) => item.productName === selectedProduct);
 
-    // Auto-fill price when product is selected
-    if (field === 'productName') {
-      const product = availableProducts.find(p => p.name === value);
-      if (product) {
-        updated[index].price = product.price.toString();
-      }
+    if (existingItem) {
+      setItems(
+        items.map((item) =>
+          item.productName === selectedProduct
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      );
+    } else {
+      setItems([
+        ...items,
+        {
+          productName: selectedProduct,
+          quantity: 1,
+          price: Number(productData.price),
+        },
+      ]);
     }
 
-    setItems(updated);
+    setSelectedProduct('');
   };
 
-  const calculateSubtotal = () => {
-    return items.reduce((sum, item) => {
-      const itemTotal = (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0);
-      return sum + itemTotal;
-    }, 0);
+  const removeItem = (productName: string) => {
+    setItems(items.filter((item) => item.productName !== productName));
+  };
+
+  const updateQuantity = (productName: string, quantity: number) => {
+    if (quantity <= 0) {
+      removeItem(productName);
+      return;
+    }
+    setItems(
+      items.map((item) =>
+        item.productName === productName ? { ...item, quantity } : item
+      )
+    );
   };
 
   const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
-    const discount = parseFloat(formData.discount) || 0;
-    return Math.max(0, subtotal - discount);
+    return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    try {
-      // TODO: Call backend API once available
-      // await actor.createInvoice({...formData, items, total: calculateTotal()});
-      
-      toast.success('Invoice created successfully');
-      setFormData({ customerName: '', phoneNumber: '', paymentMode: 'cash', discount: '' });
-      setItems([{ productName: '', quantity: '1', price: '' }]);
-      onSuccess?.();
-    } catch (error) {
-      toast.error('Failed to create invoice');
-    } finally {
-      setIsSubmitting(false);
+    if (items.length === 0) {
+      return;
     }
+
+    const invoice: Invoice = {
+      customerName,
+      itemsOrdered: items.map((item) => [item.productName, BigInt(item.quantity)]),
+      totalPrice: BigInt(calculateTotal()),
+      paymentMode,
+      timestamp: BigInt(Date.now() * 1000000),
+    };
+
+    await createInvoiceMutation.mutateAsync(invoice);
+
+    // Reset form
+    setCustomerName('');
+    setPaymentMode('');
+    setItems([]);
+    setSelectedProduct('');
   };
 
+  const total = calculateTotal();
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2">
+    <form onSubmit={handleSubmit} className="space-y-6 bg-card p-6 rounded-lg border border-border">
+      <h2 className="text-xl font-semibold text-foreground">Create Invoice</h2>
+
+      <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="customerName">Customer Name *</Label>
           <Input
             id="customerName"
-            value={formData.customerName}
-            onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-            placeholder="Enter customer name"
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
             required
+            placeholder="Enter customer name"
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="phoneNumber">Phone Number</Label>
-          <Input
-            id="phoneNumber"
-            type="tel"
-            value={formData.phoneNumber}
-            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-            placeholder="10-digit mobile number"
-            pattern="[0-9]{10}"
-          />
-        </div>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Order Items</CardTitle>
-            <Button type="button" variant="outline" size="sm" onClick={addItem}>
-              <Plus className="h-4 w-4 mr-1" />
-              Add Item
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {items.map((item, index) => (
-            <div key={index} className="flex gap-2">
-              <div className="flex-1">
-                <Select
-                  value={item.productName}
-                  onValueChange={(value) => updateItem(index, 'productName', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select product" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableProducts
-                      .filter(p => p.available)
-                      .map((product) => (
-                        <SelectItem key={product.name} value={product.name}>
-                          {product.name} ({product.bowlType}) - ₹{product.price}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="w-20">
-                <Input
-                  type="number"
-                  placeholder="Qty"
-                  value={item.quantity}
-                  onChange={(e) => updateItem(index, 'quantity', e.target.value)}
-                  required
-                  min="1"
-                />
-              </div>
-              <div className="w-24">
-                <Input
-                  type="number"
-                  placeholder="Price"
-                  value={item.price}
-                  onChange={(e) => updateItem(index, 'price', e.target.value)}
-                  required
-                  min="0"
-                />
-              </div>
-              {items.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeItem(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="paymentMode">Payment Mode *</Label>
-          <Select
-            value={formData.paymentMode}
-            onValueChange={(value) => setFormData({ ...formData, paymentMode: value })}
-          >
+          <Select value={paymentMode} onValueChange={setPaymentMode} required>
             <SelectTrigger id="paymentMode">
-              <SelectValue />
+              <SelectValue placeholder="Select payment mode" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="cash">Cash</SelectItem>
-              <SelectItem value="upi">UPI</SelectItem>
-              <SelectItem value="card">Card</SelectItem>
-              <SelectItem value="online">Online Transfer</SelectItem>
+              <SelectItem value="Cash">Cash</SelectItem>
+              <SelectItem value="Card">Card</SelectItem>
+              <SelectItem value="Online">Online</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="discount">Discount (₹)</Label>
-          <Input
-            id="discount"
-            type="number"
-            value={formData.discount}
-            onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
-            placeholder="0"
-            min="0"
-          />
+          <Label>Add Items</Label>
+          <div className="flex gap-2">
+            <Select value={selectedProduct} onValueChange={setSelectedProduct}>
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Select product" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableProducts.map(([id, product]) => (
+                  <SelectItem key={id.toString()} value={product.name}>
+                    {product.name} - ₹{Number(product.price)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button type="button" onClick={addItem} size="icon">
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <Card className="bg-muted/50">
-        <CardContent className="pt-6">
+        {items.length > 0 && (
           <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Subtotal:</span>
-              <span>₹{calculateSubtotal().toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span>Discount:</span>
-              <span>- ₹{(parseFloat(formData.discount) || 0).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-lg font-bold pt-2 border-t">
-              <span>Total:</span>
-              <span>₹{calculateTotal().toFixed(2)}</span>
+            <Label>Order Items</Label>
+            <div className="border border-border rounded-lg divide-y divide-border">
+              {items.map((item) => (
+                <div key={item.productName} className="p-3 flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="font-medium">{item.productName}</p>
+                    <p className="text-sm text-muted-foreground">₹{item.price} each</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="number"
+                      min="1"
+                      value={item.quantity}
+                      onChange={(e) => updateQuantity(item.productName, parseInt(e.target.value))}
+                      className="w-20"
+                    />
+                    <span className="font-medium w-20 text-right">
+                      ₹{item.price * item.quantity}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeItem(item.productName)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </CardContent>
-      </Card>
+        )}
 
-      <Button type="submit" disabled={isSubmitting} className="w-full bg-fresh-600 hover:bg-fresh-700">
-        {isSubmitting ? 'Creating...' : 'Create Invoice'}
+        {items.length > 0 && (
+          <div className="flex justify-between items-center pt-4 border-t border-border">
+            <span className="text-lg font-semibold">Total:</span>
+            <span className="text-2xl font-bold text-fresh-600">₹{total}</span>
+          </div>
+        )}
+      </div>
+
+      <Button
+        type="submit"
+        disabled={createInvoiceMutation.isPending || items.length === 0}
+        className="w-full bg-fresh-600 hover:bg-fresh-700"
+      >
+        {createInvoiceMutation.isPending ? 'Creating Invoice...' : 'Create Invoice'}
       </Button>
     </form>
   );

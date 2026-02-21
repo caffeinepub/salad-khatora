@@ -8,13 +8,6 @@ export interface None {
 }
 export type Option<T> = Some<T> | None;
 export type Time = bigint;
-export interface SaladBowl {
-    active: boolean;
-    name: string;
-    price: bigint;
-    bowlType: SaladBowlType;
-    recipe: Recipe;
-}
 export interface StockStatus {
     unitType: string;
     quantityInStock: bigint;
@@ -79,11 +72,6 @@ export interface Subscription {
     bowlSize: SaladBowlType;
     startDate: Time;
 }
-export interface InventoryItem {
-    unitType: string;
-    quantityInStock: bigint;
-    ingredientName: string;
-}
 export interface Ingredient {
     unitType: string;
     lowStockThreshold: bigint;
@@ -93,6 +81,20 @@ export interface Ingredient {
     costPricePerUnit: bigint;
 }
 export type Recipe = Array<[string, bigint]>;
+export interface Product {
+    fat: bigint;
+    fiber: bigint;
+    active: boolean;
+    carbs: bigint;
+    calories: bigint;
+    name: string;
+    sugar: bigint;
+    category: string;
+    price: bigint;
+    bowlType: SaladBowlType;
+    protein: bigint;
+    recipe: Recipe;
+}
 export interface UserProfile {
     age: bigint;
     heightCm: number;
@@ -123,60 +125,43 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
-    addCustomer(name: string, phone: string, email: string, address: string, preferences: string, gender: string, age: bigint, heightCm: number, weightKg: number, calculatedBMI: number): Promise<bigint>;
+    addCustomer(customer: Customer): Promise<bigint>;
     addIngredient(ingredient: Ingredient): Promise<void>;
-    addOrder(customerId: bigint, customerName: string, phone: string, deliveryAddress: string, items: Array<[string, bigint]>, orderTotal: bigint, paymentMode: string, orderStatus: string): Promise<bigint>;
-    addProduct(product: SaladBowl): Promise<bigint>;
+    addProduct(product: Product): Promise<bigint>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    bowlSizes(): Promise<{
-        gm250: boolean;
-        gm350: boolean;
-        gm500: boolean;
-    }>;
-    createSubscription(id: bigint, name: string, customerName: string, phoneNumber: string, planType: string, bowlSize: SaladBowlType, price: bigint, isPaid: boolean, startDate: Time, endDate: Time, remainingDeliveries: bigint): Promise<boolean>;
-    deductIngredientsOnSale(invoice: Invoice): Promise<void>;
-    deleteIngredient(name: string): Promise<boolean>;
-    deleteProduct(id: bigint): Promise<boolean>;
-    deleteSubscription(id: bigint): Promise<boolean>;
-    editSaladBowlRecipe(bowlName: string, newRecipe: Recipe): Promise<boolean>;
-    editSubscription(id: bigint, updatedName: string, updatedCustomerName: string, updatedPhoneNumber: string, updatedPlanType: string, updatedBowlSize: SaladBowlType, updatedPrice: bigint, updatedIsPaid: boolean, updatedStartDate: Time, updatedEndDate: Time, updatedRemainingDeliveries: bigint): Promise<boolean>;
-    getAllActiveProducts(): Promise<Array<SaladBowl>>;
-    getAllCustomers(): Promise<Array<Customer>>;
-    getAllIngredients(): Promise<Array<Ingredient>>;
-    getAllOrders(): Promise<Array<Order>>;
-    getAllProductsWithInactive(): Promise<Array<SaladBowl>>;
-    getAllStockTransactions(): Promise<Array<StockTransaction>>;
-    getAllSubscriptions(): Promise<Array<Subscription>>;
-    getAnalyticsMetrics(): Promise<{
-        monthlySales: bigint;
-        dailySales: bigint;
-        weeklySales: bigint;
-        cashFlow: bigint;
-        dailyExpenses: bigint;
-    }>;
+    bulkUploadProducts(productArray: Array<Product>): Promise<bigint>;
+    createInvoice(invoice: Invoice): Promise<void>;
+    createOrder(order: Order): Promise<bigint>;
+    createSubscription(subscription: Subscription): Promise<bigint>;
+    deleteCustomer(id: bigint): Promise<void>;
+    deleteIngredient(name: string): Promise<void>;
+    deleteProduct(id: bigint): Promise<void>;
+    deleteSubscription(id: bigint): Promise<void>;
+    getAllCustomers(): Promise<Array<[bigint, Customer]>>;
+    getAllIngredients(): Promise<Array<[string, Ingredient]>>;
+    getAllInvoices(): Promise<Array<Invoice>>;
+    getAllOrders(): Promise<Array<[bigint, Order]>>;
+    getAllProducts(): Promise<Array<[bigint, Product]>>;
+    getAllStockTransactions(): Promise<Array<[bigint, StockTransaction]>>;
+    getAllSubscriptions(): Promise<Array<[bigint, Subscription]>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
-    getCustomerOrders(customerId: bigint): Promise<Array<Order>>;
-    getCustomerProfile(customerId: bigint): Promise<Customer | null>;
+    getCustomer(id: bigint): Promise<Customer | null>;
     getIngredient(name: string): Promise<Ingredient | null>;
-    getInventoryStatus(): Promise<{
-        totalValue: bigint;
-        items: Array<InventoryItem>;
-    }>;
+    getInventoryStatus(): Promise<Array<StockStatus>>;
+    getInvoicesByPeriod(daysBack: bigint): Promise<Array<Invoice>>;
+    getMyOrders(): Promise<Array<Order>>;
     getOrder(orderId: bigint): Promise<Order | null>;
-    getProduct(id: bigint): Promise<SaladBowl | null>;
-    getStockStatus(): Promise<Array<StockStatus>>;
-    getStockTransactionsByType(transactionType: StockTransactionType): Promise<Array<StockTransaction>>;
+    getProduct(id: bigint): Promise<Product | null>;
+    getStockTransaction(id: bigint): Promise<StockTransaction | null>;
+    getSubscription(id: bigint): Promise<Subscription | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
-    monthlyPlanDuration(): Promise<bigint>;
-    recordStockIn(ingredientName: string, quantity: bigint, supplier: string, costPrice: bigint, unitType: string): Promise<boolean>;
-    recordStockOut(ingredientName: string, quantity: bigint, reason: string): Promise<boolean>;
-    recordWriteOff(ingredientName: string, quantity: bigint, reason: string): Promise<boolean>;
+    recordStockTransaction(transaction: StockTransaction): Promise<bigint>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    toggleSaladBowlAvailability(bowlName: string, isAvailable: boolean): Promise<void>;
-    updateIngredient(name: string, updatedIngredient: Ingredient): Promise<boolean>;
-    updateOrderStatus(orderId: bigint, newStatus: string): Promise<boolean>;
-    updateProduct(id: bigint, updatedProduct: SaladBowl): Promise<boolean>;
-    weeklyPlanDuration(): Promise<bigint>;
+    updateCustomer(id: bigint, customer: Customer): Promise<void>;
+    updateIngredient(name: string, ingredient: Ingredient): Promise<void>;
+    updateOrderStatus(orderId: bigint, status: string): Promise<void>;
+    updateProduct(id: bigint, product: Product): Promise<void>;
+    updateSubscription(id: bigint, subscription: Subscription): Promise<void>;
 }

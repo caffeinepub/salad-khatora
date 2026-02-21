@@ -1,149 +1,173 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { useUpdateIngredient } from '../hooks/useQueries';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { useGetAllIngredients, useUpdateIngredient } from '../hooks/useQueries';
 import type { Ingredient } from '../backend';
 
 interface EditIngredientDialogProps {
-  ingredient: Ingredient;
+  ingredientName: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export default function EditIngredientDialog({ ingredient, open, onOpenChange }: EditIngredientDialogProps) {
-  const updateIngredient = useUpdateIngredient();
+export default function EditIngredientDialog({
+  ingredientName,
+  open,
+  onOpenChange,
+}: EditIngredientDialogProps) {
+  const { data: ingredients } = useGetAllIngredients();
+  const updateIngredientMutation = useUpdateIngredient();
 
-  const [formData, setFormData] = useState({
-    name: ingredient.name,
-    quantity: ingredient.quantity.toString(),
-    costPricePerUnit: ingredient.costPricePerUnit.toString(),
-    supplierName: ingredient.supplierName,
-    lowStockThreshold: ingredient.lowStockThreshold.toString(),
-    unitType: ingredient.unitType || 'gram',
-  });
+  const [name, setName] = useState('');
+  const [unitType, setUnitType] = useState('gram');
+  const [lowStockThreshold, setLowStockThreshold] = useState('');
+  const [supplierName, setSupplierName] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [costPricePerUnit, setCostPricePerUnit] = useState('');
+
+  useEffect(() => {
+    if (ingredientName && ingredients) {
+      const ingredient = ingredients.find(([name]) => name === ingredientName);
+      if (ingredient) {
+        const [_, data] = ingredient;
+        setName(data.name);
+        setUnitType(data.unitType);
+        setLowStockThreshold(data.lowStockThreshold.toString());
+        setSupplierName(data.supplierName);
+        setQuantity(data.quantity.toString());
+        setCostPricePerUnit(data.costPricePerUnit.toString());
+      }
+    }
+  }, [ingredientName, ingredients]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const quantity = parseInt(formData.quantity);
-    const costPricePerUnit = parseInt(formData.costPricePerUnit);
-    const lowStockThreshold = parseInt(formData.lowStockThreshold);
+    const ingredient: Ingredient = {
+      name,
+      quantity: BigInt(quantity),
+      costPricePerUnit: BigInt(costPricePerUnit),
+      supplierName,
+      lowStockThreshold: BigInt(lowStockThreshold),
+      unitType,
+    };
 
-    if (isNaN(quantity) || quantity < 0) {
-      return;
-    }
-    if (isNaN(costPricePerUnit) || costPricePerUnit < 0) {
-      return;
-    }
-    if (isNaN(lowStockThreshold) || lowStockThreshold < 0) {
-      return;
-    }
-
-    try {
-      await updateIngredient.mutateAsync({
-        name: ingredient.name,
-        updatedIngredient: {
-          name: formData.name,
-          quantity: BigInt(quantity),
-          costPricePerUnit: BigInt(costPricePerUnit),
-          supplierName: formData.supplierName,
-          lowStockThreshold: BigInt(lowStockThreshold),
-          unitType: formData.unitType,
-        },
-      });
-
-      onOpenChange(false);
-    } catch (error) {
-      console.error('Failed to update ingredient:', error);
-    }
+    await updateIngredientMutation.mutateAsync({ name: ingredientName, ingredient });
+    onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit Ingredient</DialogTitle>
-          <DialogDescription>
-            Update ingredient details for {ingredient.name}
-          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="edit-ingredient-name">Ingredient Name *</Label>
-            <Input
-              id="edit-ingredient-name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g., Lettuce"
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Ingredient Name *</Label>
+              <Input
+                id="edit-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                placeholder="Enter ingredient name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-unitType">Unit Type *</Label>
+              <Select value={unitType} onValueChange={setUnitType} required>
+                <SelectTrigger id="edit-unitType">
+                  <SelectValue placeholder="Select unit type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="gram">Gram</SelectItem>
+                  <SelectItem value="kg">Kilogram</SelectItem>
+                  <SelectItem value="liter">Liter</SelectItem>
+                  <SelectItem value="ml">Milliliter</SelectItem>
+                  <SelectItem value="piece">Piece</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-quantity">Quantity *</Label>
+              <Input
+                id="edit-quantity"
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                required
+                min="0"
+                placeholder="Enter quantity"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-lowStockThreshold">Low Stock Threshold *</Label>
+              <Input
+                id="edit-lowStockThreshold"
+                type="number"
+                value={lowStockThreshold}
+                onChange={(e) => setLowStockThreshold(e.target.value)}
+                required
+                min="0"
+                placeholder="Enter threshold"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-supplierName">Supplier Name *</Label>
+              <Input
+                id="edit-supplierName"
+                value={supplierName}
+                onChange={(e) => setSupplierName(e.target.value)}
+                required
+                placeholder="Enter supplier name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-costPricePerUnit">Cost Price per Unit *</Label>
+              <Input
+                id="edit-costPricePerUnit"
+                type="number"
+                value={costPricePerUnit}
+                onChange={(e) => setCostPricePerUnit(e.target.value)}
+                required
+                min="0"
+                placeholder="Enter cost price"
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="edit-supplier-name">Supplier Name *</Label>
-            <Input
-              id="edit-supplier-name"
-              value={formData.supplierName}
-              onChange={(e) => setFormData({ ...formData, supplierName: e.target.value })}
-              placeholder="e.g., Fresh Farms"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit-quantity">Current Quantity (grams) *</Label>
-            <Input
-              id="edit-quantity"
-              type="number"
-              value={formData.quantity}
-              onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-              placeholder="e.g., 5000"
-              required
-              min="0"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit-cost-price">Cost Price per Unit (₹) *</Label>
-            <Input
-              id="edit-cost-price"
-              type="number"
-              value={formData.costPricePerUnit}
-              onChange={(e) => setFormData({ ...formData, costPricePerUnit: e.target.value })}
-              placeholder="e.g., 2"
-              required
-              min="0"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit-low-stock">Low Stock Threshold (grams) *</Label>
-            <Input
-              id="edit-low-stock"
-              type="number"
-              value={formData.lowStockThreshold}
-              onChange={(e) => setFormData({ ...formData, lowStockThreshold: e.target.value })}
-              placeholder="e.g., 1000"
-              required
-              min="0"
-            />
-          </div>
-
-          <div className="flex gap-2 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              disabled={updateIngredient.isPending}
+            <Button
+              type="submit"
+              disabled={updateIngredientMutation.isPending}
               className="bg-fresh-600 hover:bg-fresh-700"
             >
-              {updateIngredient.isPending ? 'Updating...' : 'Update Ingredient'}
+              {updateIngredientMutation.isPending ? 'Updating...' : 'Update Ingredient'}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

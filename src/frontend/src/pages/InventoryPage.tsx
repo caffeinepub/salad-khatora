@@ -1,28 +1,28 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import StockStatusTab from '../components/StockStatusTab';
 import StockInTab from '../components/StockInTab';
 import StockOutTab from '../components/StockOutTab';
 import WriteOffTab from '../components/WriteOffTab';
-import StockStatusTab from '../components/StockStatusTab';
 
 export default function InventoryPage() {
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Inventory Management</h1>
-        <p className="text-muted-foreground mt-1">
-          Manage your ingredients and track stock levels
+        <p className="text-muted-foreground mt-2">
+          Manage your ingredient inventory, stock transactions, and write-offs
         </p>
       </div>
 
-      <Tabs defaultValue="stock-status" className="w-full">
+      <Tabs defaultValue="status" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="stock-status">Stock Status</TabsTrigger>
+          <TabsTrigger value="status">Stock Status</TabsTrigger>
           <TabsTrigger value="stock-in">Stock In</TabsTrigger>
           <TabsTrigger value="stock-out">Stock Out</TabsTrigger>
           <TabsTrigger value="write-off">Write Off</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="stock-status" className="mt-6">
+        <TabsContent value="status" className="mt-6">
           <StockStatusTab />
         </TabsContent>
 

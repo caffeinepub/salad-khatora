@@ -1,60 +1,85 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T04:27:35.187Z",
+  "generatedAt": "2026-02-21T23:29:37.639Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 4,
-    "implemented": 3,
+    "implemented": 4,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "In the Inventory tab Stock Status view, display only ingredients that have stock available (quantity > 0). Highlight rows where stock is below the low stock threshold.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/StockStatusTab.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/StockStatusTab.tsx"
-        ]
-      },
-      {
-        "id": "REQ-2",
-        "summary": "In the Inventory tab Stock In form, fix the ingredient name input field so users can type and select ingredient names properly.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/components/StockInTab.tsx"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-3",
-        "summary": "In the Products tab, ensure that newly added bowl products appear in the product list immediately after creation.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/ProductForm.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/ProductList.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/ProductForm.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "In the Customers tab, resolve the 'Failed to add customer' error that occurs when attempting to add new customers. Investigate and fix the backend customer creation logic and frontend error handling.",
+        "summary": "Remove the customer reference field from the customer management system, including the database schema, backend API, and all frontend forms and displays",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/components/CustomerForm.tsx",
-          "frontend/src/hooks/useQueries.ts",
           "frontend/src/components/CustomerList.tsx"
         ],
         "matchedFiles": [
           "frontend/src/components/CustomerForm.tsx",
+          "frontend/src/components/CustomerList.tsx"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Remove the audible order notification system that plays alert sounds when new orders are detected",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useOrderNotifications.ts",
+          "frontend/src/components/Layout.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useOrderNotifications.ts",
+          "frontend/src/components/Layout.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Remove UPI QR code generation functionality from the billing system",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/BillingForm.tsx",
+          "frontend/src/components/UPIQRCode.tsx",
+          "frontend/src/utils/upiQRGenerator.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/BillingForm.tsx",
+          "frontend/src/components/UPIQRCode.tsx",
+          "frontend/src/utils/upiQRGenerator.ts"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Restore the inventory navigation and routes that were previously removed",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/Layout.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/InventoryPage.tsx",
+          "frontend/src/components/StockStatusTab.tsx",
+          "frontend/src/components/StockInTab.tsx",
+          "frontend/src/components/StockOutTab.tsx",
+          "frontend/src/components/WriteOffTab.tsx",
+          "frontend/src/components/StockTransactionTable.tsx",
+          "frontend/src/components/IngredientForm.tsx",
+          "frontend/src/components/IngredientList.tsx",
+          "frontend/src/components/EditIngredientDialog.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/Layout.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/InventoryPage.tsx",
+          "frontend/src/components/StockStatusTab.tsx",
+          "frontend/src/components/StockInTab.tsx",
+          "frontend/src/components/StockOutTab.tsx",
+          "frontend/src/components/WriteOffTab.tsx",
+          "frontend/src/components/StockTransactionTable.tsx",
+          "frontend/src/components/IngredientForm.tsx",
+          "frontend/src/components/EditIngredientDialog.tsx",
           "frontend/src/hooks/useQueries.ts"
         ]
       }
@@ -67,14 +92,27 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/src/App.tsx",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
+    "frontend/src/components/BillingForm.tsx",
     "frontend/src/components/CustomerForm.tsx",
-    "frontend/src/components/ProductForm.tsx",
+    "frontend/src/components/CustomerList.tsx",
+    "frontend/src/components/EditIngredientDialog.tsx",
+    "frontend/src/components/IngredientForm.tsx",
+    "frontend/src/components/Layout.tsx",
+    "frontend/src/components/StockInTab.tsx",
+    "frontend/src/components/StockOutTab.tsx",
     "frontend/src/components/StockStatusTab.tsx",
+    "frontend/src/components/StockTransactionTable.tsx",
+    "frontend/src/components/UPIQRCode.tsx",
+    "frontend/src/components/WriteOffTab.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useOrderNotifications.ts",
     "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/InventoryPage.tsx",
+    "frontend/src/utils/upiQRGenerator.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

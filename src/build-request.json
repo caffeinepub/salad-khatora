@@ -1,90 +1,92 @@
 {
   "kind": "build_request",
-  "title": "Fix admin panel issues in inventory, products, and customers",
+  "title": "Restore Version 22 Features",
+  "projectName": "Salad Khatora",
   "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "In the Inventory tab Stock Status view, display only ingredients that have stock available (quantity > 0). Highlight rows where stock is below the low stock threshold.",
-      "target": "frontend",
+      "text": "Remove the customer reference field from the customer management system, including the database schema, backend API, and all frontend forms and displays",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-7"
+          "msg-last"
         ],
         "quotes": [
-          "stock status should show only the stock available with low stock highlight"
+          "rebuild the features from version 22"
         ]
       },
       "acceptanceCriteria": [
-        "Stock Status table filters out ingredients with zero quantity",
-        "Ingredients below low stock threshold are visually highlighted (e.g., different background color or border)",
-        "The total value calculation reflects only available stock"
+        "Customer records no longer include a reference field",
+        "CustomerForm does not display or accept a reference field",
+        "CustomerList does not show the reference column",
+        "Backend Customer type does not include reference property"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "In the Inventory tab Stock In form, fix the ingredient name input field so users can type and select ingredient names properly.",
+      "text": "Remove the audible order notification system that plays alert sounds when new orders are detected",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-7"
+          "msg-last"
         ],
         "quotes": [
-          "In stock in not able to write ingredient name"
+          "rebuild the features from version 22"
         ]
       },
       "acceptanceCriteria": [
-        "Ingredient name input field is editable and accepts text input",
-        "Users can select ingredients from the dropdown",
-        "Selected ingredient populates correctly in the form"
+        "useOrderNotifications hook is removed or disabled",
+        "No audio alert plays when new orders arrive",
+        "Order polling functionality is removed from the Layout component"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "In the Products tab, ensure that newly added bowl products appear in the product list immediately after creation.",
-      "target": "both",
+      "text": "Remove UPI QR code generation functionality from the billing system",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-7"
+          "msg-last"
         ],
         "quotes": [
-          "In products after adding bowl it is not displayed"
+          "rebuild the features from version 22"
         ]
       },
       "acceptanceCriteria": [
-        "After successfully submitting the product form, the new product appears in the product list",
-        "The product list refreshes automatically after product creation",
-        "Product data persists and is retrievable from backend"
+        "BillingForm no longer displays UPI QR codes",
+        "UPIQRCode component is not rendered in billing flow",
+        "Payment mode selection does not trigger QR code generation"
       ]
     },
     {
       "id": "REQ-4",
-      "text": "In the Customers tab, resolve the 'Failed to add customer' error that occurs when attempting to add new customers. Investigate and fix the backend customer creation logic and frontend error handling.",
-      "target": "both",
+      "text": "Restore the inventory navigation and routes that were previously removed",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-7"
+          "msg-last"
         ],
         "quotes": [
-          "In customers tab while adding customer showing error failed to add customer"
+          "rebuild the features from version 22"
         ]
       },
       "acceptanceCriteria": [
-        "Customer form successfully submits without errors",
-        "New customers are persisted to backend storage",
-        "Newly added customers appear in the customer list",
-        "Appropriate error messages are displayed if validation fails"
+        "Inventory link appears in the sidebar navigation",
+        "Inventory page route is accessible at /admin/inventory",
+        "Navigation includes all inventory management functionality"
       ]
     }
   ],
   "constraints": [
-    "Maintain the existing single-actor backend architecture",
-    "Do not modify immutable frontend paths: useInternetIdentity hooks, useActor.ts, main.tsx, or components/ui directory"
+    "Maintain single-actor backend architecture",
+    "Preserve existing customer data during migration",
+    "Keep authentication system intact"
   ],
   "nonGoals": [
-    "Redesigning the admin panel UI layout",
-    "Adding new features beyond fixing the reported issues",
-    "Changing the authentication system"
+    "Adding new features beyond what existed in version 22",
+    "Changing the technology stack",
+    "Modifying the authentication flow"
   ],
   "imageRequirements": {
     "required": [],

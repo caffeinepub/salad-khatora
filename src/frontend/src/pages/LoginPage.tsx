@@ -1,116 +1,44 @@
 import { useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { Shield, Lock, Fingerprint, LogIn } from 'lucide-react';
 
 export default function LoginPage() {
-  const { login, identity, loginStatus, isInitializing, loginError } = useInternetIdentity();
+  const { login, loginStatus, identity } = useInternetIdentity();
   const navigate = useNavigate();
 
-  const isAuthenticated = !!identity;
-  const isLoggingIn = loginStatus === 'logging-in';
-
   useEffect(() => {
-    if (isAuthenticated && !isInitializing) {
-      navigate({ to: '/admin/dashboard' });
+    if (identity) {
+      navigate({ to: '/' });
     }
-  }, [isAuthenticated, isInitializing, navigate]);
+  }, [identity, navigate]);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     try {
-      login();
-    } catch (error) {
+      await login();
+    } catch (error: any) {
       console.error('Login error:', error);
     }
   };
 
-  if (isInitializing) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-fresh-50 to-orange-50 dark:from-gray-900 dark:to-gray-800">
-        <div className="text-center space-y-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-fresh-600 border-t-transparent mx-auto"></div>
-          <p className="text-muted-foreground">Initializing...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-fresh-50 to-orange-50 dark:from-gray-900 dark:to-gray-800 p-4">
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-4">
-            <img 
-              src="/assets/Salad Khatora.jpeg" 
-              alt="Salad Khatora" 
-              className="h-20 w-20 object-contain rounded-lg"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-          </div>
-          <CardTitle className="text-2xl font-bold">Admin Panel Login</CardTitle>
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Admin Login</CardTitle>
           <CardDescription>
-            Secure authentication for administrative access
+            Sign in with Internet Identity to manage menu items
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
-              <Shield className="h-5 w-5 text-fresh-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm">
-                <p className="font-medium">Secure Authentication</p>
-                <p className="text-muted-foreground">Login with Internet Identity for maximum security</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
-              <Lock className="h-5 w-5 text-fresh-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm">
-                <p className="font-medium">No Passwords</p>
-                <p className="text-muted-foreground">Passwordless authentication using cryptographic keys</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
-              <Fingerprint className="h-5 w-5 text-fresh-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm">
-                <p className="font-medium">Biometric Support</p>
-                <p className="text-muted-foreground">Use fingerprint or face recognition on supported devices</p>
-              </div>
-            </div>
-          </div>
-
-          {loginError && loginError.message !== 'User is already authenticated' && (
-            <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-              <p className="text-sm text-destructive">{loginError.message}</p>
-            </div>
-          )}
-
-          <div className="pt-2">
-            <Button
-              onClick={handleLogin}
-              disabled={isLoggingIn}
-              className="w-full bg-fresh-600 hover:bg-fresh-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-              size="lg"
-            >
-              {isLoggingIn ? (
-                <>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></div>
-                  Connecting to Internet Identity...
-                </>
-              ) : (
-                <>
-                  <LogIn className="h-5 w-5 mr-2" />
-                  Login with Internet Identity
-                </>
-              )}
-            </Button>
-          </div>
-
-          <p className="text-xs text-center text-muted-foreground pt-2">
-            By logging in, you agree to use this admin panel responsibly
-          </p>
+        <CardContent>
+          <Button
+            onClick={handleLogin}
+            disabled={loginStatus === 'logging-in'}
+            className="w-full bg-fresh-600 hover:bg-fresh-700"
+          >
+            {loginStatus === 'logging-in' ? 'Logging in...' : 'Login with Internet Identity'}
+          </Button>
         </CardContent>
       </Card>
     </div>

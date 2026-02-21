@@ -2,75 +2,106 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAddIngredient } from '../hooks/useQueries';
+import type { Ingredient } from '../backend';
 
 interface IngredientFormProps {
   onSuccess?: () => void;
 }
 
 export default function IngredientForm({ onSuccess }: IngredientFormProps) {
-  const addIngredient = useAddIngredient();
-  const [formData, setFormData] = useState({
-    name: '',
-    quantity: '',
-    costPricePerUnit: '',
-    supplierName: '',
-    lowStockThreshold: '',
-    unitType: 'gram',
-  });
+  const [name, setName] = useState('');
+  const [unitType, setUnitType] = useState('gram');
+  const [lowStockThreshold, setLowStockThreshold] = useState('');
+  const [supplierName, setSupplierName] = useState('');
+  const [initialQuantity, setInitialQuantity] = useState('');
+  const [costPricePerUnit, setCostPricePerUnit] = useState('');
+
+  const addIngredientMutation = useAddIngredient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const quantity = parseInt(formData.quantity);
-    const costPricePerUnit = parseInt(formData.costPricePerUnit);
-    const lowStockThreshold = parseInt(formData.lowStockThreshold);
+    const ingredient: Ingredient = {
+      name,
+      quantity: BigInt(initialQuantity),
+      costPricePerUnit: BigInt(costPricePerUnit),
+      supplierName,
+      lowStockThreshold: BigInt(lowStockThreshold),
+      unitType,
+    };
 
-    if (isNaN(quantity) || quantity < 0) {
-      return;
-    }
-    if (isNaN(costPricePerUnit) || costPricePerUnit < 0) {
-      return;
-    }
-    if (isNaN(lowStockThreshold) || lowStockThreshold < 0) {
-      return;
-    }
+    await addIngredientMutation.mutateAsync(ingredient);
 
-    try {
-      await addIngredient.mutateAsync({
-        name: formData.name,
-        quantity: BigInt(quantity),
-        costPricePerUnit: BigInt(costPricePerUnit),
-        supplierName: formData.supplierName,
-        lowStockThreshold: BigInt(lowStockThreshold),
-        unitType: formData.unitType,
-      });
+    // Reset form
+    setName('');
+    setUnitType('gram');
+    setLowStockThreshold('');
+    setSupplierName('');
+    setInitialQuantity('');
+    setCostPricePerUnit('');
 
-      setFormData({
-        name: '',
-        quantity: '',
-        costPricePerUnit: '',
-        supplierName: '',
-        lowStockThreshold: '',
-        unitType: 'gram',
-      });
-      onSuccess?.();
-    } catch (error) {
-      console.error('Failed to add ingredient:', error);
+    if (onSuccess) {
+      onSuccess();
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2">
+    <form onSubmit={handleSubmit} className="space-y-4 bg-card p-6 rounded-lg border border-border">
+      <h3 className="text-lg font-semibold">Add New Ingredient</h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="name">Ingredient Name *</Label>
           <Input
             id="name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="e.g., Lettuce"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
+            placeholder="Enter ingredient name"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="unitType">Unit Type *</Label>
+          <Select value={unitType} onValueChange={setUnitType} required>
+            <SelectTrigger id="unitType">
+              <SelectValue placeholder="Select unit type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="gram">Gram</SelectItem>
+              <SelectItem value="kg">Kilogram</SelectItem>
+              <SelectItem value="liter">Liter</SelectItem>
+              <SelectItem value="ml">Milliliter</SelectItem>
+              <SelectItem value="piece">Piece</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="initialQuantity">Initial Quantity *</Label>
+          <Input
+            id="initialQuantity"
+            type="number"
+            value={initialQuantity}
+            onChange={(e) => setInitialQuantity(e.target.value)}
+            required
+            min="0"
+            placeholder="Enter initial quantity"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="lowStockThreshold">Low Stock Threshold *</Label>
+          <Input
+            id="lowStockThreshold"
+            type="number"
+            value={lowStockThreshold}
+            onChange={(e) => setLowStockThreshold(e.target.value)}
+            required
+            min="0"
+            placeholder="Enter threshold"
           />
         </div>
 
@@ -78,59 +109,33 @@ export default function IngredientForm({ onSuccess }: IngredientFormProps) {
           <Label htmlFor="supplierName">Supplier Name *</Label>
           <Input
             id="supplierName"
-            value={formData.supplierName}
-            onChange={(e) => setFormData({ ...formData, supplierName: e.target.value })}
-            placeholder="e.g., Fresh Farms"
+            value={supplierName}
+            onChange={(e) => setSupplierName(e.target.value)}
             required
+            placeholder="Enter supplier name"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="quantity">Current Quantity (grams) *</Label>
-          <Input
-            id="quantity"
-            type="number"
-            value={formData.quantity}
-            onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-            placeholder="e.g., 5000"
-            required
-            min="0"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="costPricePerUnit">Cost Price per Unit (₹) *</Label>
+          <Label htmlFor="costPricePerUnit">Cost Price per Unit *</Label>
           <Input
             id="costPricePerUnit"
             type="number"
-            value={formData.costPricePerUnit}
-            onChange={(e) => setFormData({ ...formData, costPricePerUnit: e.target.value })}
-            placeholder="e.g., 2"
+            value={costPricePerUnit}
+            onChange={(e) => setCostPricePerUnit(e.target.value)}
             required
             min="0"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="lowStockThreshold">Low Stock Threshold (grams) *</Label>
-          <Input
-            id="lowStockThreshold"
-            type="number"
-            value={formData.lowStockThreshold}
-            onChange={(e) => setFormData({ ...formData, lowStockThreshold: e.target.value })}
-            placeholder="e.g., 1000"
-            required
-            min="0"
+            placeholder="Enter cost price"
           />
         </div>
       </div>
 
-      <Button 
-        type="submit" 
-        disabled={addIngredient.isPending} 
+      <Button
+        type="submit"
+        disabled={addIngredientMutation.isPending}
         className="w-full bg-fresh-600 hover:bg-fresh-700"
       >
-        {addIngredient.isPending ? 'Adding...' : 'Add Ingredient'}
+        {addIngredientMutation.isPending ? 'Adding Ingredient...' : 'Add Ingredient'}
       </Button>
     </form>
   );
